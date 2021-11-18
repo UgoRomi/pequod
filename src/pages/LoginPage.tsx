@@ -1,28 +1,33 @@
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { ReactComponent as MetamaskStackedLogo } from '../images/metamask-logo-stacked.svg';
 import { ReactComponent as WalletConnectLogo } from '../images/walletconnect-logo.svg';
 
 export default function LoginPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { activate } = useWeb3React();
+
   const injectedConnector = new InjectedConnector({
     supportedChainIds: [56],
   });
-
   const walletConnectConnector = new WalletConnectConnector({
     rpc: { 56: 'https://bsc-dataseed.binance.org/' },
     qrcode: true,
   });
-
-  const { activate } = useWeb3React();
+  const from = location.state?.from?.pathname || '/';
 
   const connectToWallet = async (
     provider: InjectedConnector | WalletConnectConnector
   ) => {
     try {
       await activate(provider);
+      navigate(from, { replace: true });
     } catch (error) {
-      console.error(error);
+      toast.error('Error connecting to the wallet');
     }
   };
 

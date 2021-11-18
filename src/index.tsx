@@ -8,6 +8,8 @@ import { store } from './store/store';
 import { Web3ReactProvider } from '@web3-react/core';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 function getLibrary(provider: provider) {
   return new Web3(provider);
@@ -19,6 +21,7 @@ ReactDOM.render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
+      <ToastContainer />
     </Provider>
   </Web3ReactProvider>,
   document.getElementById('root')
