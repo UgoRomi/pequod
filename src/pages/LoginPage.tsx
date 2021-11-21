@@ -1,28 +1,21 @@
-import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import useAuth from '../hooks/useAuth';
 import { ReactComponent as MetamaskStackedLogo } from '../images/metamask-logo-stacked.svg';
 import { ReactComponent as WalletConnectLogo } from '../images/walletconnect-logo.svg';
-import { injectedConnector, walletConnectConnector } from '../utils/connectors';
+import { connectorLocalStorageKey, ConnectorNames } from '../utils/connectors';
 
 export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activate } = useWeb3React();
+  const { login } = useAuth();
 
   const from = location.state?.from?.pathname || '/';
 
-  const connectToWallet = async (
-    provider: InjectedConnector | WalletConnectConnector
-  ) => {
-    try {
-      await activate(provider);
-      navigate(from, { replace: true });
-    } catch (error) {
-      toast.error('Error connecting to the wallet');
-    }
+  const connectToWallet = async (connectorId: ConnectorNames) => {
+    login(connectorId);
+    localStorage.setItem(connectorLocalStorageKey, connectorId);
+
+    navigate(from, { replace: true });
   };
 
   return (
@@ -37,7 +30,7 @@ export default function LoginPage() {
         <div className='py-8 px-4 sm:rounded-lg sm:px-10 flex flex-col gap-5'>
           <div
             className='pb-3 rounded-md bg-gray-200 flex flex-col items-center cursor-pointer'
-            onClick={() => connectToWallet(injectedConnector)}
+            onClick={() => connectToWallet(ConnectorNames.Injected)}
           >
             <MetamaskStackedLogo className='h-28 mx-auto' />
             <span className='font-semibold text-pink-500'>
@@ -46,7 +39,7 @@ export default function LoginPage() {
           </div>
           <div
             className='pb-3 pt-6 rounded-md bg-gray-200 flex flex-col items-center cursor-pointer'
-            onClick={() => connectToWallet(walletConnectConnector)}
+            onClick={() => connectToWallet(ConnectorNames.WalletConnect)}
           >
             <WalletConnectLogo className='h-16 mx-auto mb-6' />
             <span className='font-semibold text-pink-500'>
