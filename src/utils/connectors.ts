@@ -6,7 +6,7 @@ const injected = new InjectedConnector({
 });
 const walletconnect = new WalletConnectConnector({
   rpc: {
-    1: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+    1: 'https://mainnet.infura.io/v3/23ae9a2ce21a42c78bc008b128f36aa0',
     56: 'https://bsc-dataseed.binance.org/',
   },
   qrcode: true,

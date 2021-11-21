@@ -19,7 +19,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0'>
+    <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0 bg-gray-600'>
       <div className='w-full sm:mx-auto sm:w-full sm:max-w-md bg-gray-100 rounded-md shadow-lg'>
         <h1 className='text-pink-400 text-5xl text-center p-5 font-bold'>
           Pequod

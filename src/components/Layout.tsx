@@ -1,26 +1,17 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
-  CalendarIcon,
-  ChartBarIcon,
-  FolderIcon,
-  HomeIcon,
-  InboxIcon,
+  CashIcon,
+  ChartPieIcon,
+  LogoutIcon,
   MenuAlt2Icon,
-  UsersIcon,
+  TicketIcon,
   XIcon,
 } from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
-
-const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-  { name: 'Team', href: '#', icon: UsersIcon, current: false },
-  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-  { name: 'Documents', href: '#', icon: InboxIcon, current: false },
-  { name: 'Reports', href: '#', icon: ChartBarIcon, current: false },
-];
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -30,6 +21,21 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
   const { logout } = useAuth();
+  const location = useLocation();
+
+  const [navigation, setNavigation] = useState([
+    { name: 'Trading', href: '/', icon: ChartPieIcon, current: false },
+    { name: 'Portfolio', href: '/portfolio', icon: TicketIcon, current: false },
+    { name: 'Staking', href: '/staking', icon: CashIcon, current: false },
+  ]);
+
+  useEffect(() => {
+    const page = navigation.find(({ href }) => href === location.pathname);
+    if (!page || page.current) return;
+    setNavigation(
+      navigation.map((item) => ({ ...item, current: item.href === page.href }))
+    );
+  }, [location.pathname, navigation]);
 
   return (
     <div>
@@ -59,7 +65,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
             leaveFrom='translate-x-0'
             leaveTo='-translate-x-full'
           >
-            <div className='relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-indigo-700'>
+            <div className='relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-700'>
               <Transition.Child
                 as={Fragment}
                 enter='ease-in-out duration-300'
@@ -83,20 +89,20 @@ export default function Layout({ children }: { children: JSX.Element }) {
               <div className='flex-shrink-0 flex items-center px-4'>
                 <img
                   className='h-8 w-auto'
-                  src='https://tailwindui.com/img/logos/workflow-logo-indigo-300-mark-white-text.svg'
+                  src='https://tailwindui.com/img/logos/workflow-logo-pink-300-mark-white-text.svg'
                   alt='Workflow'
                 />
               </div>
               <div className='mt-5 flex-1 h-0 overflow-y-auto'>
                 <nav className='px-2 space-y-1'>
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className={classNames(
                         item.current
                           ? 'bg-pink-400 text-white'
-                          : 'text-indigo-100 hover:bg-pink-600',
+                          : 'text-pink-100 hover:bg-pink-500',
                         'group flex items-center px-2 py-2 text-base font-medium rounded-md'
                       )}
                     >
@@ -105,7 +111,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         aria-hidden='true'
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </nav>
               </div>
@@ -120,24 +126,24 @@ export default function Layout({ children }: { children: JSX.Element }) {
       {/* Static sidebar for desktop */}
       <div className='hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0'>
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <div className='flex flex-col flex-grow pt-5 bg-pink-700 overflow-y-auto'>
+        <div className='flex flex-col flex-grow pt-5 bg-gray-700 overflow-y-auto'>
           <div className='flex items-center flex-shrink-0 px-4'>
             <img
               className='h-8 w-auto'
-              src='https://tailwindui.com/img/logos/workflow-logo-indigo-300-mark-white-text.svg'
+              src='https://tailwindui.com/img/logos/workflow-logo-pink-300-mark-white-text.svg'
               alt='Workflow'
             />
           </div>
           <div className='mt-5 flex-1 flex flex-col'>
             <nav className='flex-1 px-2 pb-4 space-y-1'>
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className={classNames(
                     item.current
-                      ? 'bg-pink-800 text-white'
-                      : 'text-indigo-100 hover:bg-pink-600',
+                      ? 'bg-pink-400 text-white'
+                      : 'text-pink-100 hover:bg-pink-500',
                     'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   )}
                 >
@@ -146,7 +152,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     aria-hidden='true'
                   />
                   {item.name}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>
@@ -156,7 +162,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
         <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow'>
           <button
             type='button'
-            className='px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden'
+            className='px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500 md:hidden'
             onClick={() => setSidebarOpen(true)}
           >
             <span className='sr-only'>Open sidebar</span>
@@ -170,7 +176,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                 <div>
                   <Menu.Button className='max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'>
                     <span className='sr-only'>Open user menu</span>
-                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'>
+                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-pink-400 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'>
                       {account?.slice(0, 6) + '...' + account?.slice(36)}
                     </span>
                   </Menu.Button>
@@ -190,10 +196,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         <span
                           className={classNames(
                             active ? 'bg-gray-100' : '',
-                            'block px-4 py-2 text-sm text-gray-700 cursor-pointer'
+                            'flex items-center px-4 py-2 text-sm text-gray-700 cursor-pointer'
                           )}
                         >
-                          Logout
+                          <LogoutIcon className='mr-2 h-5' aria-hidden='true' />
+                          Disconnect
                         </span>
                       )}
                     </Menu.Item>
@@ -206,11 +213,6 @@ export default function Layout({ children }: { children: JSX.Element }) {
 
         <main>
           <div className='py-6'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
-              <h1 className='text-2xl font-semibold text-gray-900'>
-                Dashboard
-              </h1>
-            </div>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
               {children}
             </div>
