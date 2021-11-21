@@ -5,19 +5,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ReactComponent as MetamaskStackedLogo } from '../images/metamask-logo-stacked.svg';
 import { ReactComponent as WalletConnectLogo } from '../images/walletconnect-logo.svg';
+import { injectedConnector, walletConnectConnector } from '../utils/connectors';
 
 export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { activate } = useWeb3React();
 
-  const injectedConnector = new InjectedConnector({
-    supportedChainIds: [56],
-  });
-  const walletConnectConnector = new WalletConnectConnector({
-    rpc: { 56: 'https://bsc-dataseed.binance.org/' },
-    qrcode: true,
-  });
   const from = location.state?.from?.pathname || '/';
 
   const connectToWallet = async (
