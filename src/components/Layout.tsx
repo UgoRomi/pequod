@@ -89,7 +89,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               <div className='flex-shrink-0 flex items-center px-4'>
                 <img
                   className='h-8 w-auto'
-                  src='https://tailwindui.com/img/logos/workflow-logo-pink-300-mark-white-text.svg'
+                  src='https://tailwindui.com/img/logos/workflow-logo-purple-300-mark-white-text.svg'
                   alt='Workflow'
                 />
               </div>
@@ -101,13 +101,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       to={item.href}
                       className={classNames(
                         item.current
-                          ? 'bg-pink-400 text-white'
-                          : 'text-pink-100 hover:bg-pink-500',
+                          ? 'bg-purple-400 text-white'
+                          : 'text-purple-100 hover:bg-purple-500',
                         'group flex items-center px-2 py-2 text-base font-medium rounded-md'
                       )}
                     >
                       <item.icon
-                        className='mr-4 flex-shrink-0 h-6 w-6 text-pink-300'
+                        className='mr-4 flex-shrink-0 h-6 w-6 text-purple-300'
                         aria-hidden='true'
                       />
                       {item.name}
@@ -130,7 +130,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
           <div className='flex items-center flex-shrink-0 px-4'>
             <img
               className='h-8 w-auto'
-              src='https://tailwindui.com/img/logos/workflow-logo-pink-300-mark-white-text.svg'
+              src='https://tailwindui.com/img/logos/workflow-logo-purple-300-mark-white-text.svg'
               alt='Workflow'
             />
           </div>
@@ -142,13 +142,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   to={item.href}
                   className={classNames(
                     item.current
-                      ? 'bg-pink-400 text-white'
-                      : 'text-pink-100 hover:bg-pink-500',
+                      ? 'bg-purple-400 text-white'
+                      : 'text-purple-100 hover:bg-purple-500',
                     'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   )}
                 >
                   <item.icon
-                    className='mr-3 flex-shrink-0 h-6 w-6 text-pink-300'
+                    className='mr-3 flex-shrink-0 h-6 w-6 text-purple-300'
                     aria-hidden='true'
                   />
                   {item.name}
@@ -162,7 +162,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
         <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow'>
           <button
             type='button'
-            className='px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500 md:hidden'
+            className='px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden'
             onClick={() => setSidebarOpen(true)}
           >
             <span className='sr-only'>Open sidebar</span>
@@ -174,9 +174,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
               {/* Profile dropdown */}
               <Menu as='div' className='ml-3 relative'>
                 <div>
-                  <Menu.Button className='max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'>
+                  <Menu.Button className='max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
                     <span className='sr-only'>Open user menu</span>
-                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-pink-400 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'>
+                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-purple-400 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
                       {account?.slice(0, 6) + '...' + account?.slice(36)}
                     </span>
                   </Menu.Button>

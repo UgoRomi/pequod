@@ -21,7 +21,7 @@ export default function LoginPage() {
   return (
     <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0 bg-gray-600'>
       <div className='w-full sm:mx-auto sm:w-full sm:max-w-md bg-gray-100 rounded-md shadow-lg'>
-        <h1 className='text-pink-400 text-5xl text-center p-5 font-bold'>
+        <h1 className='text-purple-400 text-5xl text-center p-5 font-bold'>
           Pequod
         </h1>
         <p className='text-gray-800 text-xl font-semibold text-center'>
@@ -33,7 +33,7 @@ export default function LoginPage() {
             onClick={() => connectToWallet(ConnectorNames.Injected)}
           >
             <MetamaskStackedLogo className='h-28 mx-auto' />
-            <span className='font-semibold text-pink-500'>
+            <span className='font-semibold text-purple-500'>
               Connect using metamask
             </span>
           </div>
@@ -42,7 +42,7 @@ export default function LoginPage() {
             onClick={() => connectToWallet(ConnectorNames.WalletConnect)}
           >
             <WalletConnectLogo className='h-16 mx-auto mb-6' />
-            <span className='font-semibold text-pink-500'>
+            <span className='font-semibold text-purple-500'>
               Connect using WalletConnect
             </span>
           </div>
