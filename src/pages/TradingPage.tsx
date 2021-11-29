@@ -2,10 +2,21 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Carousel from 'react-multi-carousel';
-import { PlusIcon, SearchIcon } from '@heroicons/react/outline';
+import { MinusIcon, PlusIcon, SearchIcon } from '@heroicons/react/outline';
 import { classNames } from '../utils/utils';
 import PercentagesGroup from '../components/PercentagesGroup';
-
+import { useWeb3React } from '@web3-react/core';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import {
+  Fetcher,
+  ChainId,
+  WETH,
+  Trade,
+  TokenAmount,
+  TradeType,
+  Percent,
+  Route,
+} from '@pancakeswap/sdk';
 interface AvailableStaking {
   tokenName: string;
   tokenImage: string;
@@ -18,10 +29,28 @@ interface AvailableStaking {
   tokenPriceUSD: number;
 }
 
-interface Token {
+interface TokenSearchResult {
   name: string;
   address: string;
   symbol: string;
+}
+
+interface TokenDetails {
+  name: string;
+  symbol: string;
+  price: string;
+  priceBNB: string;
+  address: string;
+}
+
+interface PancakeApiResponse {
+  updated_at: 1234567;
+  data: {
+    name: string;
+    symbol: string;
+    price: string;
+    price_BNB: string;
+  };
 }
 
 const responsive = {
@@ -45,12 +74,38 @@ const responsive = {
 export default function TradingPage() {
   const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [tokenSearch, setTokenSearch] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<Token[]>([]);
+  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
-  const [currentSelection, setCurrentSelection] = useState<'buy' | 'sell'>(
-    'buy'
-  );
-  const [amountToTrade, setAmountToTrade] = useState<number>(0);
+  const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
+    'buy' | 'sell'
+  >('buy');
+  const [amountFrom, setAmountFrom] = useState<number>(0);
+  const [amountTo, setAmountTo] = useState<number>(0);
+  const [stopLoss, setStopLoss] = useState<number>(0);
+  const [takeProfit, setTakeProfit] = useState<number>(0);
+
+  const { library, account } = useWeb3React();
+
+  const [selectedTokenInfo, setSelectedTokenInfo] =
+    useState<TokenDetails | null>(null);
+
+  const updateFrom = (value: number) => {
+    setAmountFrom(value);
+    if (!selectedTokenInfo) return;
+    setAmountTo(value / parseFloat(selectedTokenInfo.priceBNB));
+  };
+
+  const updateTo = (value: number) => {
+    setAmountTo(value);
+    if (!selectedTokenInfo) return;
+    setAmountFrom(value * parseFloat(selectedTokenInfo.priceBNB));
+  };
+
+  const formatAmount = (amount: number): string => {
+    if (amount.toString().indexOf('e') === -1) return amount.toString();
+
+    return amount.toFixed(15);
+  };
 
   useEffect(() => {
     axios
@@ -64,6 +119,8 @@ export default function TradingPage() {
           'There was an error retrieving available staking options\nPlease try reloading this page'
         );
       });
+
+    handleTokenSearch('0xe861dff2099d15185b50de380db8249984cb26ea');
   }, []);
 
   useEffect(() => {
@@ -77,13 +134,100 @@ export default function TradingPage() {
         .then((res) => {
           setSearchResults(res.data);
         })
-        .catch((_err) => {
+        .catch((err) => {
+          console.error(err);
           toast.error('Error retrieving tokens, please retry');
         });
     }, 200);
 
     return () => clearTimeout(searchTokens);
   }, [tokenSearch]);
+
+  const handleTokenSearch = (tokenAddress: string) => {
+    axios
+      .get(`https://api.pancakeswap.info/api/v2/tokens/${tokenAddress}`)
+      .then((res) => {
+        const { data: response }: { data: PancakeApiResponse } = res;
+        const { price_BNB: priceBNB, name, symbol, price } = response.data;
+        setSelectedTokenInfo({
+          name,
+          symbol,
+          price,
+          priceBNB,
+          address: tokenAddress,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(
+          'Error retrieving token details from pancakeSwap, please retry'
+        );
+      });
+  };
+
+  const swap = async () => {
+    const provider = new JsonRpcProvider('https://bsc-dataseed.binance.org/');
+    const token = await Fetcher.fetchTokenData(
+      ChainId.MAINNET,
+      selectedTokenInfo!.address,
+      provider
+    );
+    const pair = await Fetcher.fetchPairData(
+      token,
+      WETH[token.chainId],
+      provider
+    );
+    const route = new Route([pair], WETH[token.chainId]);
+    const trade = new Trade(
+      route,
+      new TokenAmount(
+        WETH[token.chainId],
+        library.utils.toWei(amountFrom.toString())
+      ),
+      TradeType.EXACT_INPUT
+    );
+
+    // Slippage 11%
+    const slippageTolerance = new Percent('1100', '10000');
+    const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
+    const path = [WETH[token.chainId].address, token.address];
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    const value = trade.inputAmount.raw;
+
+    // get router ABI
+    const routerABI = (await axios.get('pancakeRouterABI.json')).data;
+
+    const routerContract = new library.eth.Contract(
+      routerABI,
+      '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake router address
+      { from: account }
+    );
+    const data = routerContract.methods.swapExactETHForTokens(
+      library.utils.toHex(amountOutMin.toString()),
+      path,
+      account,
+      library.utils.toHex(deadline)
+    );
+    const nonce = await library.eth.getTransactionCount(account);
+    const rawTransaction = {
+      from: account,
+      gasPrice: library.utils.toHex(5000000000),
+      gas: library.utils.toHex(290000),
+      to: '0x10ED43C718714eb63d5aA57B78B54704E256024E', // pancake router address
+      value: library.utils.toHex(value.toString()),
+      data: data.encodeABI(),
+      nonce: library.utils.toHex(nonce),
+    };
+
+    library.eth.sendTransaction(rawTransaction, (err: any, hash: any) => {
+      if (err) {
+        console.error(err);
+        toast.error('Error sending transaction');
+        return;
+      }
+      toast.success(`Transaction sent\nHash: ${hash}`);
+    });
+  };
 
   return (
     <div>
@@ -189,7 +333,11 @@ export default function TradingPage() {
                   {searchResults?.length > 0 && searchFocused && (
                     <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-white'>
                       {searchResults.map((token, i) => (
-                        <div className='cursor-pointer' key={token.address}>
+                        <div
+                          className='cursor-pointer'
+                          onClick={() => handleTokenSearch(token.address)}
+                          key={token.address}
+                        >
                           <span className='p-1 text-md text-gray-800 font-semibold'>
                             {token.name} - ${token.symbol}
                           </span>
@@ -205,18 +353,18 @@ export default function TradingPage() {
             </div>
           </div>
           <div className='col-span-2 lg:col-span-1 lg:border-r'></div>
-          <div className='col-span-2 lg:col-span-1 grid grid-cols-2 gap-y-4 lg:border-l px-5'>
+          <div className='col-span-2 lg:col-span-1 grid grid-cols-2 gap-y-4 lg:border-l px-5 lg:px-28'>
             {/* 1st row */}
             <div className='flex justify-center border-r'>
               <button
                 type='button'
                 className={classNames(
-                  currentSelection === 'buy'
+                  currentlySelectedTab === 'buy'
                     ? 'bg-purple-100 border-transparent'
                     : 'bg-white border-purple-200',
                   'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700  hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                 )}
-                onClick={() => setCurrentSelection('buy')}
+                onClick={() => setCurrentlySelectedTab('buy')}
               >
                 Buy
               </button>
@@ -225,42 +373,165 @@ export default function TradingPage() {
               <button
                 type='button'
                 className={classNames(
-                  currentSelection === 'sell'
+                  currentlySelectedTab === 'sell'
                     ? 'bg-purple-100 border-transparent'
                     : 'bg-white border-purple-200',
                   'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700  hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                 )}
-                onClick={() => setCurrentSelection('sell')}
+                onClick={() => setCurrentlySelectedTab('sell')}
               >
                 Sell
               </button>
             </div>
             {/* 2nd row */}
-            <div className='col-span-2 lg:flex lg:justify-center'>
-              <div className='lg:w-80'>
-                <div className='flex justify-between'>
-                  <label
-                    htmlFor='amount'
-                    className='block text-sm font-medium text-gray-700'
-                  >
-                    Total
-                  </label>
-                </div>
-                <div className='mt-1'>
-                  <input
-                    type='number'
-                    name='amount'
-                    id='amount'
-                    className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
-                    placeholder='0.0'
-                    value={amountToTrade}
-                    onChange={(e) => setAmountToTrade(Number(e.target.value))}
-                  />
-                </div>
-                <PercentagesGroup></PercentagesGroup>
+            <div className='col-span-2 w-full mx-auto'>
+              <div className='flex justify-between'>
+                <label
+                  htmlFor='amountFrom'
+                  className='block text-sm font-medium text-gray-700'
+                >
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? '(BNB)'
+                    : `(${selectedTokenInfo?.symbol})`}
+                </label>
               </div>
+              <div className='mt-1'>
+                <input
+                  type='number'
+                  name='amountFrom'
+                  id='amountFrom'
+                  min='0'
+                  className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
+                  placeholder='0.0'
+                  value={formatAmount(amountFrom)}
+                  onChange={(e) => updateFrom(Number(e.target.value))}
+                />
+              </div>
+              <PercentagesGroup></PercentagesGroup>
             </div>
             {/* 3rd row */}
+            <div className='col-span-2 w-full mx-auto'>
+              <div className='flex justify-between'>
+                <label
+                  htmlFor='amountTo'
+                  className='block text-sm font-medium text-gray-700'
+                >
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? `(${selectedTokenInfo?.symbol})`
+                    : '(BNB)'}
+                </label>
+              </div>
+              <div className='mt-1'>
+                <input
+                  type='number'
+                  name='amountTo'
+                  min='0'
+                  id='amountTo'
+                  className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
+                  placeholder='0.0'
+                  value={formatAmount(amountTo)}
+                  onChange={(e) => updateTo(Number(e.target.value))}
+                />
+              </div>
+            </div>
+            {/* 4th row */}
+            <div className='mr-5'>
+              <label
+                htmlFor='takeProfit'
+                className='block text-sm font-medium text-gray-700'
+              >
+                Take Profit (%)
+              </label>
+              <div className='mt-1 flex rounded-md shadow-sm'>
+                <button
+                  type='button'
+                  onClick={() =>
+                    setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1)
+                  }
+                  className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                >
+                  <MinusIcon
+                    className='h-4 w-4 text-gray-500'
+                    aria-hidden='true'
+                  />
+                </button>
+                <div className='relative flex items-stretch flex-grow focus-within:z-10'>
+                  <input
+                    type='number'
+                    name='takeProfit'
+                    id='takeProfit'
+                    min='0'
+                    value={takeProfit}
+                    onChange={(e) => setTakeProfit(Number(e.target.value))}
+                    className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300'
+                    placeholder='0'
+                  />
+                </div>
+                <button
+                  type='button'
+                  onClick={() => setTakeProfit(takeProfit + 1)}
+                  className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                >
+                  <PlusIcon
+                    className='h-4 w-4 text-gray-500'
+                    aria-hidden='true'
+                  />
+                </button>
+              </div>
+            </div>
+            <div className='ml-5'>
+              <label
+                htmlFor='stopLoss'
+                className='block text-sm font-medium text-gray-700'
+              >
+                Stop Loss (%)
+              </label>
+              <div className='mt-1 flex rounded-md shadow-sm'>
+                <button
+                  type='button'
+                  onClick={() => setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1)}
+                  className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                >
+                  <MinusIcon
+                    className='h-4 w-4 text-gray-500'
+                    aria-hidden='true'
+                  />
+                </button>
+                <div className='relative flex items-stretch flex-grow focus-within:z-10'>
+                  <input
+                    type='number'
+                    name='stopLoss'
+                    id='stopLoss'
+                    min='0'
+                    value={stopLoss}
+                    onChange={(e) => setStopLoss(Number(e.target.value))}
+                    className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300'
+                    placeholder='0'
+                  />
+                </div>
+                <button
+                  type='button'
+                  onClick={() => setStopLoss(stopLoss + 1)}
+                  className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                >
+                  <PlusIcon
+                    className='h-4 w-4 text-gray-500'
+                    aria-hidden='true'
+                  />
+                </button>
+              </div>
+            </div>
+            {/* 5th row */}
+            <div className='col-span-2 mt-5 flex justify-center'>
+              <button
+                onClick={swap}
+                className='bg-purple-400 text-white py-2 px-4 rounded-md'
+              >
+                Place order
+              </button>
+            </div>
           </div>
         </div>
       </div>
