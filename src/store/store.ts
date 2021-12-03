@@ -1,7 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
+import tradeDialogReducer from './tradeDialogSlice';
 
 export const store = configureStore({
-  reducer: {},
+  reducer: { tradeDialog: tradeDialogReducer },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

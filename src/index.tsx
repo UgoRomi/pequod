@@ -9,6 +9,8 @@ import { Web3ReactProvider } from '@web3-react/core';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
 import { ToastContainer } from 'react-toastify';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 function getLibrary(provider: provider) {
   return new Web3(provider);
@@ -16,10 +18,12 @@ function getLibrary(provider: provider) {
 
 ReactDOM.render(
   <Web3ReactProvider getLibrary={getLibrary}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-    <ToastContainer />
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+      <ToastContainer />
+    </Provider>
   </Web3ReactProvider>,
   document.getElementById('root')
 );
