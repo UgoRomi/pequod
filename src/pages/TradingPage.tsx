@@ -89,6 +89,7 @@ export default function TradingPage() {
   >('buy');
   const [amountFrom, setAmountFrom] = useState<number>(0);
   const [amountTo, setAmountTo] = useState<number>(0);
+  const [slippage, setSlippage] = useState<number>(1);
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [takeProfit, setTakeProfit] = useState<number>(0);
 
@@ -196,8 +197,8 @@ export default function TradingPage() {
       TradeType.EXACT_INPUT
     );
 
-    // Slippage 11%
-    const slippageTolerance = new Percent('1100', '10000');
+    // Slippage
+    const slippageTolerance = new Percent((slippage * 100).toString(), '10000');
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
     const path = [WETH[token.chainId].address, token.address];
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
@@ -561,7 +562,7 @@ export default function TradingPage() {
           </div>
         </div>
       </div>
-      <TradeSettingsDialog />
+      <TradeSettingsDialog slippage={slippage} setSlippage={setSlippage} />
     </>
   );
 }

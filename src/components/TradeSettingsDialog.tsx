@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
+import { XIcon } from '@heroicons/react/outline';
 import { Fragment } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
@@ -6,12 +7,22 @@ import {
   selectDialogIsOpen,
 } from '../store/tradeDialogSlice';
 
-export default function TradeSettingsDialog() {
+export default function TradeSettingsDialog({
+  slippage,
+  setSlippage,
+}: {
+  slippage: number;
+  setSlippage: (slippage: number) => void;
+}) {
   const isOpen = useAppSelector(selectDialogIsOpen);
   const dispatch = useAppDispatch();
 
   const closeDialog = () => {
     dispatch(closeTradeSettingsDialog());
+  };
+
+  const formatSlippage = (slippage: number) => {
+    setSlippage(Math.trunc(slippage * 100) / 100);
   };
 
   return (
@@ -52,27 +63,49 @@ export default function TradeSettingsDialog() {
             leaveTo='opacity-0 scale-95'
           >
             <div className='inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl'>
+              <div className='hidden sm:block absolute top-0 right-0 pt-4 pr-4'>
+                <button
+                  type='button'
+                  className='bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                  onClick={closeDialog}
+                >
+                  <span className='sr-only'>Close</span>
+                  <XIcon className='h-6 w-6' aria-hidden='true' />
+                </button>
+              </div>
               <Dialog.Title
                 as='h3'
                 className='text-lg font-medium leading-6 text-gray-900'
               >
-                Payment successful
+                Settings
               </Dialog.Title>
               <div className='mt-2'>
-                <p className='text-sm text-gray-500'>
-                  Your payment has been successfully submitted. We’ve sent you
-                  an email with all of the details of your order.
-                </p>
-              </div>
-
-              <div className='mt-4'>
-                <button
-                  type='button'
-                  className='inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500'
-                  onClick={closeDialog}
+                <label
+                  htmlFor='slippage'
+                  className='block text-sm font-medium text-gray-700'
                 >
-                  Got it, thanks!
-                </button>
+                  Slippage
+                </label>
+                <div className='mt-1'>
+                  <input
+                    type='number'
+                    name='slippage'
+                    id='slippage'
+                    min='0'
+                    max='49'
+                    step='0.01'
+                    className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
+                    aria-describedby='slippage-description'
+                    value={slippage}
+                    onChange={(e) => formatSlippage(parseFloat(e.target.value))}
+                  />
+                </div>
+                <p
+                  className='mt-2 text-sm text-gray-500'
+                  id='slippage-description'
+                >
+                  Variance you are willing to accept in the outcome of the trade
+                </p>
               </div>
             </div>
           </Transition.Child>
