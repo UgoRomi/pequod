@@ -98,6 +98,7 @@ const responsive = {
 export default function TradingPage() {
   const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [tokenSearch, setTokenSearch] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
@@ -442,7 +443,9 @@ export default function TradingPage() {
               {selectedTokenInfo && (
                 <span>
                   {selectedTokenInfo.symbol}/BNB{' '}
-                  {formatPrice(parseFloat(selectedTokenInfo.priceBNB))}
+                  {formatPrice(
+                    hoverValue || parseFloat(selectedTokenInfo.priceBNB)
+                  )}
                 </span>
               )}
               <span>{hoverDate || currentDate}</span>
