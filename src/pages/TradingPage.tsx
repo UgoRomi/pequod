@@ -25,6 +25,8 @@ import {
 import { useAppDispatch } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
+import PairChart from '../components/PairChart';
+import Web3 from 'web3';
 interface AvailableStaking {
   tokenName: string;
   tokenImage: string;
@@ -52,13 +54,27 @@ interface TokenDetails {
 }
 
 interface PancakeApiResponse {
-  updated_at: 1234567;
+  updated_at: number;
   data: {
     name: string;
     symbol: string;
     price: string;
     price_BNB: string;
   };
+}
+
+interface PequodPairPriceHistoryApiResponse {
+  date: string;
+  open: number;
+  low: number;
+  high: number;
+  close: number;
+  volume: number;
+}
+
+interface GraphData {
+  time: Date;
+  value: number;
 }
 
 const responsive = {
@@ -92,12 +108,20 @@ export default function TradingPage() {
   const [slippage, setSlippage] = useState<number>(1);
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [takeProfit, setTakeProfit] = useState<number>(0);
-
-  const dispatch = useAppDispatch();
-  const { library, account } = useWeb3React();
-
+  const [hoverValue, setHoverValue] = useState<number | undefined>();
+  const [hoverDate, setHoverDate] = useState<string | undefined>();
+  const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
   const [selectedTokenInfo, setSelectedTokenInfo] =
     useState<TokenDetails | null>(null);
+  const dispatch = useAppDispatch();
+  const { library, account } = useWeb3React();
+  const currentDate = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   const updateFrom = (value: number) => {
     setAmountFrom(value);
@@ -117,6 +141,12 @@ export default function TradingPage() {
     return amount.toFixed(15);
   };
 
+  const formatPrice = (price: number): string => {
+    const minimum = 0.000001;
+    if (price < minimum) return `<${minimum.toString()}`;
+    return price.toString();
+  };
+
   useEffect(() => {
     axios
       .get('http://localhost:3001/staking')
@@ -129,31 +159,41 @@ export default function TradingPage() {
           'There was an error retrieving available staking options\nPlease try reloading this page'
         );
       });
-
-    handleTokenSearch('0xe861dff2099d15185b50de380db8249984cb26ea');
   }, []);
 
+  // TODO: Uncomment when our search API is ready
+  // useEffect(() => {
+  //   if (!tokenSearch) {
+  //     setSearchResults([]);
+  //     return;
+  //   }
+  //   const searchTokens = setTimeout(() => {
+  //     axios
+  //       .get(`http://localhost:3001/tokens/${tokenSearch}`)
+  //       .then((res) => {
+  //         setSearchResults(res.data);
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //         toast.error('Error retrieving tokens, please retry');
+  //       });
+  //   }, 200);
+
+  //   return () => clearTimeout(searchTokens);
+  // }, [tokenSearch]);
+
   useEffect(() => {
-    if (!tokenSearch) {
-      setSearchResults([]);
-      return;
-    }
+    if (!Web3.utils.isAddress(tokenSearch)) return;
+
     const searchTokens = setTimeout(() => {
-      axios
-        .get(`http://localhost:3001/tokens/${tokenSearch}`)
-        .then((res) => {
-          setSearchResults(res.data);
-        })
-        .catch((err) => {
-          console.error(err);
-          toast.error('Error retrieving tokens, please retry');
-        });
+      handleTokenSearch(tokenSearch);
     }, 200);
 
     return () => clearTimeout(searchTokens);
   }, [tokenSearch]);
 
   const handleTokenSearch = (tokenAddress: string) => {
+    // Get token info from pancake API
     axios
       .get(`https://api.pancakeswap.info/api/v2/tokens/${tokenAddress}`)
       .then((res) => {
@@ -171,6 +211,28 @@ export default function TradingPage() {
         console.error(err);
         toast.error(
           'Error retrieving token details from pancakeSwap, please retry'
+        );
+      });
+
+    // Get price history from our API
+    axios
+      .get(
+        `https://pequod-node-develop.herokuapp.com/tokens/price/history/${tokenAddress}/bnb`
+      )
+      .then((res) => {
+        const {
+          data: response,
+        }: { data: PequodPairPriceHistoryApiResponse[] } = res;
+        const priceHistory: GraphData[] = response.map((item) => ({
+          time: new Date(item.date),
+          value: item.close,
+        }));
+        setPriceHistory(priceHistory);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(
+          'Error retrieving token details from our API, please retry'
         );
       });
   };
@@ -321,7 +383,7 @@ export default function TradingPage() {
             ))}
           </Carousel>
           <div className='grid grid-rows-buy grid-cols-2 gap-y-8 lg:bg-white lg:p-5 lg:border-2 lg:border-purple-400 lg:rounded-md'>
-            <div className='col-span-2 grid grid-cols-buy'>
+            <div className='col-span-2 gap-2 lg:gap-0 grid grid-cols-buy'>
               <div className='flex-1 flex flex-col'>
                 <p className='font-bold m-auto mb-3 text-md text-gray-800'>
                   Search token
@@ -376,7 +438,23 @@ export default function TradingPage() {
                 </button>
               </div>
             </div>
-            <div className='col-span-2 lg:col-span-1 lg:border-r'></div>
+            <div className='col-span-2 lg:col-span-1 lg:border-r'>
+              {selectedTokenInfo && (
+                <span>
+                  {selectedTokenInfo.symbol}/BNB{' '}
+                  {formatPrice(parseFloat(selectedTokenInfo.priceBNB))}
+                </span>
+              )}
+              <span>{hoverDate || currentDate}</span>
+              <div style={{ height: '90%', width: '100%' }}>
+                <PairChart
+                  data={priceHistory}
+                  setHoverValue={setHoverValue}
+                  setHoverDate={setHoverDate}
+                  isChangePositive={true}
+                />
+              </div>{' '}
+            </div>
             <div className='col-span-2 lg:col-span-1 grid grid-cols-2 gap-y-4 lg:border-l px-5 lg:px-28'>
               {/* 1st row */}
               <div className='flex justify-center border-r'>
