@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Carousel from 'react-multi-carousel';
@@ -48,22 +48,20 @@ interface TokenSearchResult {
 interface TokenDetails {
   name: string;
   symbol: string;
-  price: string;
-  priceBNB: string;
   address: string;
+  decimals: number;
+  tokenReserve: number;
+  BNBReserve: number;
+  priceBNB: number;
 }
 
-interface PancakeApiResponse {
-  updated_at: number;
-  data: {
-    name: string;
-    symbol: string;
-    price: string;
-    price_BNB: string;
-  };
+interface TokenInfoResponse {
+  name: string;
+  symbol: string;
+  decimals: number;
 }
 
-interface PequodPairPriceHistoryApiResponse {
+interface PairPriceHistoryApiResponse {
   date: string;
   open: number;
   low: number;
@@ -112,8 +110,15 @@ export default function TradingPage() {
   const [hoverValue, setHoverValue] = useState<number | undefined>();
   const [hoverDate, setHoverDate] = useState<string | undefined>();
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
-  const [selectedTokenInfo, setSelectedTokenInfo] =
-    useState<TokenDetails | null>(null);
+  const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
+    name: '',
+    address: '',
+    symbol: '',
+    BNBReserve: 0,
+    decimals: 0,
+    priceBNB: 0,
+    tokenReserve: 0,
+  });
   const dispatch = useAppDispatch();
   const { library, account } = useWeb3React();
   const currentDate = new Date().toLocaleString('en-US', {
@@ -127,13 +132,13 @@ export default function TradingPage() {
   const updateFrom = (value: number) => {
     setAmountFrom(value);
     if (!selectedTokenInfo) return;
-    setAmountTo(value / parseFloat(selectedTokenInfo.priceBNB));
+    setAmountTo(value / selectedTokenInfo.priceBNB);
   };
 
   const updateTo = (value: number) => {
     setAmountTo(value);
     if (!selectedTokenInfo) return;
-    setAmountFrom(value * parseFloat(selectedTokenInfo.priceBNB));
+    setAmountFrom(value * selectedTokenInfo.priceBNB);
   };
 
   const formatAmount = (amount: number): string => {
@@ -183,31 +188,24 @@ export default function TradingPage() {
   //   return () => clearTimeout(searchTokens);
   // }, [tokenSearch]);
 
-  useEffect(() => {
-    if (!Web3.utils.isAddress(tokenSearch)) return;
-
-    const searchTokens = setTimeout(() => {
-      handleTokenSearch(tokenSearch);
-      getTokenPrice(tokenSearch, library, account);
-    }, 200);
-
-    return () => clearTimeout(searchTokens);
-  }, [tokenSearch, account, library]);
-
-  const handleTokenSearch = (tokenAddress: string) => {
-    // Get token info from pancake API
+  const handleTokenSearch = useCallback((tokenAddress: string) => {
     axios
-      .get(`https://api.pancakeswap.info/api/v2/tokens/${tokenAddress}`)
+      .get(
+        `https://pequod-node-develop.herokuapp.com/tokens/info/${tokenAddress}`
+      )
       .then((res) => {
-        const { data: response }: { data: PancakeApiResponse } = res;
-        const { price_BNB: priceBNB, name, symbol, price } = response.data;
-        setSelectedTokenInfo({
-          name,
-          symbol,
-          price,
-          priceBNB,
-          address: tokenAddress,
-        });
+        const { data: response }: { data: TokenInfoResponse } = res;
+        const { name, symbol, decimals } = response;
+        setSelectedTokenInfo(
+          (selectedTokenInfo) =>
+            ({
+              ...selectedTokenInfo,
+              name,
+              symbol,
+              decimals: decimals,
+              address: tokenAddress,
+            } as TokenDetails)
+        );
       })
       .catch((err) => {
         console.error(err);
@@ -222,14 +220,19 @@ export default function TradingPage() {
         `https://pequod-node-develop.herokuapp.com/tokens/price/history/30/${tokenAddress}/bnb`
       )
       .then((res) => {
-        const {
-          data: response,
-        }: { data: PequodPairPriceHistoryApiResponse[] } = res;
+        const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
         const priceHistory: GraphData[] = response.map((item) => ({
           time: new Date(item.date),
           value: item.close,
         }));
         setPriceHistory(priceHistory);
+        setSelectedTokenInfo(
+          (selectedTokenInfo) =>
+            ({
+              ...selectedTokenInfo,
+              priceBNB: priceHistory[priceHistory.length - 1].value,
+            } as TokenDetails)
+        );
       })
       .catch((err) => {
         console.error(err);
@@ -237,7 +240,48 @@ export default function TradingPage() {
           'Error retrieving token details from our API, please retry'
         );
       });
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!Web3.utils.isAddress(tokenSearch)) return;
+    setAmountFrom(0);
+    setAmountTo(0);
+
+    const searchTokens = setTimeout(async () => {
+      handleTokenSearch(tokenSearch);
+      const { BNBReserve, tokenReserve } = await getTokenPrice(
+        tokenSearch,
+        library,
+        account
+      );
+
+      setSelectedTokenInfo((selectedTokenInfo) => ({
+        ...selectedTokenInfo,
+        BNBReserve,
+        tokenReserve,
+      }));
+    }, 200);
+
+    return () => clearTimeout(searchTokens);
+  }, [tokenSearch, account, library, handleTokenSearch]);
+
+  // Update price when decimals, BNBReserve, or tokenReserve change
+  useEffect(() => {
+    const priceBNB =
+      selectedTokenInfo.BNBReserve /
+      Math.pow(10, 18) /
+      (selectedTokenInfo.tokenReserve /
+        Math.pow(10, selectedTokenInfo.decimals));
+    if (!priceBNB) return;
+    setSelectedTokenInfo((selectedTokenInfo) => ({
+      ...selectedTokenInfo,
+      priceBNB,
+    }));
+  }, [
+    selectedTokenInfo.decimals,
+    selectedTokenInfo.BNBReserve,
+    selectedTokenInfo.tokenReserve,
+  ]);
 
   const swap = async () => {
     const provider = new JsonRpcProvider('https://bsc-dataseed.binance.org/');
@@ -265,7 +309,7 @@ export default function TradingPage() {
     const slippageTolerance = new Percent((slippage * 100).toString(), '10000');
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
     const path = [WETH[token.chainId].address, token.address];
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
     const value = trade.inputAmount.raw;
 
     // get router ABI
@@ -287,7 +331,7 @@ export default function TradingPage() {
       from: account,
       gasPrice: library.utils.toHex(5000000000),
       gas: library.utils.toHex(290000),
-      to: '0x10ED43C718714eb63d5aA57B78B54704E256024E', // pancake router address
+      to: '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake router address
       value: library.utils.toHex(value.toString()),
       data: data.encodeABI(),
       nonce: library.utils.toHex(nonce),
@@ -442,14 +486,12 @@ export default function TradingPage() {
             </div>
             <div className='col-span-2 lg:col-span-1 lg:border-r'>
               {selectedTokenInfo && (
-                <span>
+                <p>
                   {selectedTokenInfo.symbol}/BNB{' '}
-                  {formatPrice(
-                    hoverValue || parseFloat(selectedTokenInfo.priceBNB)
-                  )}
-                </span>
+                  {formatPrice(hoverValue || selectedTokenInfo.priceBNB)}
+                </p>
               )}
-              <span>{hoverDate || currentDate}</span>
+              <p>{hoverDate || currentDate}</p>
               <div style={{ height: '90%', width: '100%' }}>
                 <PairChart
                   data={priceHistory}
