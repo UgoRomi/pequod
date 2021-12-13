@@ -27,6 +27,7 @@ import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import PairChart from '../components/PairChart';
 import Web3 from 'web3';
+import { PairDataTimeWindowEnum } from '../utils/chart';
 interface AvailableStaking {
   tokenName: string;
   tokenImage: string;
@@ -119,6 +120,9 @@ export default function TradingPage() {
     priceBNB: 0,
     tokenReserve: 0,
   });
+  const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
+    PairDataTimeWindowEnum.DAY
+  );
   const dispatch = useAppDispatch();
   const { library, account } = useWeb3React();
   const currentDate = new Date().toLocaleString('en-US', {
@@ -188,7 +192,7 @@ export default function TradingPage() {
   //   return () => clearTimeout(searchTokens);
   // }, [tokenSearch]);
 
-  const handleTokenSearch = useCallback((tokenAddress: string) => {
+  const getTokenInfo = useCallback((tokenAddress: string) => {
     axios
       .get(
         `https://pequod-node-develop.herokuapp.com/tokens/info/${tokenAddress}`
@@ -213,11 +217,14 @@ export default function TradingPage() {
           'Error retrieving token details from pancakeSwap, please retry'
         );
       });
+  }, []);
 
-    // Get price history from our API
+  // Get price history from our API
+  useEffect(() => {
+    if (!selectedTokenInfo.address) return;
     axios
       .get(
-        `https://pequod-node-develop.herokuapp.com/tokens/price/history/30/${tokenAddress}/bnb`
+        `https://pequod-node-develop.herokuapp.com/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/bnb`
       )
       .then((res) => {
         const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
@@ -240,7 +247,7 @@ export default function TradingPage() {
           'Error retrieving token details from our API, please retry'
         );
       });
-  }, []);
+  }, [selectedTokenInfo.address, timeWindow]);
 
   useEffect(() => {
     if (!Web3.utils.isAddress(tokenSearch)) return;
@@ -248,7 +255,7 @@ export default function TradingPage() {
     setAmountTo(0);
 
     const searchTokens = setTimeout(async () => {
-      handleTokenSearch(tokenSearch);
+      getTokenInfo(tokenSearch);
       const { BNBReserve, tokenReserve } = await getTokenPrice(
         tokenSearch,
         library,
@@ -263,7 +270,7 @@ export default function TradingPage() {
     }, 200);
 
     return () => clearTimeout(searchTokens);
-  }, [tokenSearch, account, library, handleTokenSearch]);
+  }, [tokenSearch, account, library, getTokenInfo]);
 
   // Update price when decimals, BNBReserve, or tokenReserve change
   useEffect(() => {
@@ -458,7 +465,7 @@ export default function TradingPage() {
                         {searchResults.map((token, i) => (
                           <div
                             className='cursor-pointer'
-                            onClick={() => handleTokenSearch(token.address)}
+                            onClick={() => getTokenInfo(token.address)}
                             key={token.address}
                           >
                             <span className='p-1 text-md text-gray-800 font-semibold'>
@@ -485,21 +492,67 @@ export default function TradingPage() {
               </div>
             </div>
             <div className='col-span-2 lg:col-span-1 lg:border-r'>
-              {selectedTokenInfo && (
-                <p>
-                  {selectedTokenInfo.symbol}/BNB{' '}
-                  {formatPrice(hoverValue || selectedTokenInfo.priceBNB)}
-                </p>
+              {selectedTokenInfo.symbol && (
+                <>
+                  <p className='flex flex-col md:flex-row md:justify-between'>
+                    <span className='text-xl font-medium'>
+                      {selectedTokenInfo.symbol}/BNB{' '}
+                      {formatPrice(hoverValue || selectedTokenInfo.priceBNB)}
+                    </span>
+                    <span className='my-4 md:my-0'>
+                      <span className='relative z-0 inline-flex shadow-sm rounded-md'>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setTimeWindow(PairDataTimeWindowEnum.DAY)
+                          }
+                          className='relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                        >
+                          1D
+                        </button>
+                        <button
+                          onClick={() =>
+                            setTimeWindow(PairDataTimeWindowEnum.WEEK)
+                          }
+                          type='button'
+                          className='-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                        >
+                          1W
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setTimeWindow(PairDataTimeWindowEnum.MONTH)
+                          }
+                          className='-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                        >
+                          1M
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setTimeWindow(PairDataTimeWindowEnum.YEAR)
+                          }
+                          className='-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                        >
+                          1Y
+                        </button>
+                      </span>
+                    </span>
+                  </p>
+                  <p>{hoverDate || currentDate}</p>
+                </>
               )}
-              <p>{hoverDate || currentDate}</p>
-              <div style={{ height: '90%', width: '100%' }}>
-                <PairChart
-                  data={priceHistory}
-                  setHoverValue={setHoverValue}
-                  setHoverDate={setHoverDate}
-                  isChangePositive={true}
-                />
-              </div>{' '}
+              {priceHistory && (
+                <div style={{ height: '90%', width: '100%' }}>
+                  <PairChart
+                    data={priceHistory}
+                    setHoverValue={setHoverValue}
+                    setHoverDate={setHoverDate}
+                    isChangePositive={true}
+                  />
+                </div>
+              )}
             </div>
             <div className='col-span-2 lg:col-span-1 grid grid-cols-2 gap-y-4 lg:border-l px-5 lg:px-28'>
               {/* 1st row */}
