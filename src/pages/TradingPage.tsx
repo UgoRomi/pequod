@@ -8,7 +8,7 @@ import {
   PlusIcon,
   SearchIcon,
 } from '@heroicons/react/outline';
-import { classNames } from '../utils/utils';
+import { classNames, getTokenPrice } from '../utils/utils';
 import PercentagesGroup from '../components/PercentagesGroup';
 import { useWeb3React } from '@web3-react/core';
 import { JsonRpcProvider } from '@ethersproject/providers';
@@ -188,10 +188,11 @@ export default function TradingPage() {
 
     const searchTokens = setTimeout(() => {
       handleTokenSearch(tokenSearch);
+      getTokenPrice(tokenSearch, library, account);
     }, 200);
 
     return () => clearTimeout(searchTokens);
-  }, [tokenSearch]);
+  }, [tokenSearch, account, library]);
 
   const handleTokenSearch = (tokenAddress: string) => {
     // Get token info from pancake API
@@ -218,7 +219,7 @@ export default function TradingPage() {
     // Get price history from our API
     axios
       .get(
-        `https://pequod-node-develop.herokuapp.com/tokens/price/history/${tokenAddress}/bnb`
+        `https://pequod-node-develop.herokuapp.com/tokens/price/history/30/${tokenAddress}/bnb`
       )
       .then((res) => {
         const {
