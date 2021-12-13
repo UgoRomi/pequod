@@ -506,7 +506,12 @@ export default function TradingPage() {
                           onClick={() =>
                             setTimeWindow(PairDataTimeWindowEnum.DAY)
                           }
-                          className='relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                          className={classNames(
+                            timeWindow === PairDataTimeWindowEnum.DAY
+                              ? 'border-purple-400 bg-purple-200 z-10'
+                              : 'border-gray-300 bg-white',
+                            'relative inline-flex items-center px-4 py-2 rounded-l-md border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                          )}
                         >
                           1D
                         </button>
@@ -515,7 +520,12 @@ export default function TradingPage() {
                             setTimeWindow(PairDataTimeWindowEnum.WEEK)
                           }
                           type='button'
-                          className='-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                          className={classNames(
+                            timeWindow === PairDataTimeWindowEnum.WEEK
+                              ? 'border-purple-400 bg-purple-200 z-10'
+                              : 'border-gray-300 bg-white',
+                            '-ml-px relative inline-flex items-center px-4 py-2 border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                          )}
                         >
                           1W
                         </button>
@@ -524,7 +534,12 @@ export default function TradingPage() {
                           onClick={() =>
                             setTimeWindow(PairDataTimeWindowEnum.MONTH)
                           }
-                          className='-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                          className={classNames(
+                            timeWindow === PairDataTimeWindowEnum.MONTH
+                              ? 'border-purple-400 bg-purple-200 z-10'
+                              : 'border-gray-300 bg-white',
+                            '-ml-px relative inline-flex items-center px-4 py-2 border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                          )}
                         >
                           1M
                         </button>
@@ -533,7 +548,12 @@ export default function TradingPage() {
                           onClick={() =>
                             setTimeWindow(PairDataTimeWindowEnum.YEAR)
                           }
-                          className='-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                          className={classNames(
+                            timeWindow === PairDataTimeWindowEnum.YEAR
+                              ? 'border-purple-400 bg-purple-200 z-10'
+                              : 'border-gray-300 bg-white',
+                            '-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                          )}
                         >
                           1Y
                         </button>
