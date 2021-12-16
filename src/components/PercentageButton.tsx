@@ -22,7 +22,9 @@ export default function PercentageButton({
       >
         {' '}
       </button>
-      <span className='w-full flex justify-center'>{text}</span>
+      <span className='w-full flex justify-center text-gray-700 dark:text-gray-200'>
+        {text}
+      </span>
     </div>
   );
 }

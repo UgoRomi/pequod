@@ -95,7 +95,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       to={item.href}
                       className={classNames(
                         item.current
-                          ? 'bg-purple-400 text-white'
+                          ? 'bg-purple-400 text-white dark:bg-purple-500 dark:text-gray-200'
                           : 'text-purple-100 hover:bg-purple-500',
                         'group flex items-center px-2 py-2 text-base font-medium rounded-md'
                       )}
@@ -149,10 +149,10 @@ export default function Layout({ children }: { children: JSX.Element }) {
         </div>
       </div>
       <div className='md:pl-64 flex flex-col flex-1'>
-        <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow'>
+        <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-900 shadow'>
           <button
             type='button'
-            className='px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden'
+            className='px-4 text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden'
             onClick={() => setSidebarOpen(true)}
           >
             <span className='sr-only'>Open sidebar</span>
@@ -166,8 +166,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                 <div>
                   <Menu.Button className='max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
                     <span className='sr-only'>Open user menu</span>
-                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-purple-400 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
-                      {account?.slice(0, 6) + '...' + account?.slice(36)}
+                    <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-purple-400 hover:bg-purple-500 dark:text-gray-200 dark:bg-purple-500 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                      {account?.slice(0, 6) + '...' + account?.slice(37)}
                     </span>
                   </Menu.Button>
                 </div>
@@ -180,13 +180,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   leaveFrom='transform opacity-100 scale-100'
                   leaveTo='transform opacity-0 scale-95'
                 >
-                  <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                  <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 focus:outline-none'>
                     <Menu.Item onClick={logout}>
                       {({ active }) => (
                         <span
                           className={classNames(
-                            active ? 'bg-gray-100' : '',
-                            'flex items-center px-4 py-2 text-sm text-gray-700 cursor-pointer'
+                            active ? 'bg-gray-100 dark:bg-gray-900' : '',
+                            'flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer'
                           )}
                         >
                           <LogoutIcon className='mr-2 h-5' aria-hidden='true' />

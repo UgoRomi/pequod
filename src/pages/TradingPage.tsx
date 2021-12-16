@@ -433,10 +433,10 @@ export default function TradingPage() {
               </div>
             ))}
           </Carousel>
-          <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:p-5 xl:border-2 xl:border-purple-400 xl:rounded-md'>
+          <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-gray-900 xl:p-5 xl:border-2 xl:border-purple-400 xl:rounded-md'>
             <div className='col-span-2 gap-2 xl:gap-0 grid grid-cols-buy'>
               <div className='flex-1 flex flex-col'>
-                <p className='font-bold m-auto mb-3 text-md text-gray-800'>
+                <p className='font-bold m-auto mb-3 text-md text-gray-800 dark:text-gray-200'>
                   Search token
                 </p>
                 <form className='w-full flex justify-center md:ml-0'>
@@ -449,7 +449,7 @@ export default function TradingPage() {
                     </div>
                     <input
                       id='search-field'
-                      className='block w-full h-full pl-10 pr-3 py-2 bg-white xl:bg-purple-50 text-gray-600 focus:outline-none focus:ring focus:ring-purple-400 placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
+                      className='block w-full h-full pl-10 pr-3 py-2 dark:bg-gray-900 bg-white xl:bg-purple-50 text-gray-600 xl:dark:text-gray-600 dark:text-gray-200 focus:outline-none focus:ring focus:ring-purple-400 placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
                       placeholder='0xe861....'
                       type='search'
                       name='search'
@@ -489,7 +489,7 @@ export default function TradingPage() {
                 </button>
               </div>
             </div>
-            <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3'>
+            <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-gray-700 dark:text-gray-200'>
               {selectedTokenInfo.symbol && (
                 <>
                   <p className='flex flex-col xl:flex-row xl:justify-between'>
@@ -580,9 +580,9 @@ export default function TradingPage() {
                     type='button'
                     className={classNames(
                       currentlySelectedTab === 'buy'
-                        ? 'bg-purple-100 border-transparent'
-                        : 'bg-white border-purple-200',
-                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700  hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                        ? 'bg-purple-100 border-transparent dark:bg-purple-400 dark:text-purple-100'
+                        : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
+                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                     )}
                     onClick={() => setCurrentlySelectedTab('buy')}
                   >
@@ -594,9 +594,9 @@ export default function TradingPage() {
                     type='button'
                     className={classNames(
                       currentlySelectedTab === 'sell'
-                        ? 'bg-purple-100 border-transparent'
-                        : 'bg-white border-purple-200',
-                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700  hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                        ? 'bg-purple-100 border-transparent dark:bg-purple-400 dark:text-purple-100'
+                        : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
+                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                     )}
                     onClick={() => setCurrentlySelectedTab('sell')}
                   >
@@ -608,7 +608,7 @@ export default function TradingPage() {
                   <div className='flex justify-between'>
                     <label
                       htmlFor='amountFrom'
-                      className='block text-sm font-medium text-gray-700'
+                      className='block text-sm font-medium text-gray-700 dark:text-gray-200'
                     >
                       Total{' '}
                       {currentlySelectedTab === 'buy'
@@ -635,7 +635,7 @@ export default function TradingPage() {
                   <div className='flex justify-between'>
                     <label
                       htmlFor='amountTo'
-                      className='block text-sm font-medium text-gray-700'
+                      className='block text-sm font-medium text-gray-700 dark:text-gray-200'
                     >
                       Total{' '}
                       {currentlySelectedTab === 'buy'
@@ -660,7 +660,7 @@ export default function TradingPage() {
                 <div className='mr-5'>
                   <label
                     htmlFor='takeProfit'
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
                   >
                     Take Profit (%)
                   </label>
@@ -704,7 +704,7 @@ export default function TradingPage() {
                 <div className='ml-5'>
                   <label
                     htmlFor='stopLoss'
-                    className='block text-sm font-medium text-gray-700'
+                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
                   >
                     Stop Loss (%)
                   </label>
