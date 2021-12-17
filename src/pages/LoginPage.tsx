@@ -12,7 +12,7 @@ export default function LoginPage() {
   const from = location.state?.from?.pathname || '/';
 
   const connectToWallet = async (connectorId: ConnectorNames) => {
-    login(connectorId);
+    await login(connectorId);
     localStorage.setItem(connectorLocalStorageKey, connectorId);
 
     navigate(from, { replace: true });

@@ -20,14 +20,14 @@ const useAuth = () => {
   const { activate, deactivate } = useWeb3React();
 
   const login = useCallback(
-    (connectorID: ConnectorNames) => {
+    async (connectorID: ConnectorNames) => {
       const connector = connectorsByName[connectorID];
       if (connector) {
-        activate(connector, async (error: Error) => {
+        await activate(connector, async (error: Error) => {
           if (error instanceof UnsupportedChainIdError) {
             const hasSetup = await setupNetwork();
             if (hasSetup) {
-              activate(connector);
+              await activate(connector);
             }
           } else {
             window.localStorage.removeItem(connectorLocalStorageKey);
