@@ -3,11 +3,13 @@ import { RootState } from './store';
 import axios, { AxiosInstance } from 'axios';
 
 interface AxiosInstancesState {
-  pequodAPI: AxiosInstance | null;
+  pequodAPI: AxiosInstance;
 }
 
 const initialState: AxiosInstancesState = {
-  pequodAPI: null,
+  pequodAPI: axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL,
+  }),
 };
 
 export const axiosInterfacesSlice = createSlice({

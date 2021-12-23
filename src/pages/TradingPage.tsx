@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
   CogIcon,
@@ -7,26 +6,21 @@ import {
   PlusIcon,
   SearchIcon,
 } from '@heroicons/react/outline';
-import { classNames, getTokenPrice } from '../utils/utils';
-import PercentagesGroup from '../components/PercentagesGroup';
+import { classNames } from '../utils/utils';
 import { useWeb3React } from '@web3-react/core';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import {
-  Fetcher,
-  ChainId,
-  WETH,
-  Trade,
-  TokenAmount,
-  TradeType,
-  Percent,
-  Route,
-} from '@pancakeswap/sdk';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import PairChart from '../components/PairChart';
 import Web3 from 'web3';
 import { PairDataTimeWindowEnum } from '../utils/chart';
+import {
+  getTokenPrice,
+  useAllowance,
+  useApprove,
+  useSwap,
+} from '../utils/contractsUtils';
+import { selectPequodApiInstance } from '../store/axiosInstancesSlice';
 
 interface TokenSearchResult {
   name: string;
@@ -42,6 +36,8 @@ interface TokenDetails {
   tokenReserve: number;
   BNBReserve: number;
   priceBNB: number;
+  allowance: number;
+  allowanceFetched: boolean;
 }
 
 interface TokenInfoResponse {
@@ -88,12 +84,44 @@ export default function TradingPage() {
     decimals: 0,
     priceBNB: 0,
     tokenReserve: 0,
+    allowance: 0,
+    allowanceFetched: false,
   });
   const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.DAY
   );
   const dispatch = useAppDispatch();
   const { library, account } = useWeb3React();
+  const pequodApi = useAppSelector(selectPequodApiInstance);
+  const approve = useApprove(
+    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string,
+    selectedTokenInfo.address
+  );
+  useAllowance(
+    selectedTokenInfo.address,
+    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+  ).then((allowance: number) => {
+    if (allowance === selectedTokenInfo.allowance) return;
+    setSelectedTokenInfo({
+      ...selectedTokenInfo,
+      allowance,
+    });
+  });
+
+  useEffect(() => {
+    // Wait for the allowance to be fetched
+    if (!selectedTokenInfo.allowanceFetched) return;
+
+    // If the contract is already allowed, don't do anything
+    if (selectedTokenInfo.allowance !== 0) return;
+  }, [selectedTokenInfo.allowanceFetched, selectedTokenInfo.allowance]);
+
+  const { buyCallback, sellCallback } = useSwap(
+    selectedTokenInfo.address,
+    amountFrom.toString(),
+    slippage
+  );
+
   const currentDate = new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -105,13 +133,21 @@ export default function TradingPage() {
   const updateFrom = (value: number) => {
     setAmountFrom(value);
     if (!selectedTokenInfo) return;
-    setAmountTo(value / selectedTokenInfo.priceBNB);
+    if (currentlySelectedTab === 'buy') {
+      setAmountTo(value / selectedTokenInfo.priceBNB);
+    } else {
+      setAmountTo(value * selectedTokenInfo.priceBNB);
+    }
   };
 
   const updateTo = (value: number) => {
     setAmountTo(value);
     if (!selectedTokenInfo) return;
-    setAmountFrom(value * selectedTokenInfo.priceBNB);
+    if (currentlySelectedTab === 'buy') {
+      setAmountFrom(value * selectedTokenInfo.priceBNB);
+    } else {
+      setAmountTo(value / selectedTokenInfo.priceBNB);
+    }
   };
 
   const formatAmount = (amount: number): string => {
@@ -126,33 +162,36 @@ export default function TradingPage() {
     return price.toString();
   };
 
-  const getTokenInfo = useCallback((tokenAddress: string) => {
-    axios
-      .get(`tokens/info/${tokenAddress}`)
-      .then((res) => {
-        const { data: response }: { data: TokenInfoResponse } = res;
-        const { name, symbol, decimals } = response;
-        setSelectedTokenInfo(
-          (selectedTokenInfo) =>
-            ({
-              ...selectedTokenInfo,
-              name,
-              symbol,
-              decimals: decimals,
-              address: tokenAddress,
-            } as TokenDetails)
-        );
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error('Error retrieving token info, please retry');
-      });
-  }, []);
+  const getTokenInfo = useCallback(
+    (tokenAddress: string) => {
+      pequodApi
+        .get(`tokens/info/${tokenAddress}`)
+        .then((res) => {
+          const { data: response }: { data: TokenInfoResponse } = res;
+          const { name, symbol, decimals } = response;
+          setSelectedTokenInfo(
+            (selectedTokenInfo) =>
+              ({
+                ...selectedTokenInfo,
+                name,
+                symbol,
+                decimals: decimals,
+                address: tokenAddress,
+              } as TokenDetails)
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error('Error retrieving token info, please retry');
+        });
+    },
+    [pequodApi]
+  );
 
   // Get price history from our API
   useEffect(() => {
     if (!selectedTokenInfo.address) return;
-    axios
+    pequodApi
       .get(
         `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/bnb`
       )
@@ -177,7 +216,7 @@ export default function TradingPage() {
           'Error retrieving token details from our API, please retry'
         );
       });
-  }, [selectedTokenInfo.address, timeWindow]);
+  }, [selectedTokenInfo.address, timeWindow, pequodApi]);
 
   useEffect(() => {
     if (!Web3.utils.isAddress(tokenSearch)) return;
@@ -189,7 +228,7 @@ export default function TradingPage() {
       const { BNBReserve, tokenReserve } = await getTokenPrice(
         tokenSearch,
         library,
-        account
+        account as string
       );
 
       setSelectedTokenInfo((selectedTokenInfo) => ({
@@ -219,70 +258,6 @@ export default function TradingPage() {
     selectedTokenInfo.BNBReserve,
     selectedTokenInfo.tokenReserve,
   ]);
-
-  const swap = async () => {
-    const provider = new JsonRpcProvider('https://bsc-dataseed.binance.org/');
-    const token = await Fetcher.fetchTokenData(
-      ChainId.MAINNET,
-      selectedTokenInfo!.address,
-      provider
-    );
-    const pair = await Fetcher.fetchPairData(
-      token,
-      WETH[token.chainId],
-      provider
-    );
-    const route = new Route([pair], WETH[token.chainId]);
-    const trade = new Trade(
-      route,
-      new TokenAmount(
-        WETH[token.chainId],
-        library.utils.toWei(amountFrom.toString())
-      ),
-      TradeType.EXACT_INPUT
-    );
-
-    // Slippage
-    const slippageTolerance = new Percent((slippage * 100).toString(), '10000');
-    const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
-    const path = [WETH[token.chainId].address, token.address];
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
-    const value = trade.inputAmount.raw;
-
-    // get router ABI
-    const routerABI = (await axios.get('pancakeRouterABI.json')).data;
-
-    const routerContract = new library.eth.Contract(
-      routerABI,
-      '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake router address
-      { from: account }
-    );
-    const data = routerContract.methods.swapExactETHForTokens(
-      library.utils.toHex(amountOutMin.toString()),
-      path,
-      account,
-      library.utils.toHex(deadline)
-    );
-    const nonce = await library.eth.getTransactionCount(account);
-    const rawTransaction = {
-      from: account,
-      gasPrice: library.utils.toHex(5000000000),
-      gas: library.utils.toHex(290000),
-      to: '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake router address
-      value: library.utils.toHex(value.toString()),
-      data: data.encodeABI(),
-      nonce: library.utils.toHex(nonce),
-    };
-
-    library.eth.sendTransaction(rawTransaction, (err: any, hash: any) => {
-      if (err) {
-        console.error(err);
-        toast.error('Error sending transaction');
-        return;
-      }
-      toast.success(`Transaction sent\nHash: ${hash}`);
-    });
-  };
 
   const openDialog = () => {
     dispatch(openTradeSettingsDialog());
@@ -443,7 +418,13 @@ export default function TradingPage() {
                         : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
                       'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                     )}
-                    onClick={() => setCurrentlySelectedTab('buy')}
+                    onClick={() => {
+                      setCurrentlySelectedTab('buy');
+                      setAmountFrom(0);
+                      setAmountTo(0);
+                      setTakeProfit(0);
+                      setStopLoss(0);
+                    }}
                   >
                     Buy
                   </button>
@@ -457,7 +438,13 @@ export default function TradingPage() {
                         : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
                       'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
                     )}
-                    onClick={() => setCurrentlySelectedTab('sell')}
+                    onClick={() => {
+                      setCurrentlySelectedTab('sell');
+                      setAmountFrom(0);
+                      setAmountTo(0);
+                      setTakeProfit(0);
+                      setStopLoss(0);
+                    }}
                   >
                     Sell
                   </button>
@@ -472,7 +459,9 @@ export default function TradingPage() {
                       Total{' '}
                       {currentlySelectedTab === 'buy'
                         ? '(BNB)'
-                        : `(${selectedTokenInfo?.symbol})`}
+                        : selectedTokenInfo?.symbol
+                        ? `(${selectedTokenInfo?.symbol})`
+                        : ''}
                     </label>
                   </div>
                   <div className='mt-1'>
@@ -481,13 +470,14 @@ export default function TradingPage() {
                       name='amountFrom'
                       id='amountFrom'
                       min='0'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
+                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
                       placeholder='0.0'
+                      disabled={!selectedTokenInfo.address}
                       value={formatAmount(amountFrom)}
                       onChange={(e) => updateFrom(Number(e.target.value))}
                     />
                   </div>
-                  <PercentagesGroup></PercentagesGroup>
+                  {/* <PercentagesGroup></PercentagesGroup> */}
                 </div>
                 {/* 3rd row */}
                 <div className='col-span-2 w-full mx-auto'>
@@ -498,7 +488,9 @@ export default function TradingPage() {
                     >
                       Total{' '}
                       {currentlySelectedTab === 'buy'
-                        ? `(${selectedTokenInfo?.symbol})`
+                        ? selectedTokenInfo?.symbol
+                          ? `(${selectedTokenInfo?.symbol})`
+                          : ''
                         : '(BNB)'}
                     </label>
                   </div>
@@ -508,8 +500,9 @@ export default function TradingPage() {
                       name='amountTo'
                       min='0'
                       id='amountTo'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5'
+                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
                       placeholder='0.0'
+                      disabled={!selectedTokenInfo.address}
                       value={formatAmount(amountTo)}
                       onChange={(e) => updateTo(Number(e.target.value))}
                     />
@@ -529,7 +522,8 @@ export default function TradingPage() {
                       onClick={() =>
                         setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1)
                       }
-                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                      disabled={!selectedTokenInfo.address}
+                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
                     >
                       <MinusIcon
                         className='h-4 w-4 text-gray-500'
@@ -543,15 +537,17 @@ export default function TradingPage() {
                         id='takeProfit'
                         min='0'
                         value={takeProfit}
+                        disabled={!selectedTokenInfo.address}
                         onChange={(e) => setTakeProfit(Number(e.target.value))}
-                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300'
+                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300 disabled:opacity-80 disabled:cursor-not-allowed'
                         placeholder='0'
                       />
                     </div>
                     <button
                       type='button'
                       onClick={() => setTakeProfit(takeProfit + 1)}
-                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                      disabled={!selectedTokenInfo.address}
+                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
                     >
                       <PlusIcon
                         className='h-4 w-4 text-gray-500'
@@ -573,7 +569,8 @@ export default function TradingPage() {
                       onClick={() =>
                         setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1)
                       }
-                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                      disabled={!selectedTokenInfo.address}
+                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
                     >
                       <MinusIcon
                         className='h-4 w-4 text-gray-500'
@@ -588,14 +585,16 @@ export default function TradingPage() {
                         min='0'
                         value={stopLoss}
                         onChange={(e) => setStopLoss(Number(e.target.value))}
-                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300'
+                        disabled={!selectedTokenInfo.address}
+                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300 disabled:opacity-80 disabled:cursor-not-allowed'
                         placeholder='0'
                       />
                     </div>
                     <button
                       type='button'
                       onClick={() => setStopLoss(stopLoss + 1)}
-                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
+                      disabled={!selectedTokenInfo.address}
+                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
                     >
                       <PlusIcon
                         className='h-4 w-4 text-gray-500'
@@ -606,12 +605,34 @@ export default function TradingPage() {
                 </div>
                 {/* 5th row */}
                 <div className='col-span-2 mt-5 flex justify-center'>
-                  <button
-                    onClick={swap}
-                    className='bg-purple-400 text-white py-2 px-4 rounded-md'
-                  >
-                    Place order
-                  </button>
+                  {selectedTokenInfo.allowance > 0 ? (
+                    <button
+                      onClick={() => {
+                        if (currentlySelectedTab === 'buy') {
+                          buyCallback();
+                        } else {
+                          sellCallback();
+                        }
+                      }}
+                      className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                      disabled={
+                        !selectedTokenInfo ||
+                        !selectedTokenInfo.address ||
+                        !amountFrom ||
+                        !amountTo
+                      }
+                    >
+                      Place order
+                    </button>
+                  ) : (
+                    <button
+                      onClick={approve}
+                      className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                      disabled={approve === undefined}
+                    >
+                      Approve {selectedTokenInfo.symbol}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
