@@ -235,7 +235,7 @@ export function useSwap(
     const rawTransaction = {
       from: account,
       gasPrice: library.utils.toHex(gasPrice),
-      gas: library.utils.toHex(580000),
+      gas: library.utils.toHex(1000000),
       to: process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
       data: data.encodeABI(),
       nonce: library.utils.toHex(nonce),
