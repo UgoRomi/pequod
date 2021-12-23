@@ -159,12 +159,28 @@ export function useSwap(
       { from: account }
     );
     const nonce = await library.eth.getTransactionCount(account);
-    return { amountOutMin, deadline, value, nonce, routerContract, token };
+    const gasPrice = await library.eth.getGasPrice();
+    return {
+      amountOutMin,
+      deadline,
+      value,
+      nonce,
+      routerContract,
+      token,
+      gasPrice,
+    };
   };
 
   const buy = async () => {
-    const { amountOutMin, deadline, value, nonce, routerContract, token } =
-      await swapData('in');
+    const {
+      amountOutMin,
+      deadline,
+      value,
+      nonce,
+      routerContract,
+      token,
+      gasPrice,
+    } = await swapData('in');
 
     const path = [WETH[token.chainId].address, token.address];
     const data =
@@ -174,10 +190,11 @@ export function useSwap(
         account,
         library.utils.toHex(deadline)
       );
+
     const rawTransaction = {
       from: account,
-      gasPrice: library.utils.toHex(5000000000),
-      gas: library.utils.toHex(290000),
+      gasPrice: library.utils.toHex(gasPrice),
+      gas: library.utils.toHex(580000),
       to: process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
       value: library.utils.toHex(value.toString()),
       data: data.encodeABI(),
@@ -195,8 +212,15 @@ export function useSwap(
   };
 
   const sell = async () => {
-    const { amountOutMin, deadline, value, nonce, routerContract, token } =
-      await swapData('out');
+    const {
+      amountOutMin,
+      deadline,
+      value,
+      nonce,
+      routerContract,
+      token,
+      gasPrice,
+    } = await swapData('out');
 
     const path = [token.address, WETH[token.chainId].address];
     const data =
@@ -207,10 +231,11 @@ export function useSwap(
         account,
         library.utils.toHex(deadline)
       );
+
     const rawTransaction = {
       from: account,
-      gasPrice: library.utils.toHex(5000000000),
-      gas: library.utils.toHex(290000),
+      gasPrice: library.utils.toHex(gasPrice),
+      gas: library.utils.toHex(580000),
       to: process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
       data: data.encodeABI(),
       nonce: library.utils.toHex(nonce),
