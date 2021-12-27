@@ -2,12 +2,12 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 
 const injected = new InjectedConnector({
-  supportedChainIds: [56],
+  supportedChainIds: [parseInt(process.env.REACT_APP_CHAIN_ID as string)],
 });
 const walletconnect = new WalletConnectConnector({
   rpc: {
-    1: 'https://mainnet.infura.io/v3/23ae9a2ce21a42c78bc008b128f36aa0',
-    56: 'https://bsc-dataseed.binance.org/',
+    [parseInt(process.env.REACT_APP_CHAIN_ID as string)]: process.env
+      .REACT_APP_CHAIN_RPC_URL as string,
   },
   qrcode: true,
 });

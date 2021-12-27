@@ -1,21 +1,23 @@
 export const setupNetwork = async () => {
   const provider = window.ethereum;
   if (provider) {
-    const chainId = 56;
+    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID as string);
     try {
       await provider.request({
         method: 'wallet_addEthereumChain',
         params: [
           {
             chainId: `0x${chainId.toString(16)}`,
-            chainName: 'Binance Smart Chain Mainnet',
+            chainName: process.env.REACT_APP_CHAIN_NAME as string,
             nativeCurrency: {
               name: 'BNB',
               symbol: 'bnb',
               decimals: 18,
             },
-            rpcUrls: ['https://bsc-dataseed.binance.org/'],
-            blockExplorerUrls: ['https://bscscan.com/'],
+            rpcUrls: [process.env.REACT_APP_CHAIN_RPC_URL as string],
+            blockExplorerUrls: [
+              process.env.REACT_APP_CHAIN_BLOCK_EXPLORER_URL as string,
+            ],
           },
         ],
       });
