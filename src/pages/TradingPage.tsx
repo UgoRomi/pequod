@@ -22,6 +22,17 @@ import {
 } from '../utils/contractsUtils';
 import { selectPequodApiInstance } from '../store/axiosInstancesSlice';
 
+export enum eventCallback {
+  PURCHASE,
+  SELL,
+  SET_TAKE_PROFIT,
+}
+
+export interface TransactionState {
+  hash: string | undefined;
+  type: eventCallback | undefined;
+}
+
 interface TokenSearchResult {
   name: string;
   address: string;
@@ -90,7 +101,8 @@ export default function TradingPage() {
   const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.DAY
   );
-  const [pendingTransaction, setPendingTransaction] = useState<string>();
+  const [pendingTransaction, setPendingTransaction] =
+    useState<TransactionState>();
   const dispatch = useAppDispatch();
   const { library, account } = useWeb3React();
   const pequodApi = useAppSelector(selectPequodApiInstance);
@@ -279,6 +291,7 @@ export default function TradingPage() {
               toast.error(`Transaction ${pendingTransaction} failed`);
               return;
             }
+            // TODO: Call the callback based on pendingTransaction.type
             toast.success(`Transaction ${pendingTransaction} succeeded`);
           }
         );

@@ -16,6 +16,7 @@ import PANCAKE_FACTORY_ABI from '../pancakeFactoryABI.json';
 import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
 import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
+import { eventCallback, TransactionState } from '../pages/TradingPage';
 
 interface UnitMap {
   noether: string;
@@ -139,11 +140,12 @@ export function useSwap(
       if (value.length === token.decimals + 1) unit = key;
     }
 
-    const trade = new Trade(
-      route,
-      new TokenAmount(input, library.utils.toWei(amount, unit)),
-      TradeType.EXACT_INPUT
-    );
+    const tradeAmount =
+      bnbInOrOut === 'out'
+        ? new TokenAmount(input, library.utils.toWei(amount, unit))
+        : new TokenAmount(input, library.utils.toWei(amount));
+
+    const trade = new Trade(route, tradeAmount, TradeType.EXACT_INPUT);
 
     // Slippage
     const slippageTolerance = new Percent((slippage * 100).toString(), '10000');
@@ -173,7 +175,7 @@ export function useSwap(
 
   const buy = async (
     setPendingTransaction: React.Dispatch<
-      React.SetStateAction<string | undefined>
+      React.SetStateAction<TransactionState | undefined>
     >
   ) => {
     const {
@@ -205,19 +207,19 @@ export function useSwap(
       nonce: library.utils.toHex(nonce),
     };
 
-    library.eth.sendTransaction(rawTransaction, (err: any, hash: any) => {
+    library.eth.sendTransaction(rawTransaction, (err: any, hash: string) => {
       if (err) {
         console.error(err);
         toast.error('Error sending transaction');
         return;
       }
-      setPendingTransaction(hash);
+      setPendingTransaction({ hash, type: eventCallback.PURCHASE });
     });
   };
 
   const sell = async (
     setPendingTransaction: React.Dispatch<
-      React.SetStateAction<string | undefined>
+      React.SetStateAction<TransactionState | undefined>
     >
   ) => {
     const {
@@ -249,13 +251,13 @@ export function useSwap(
       nonce: library.utils.toHex(nonce),
     };
 
-    library.eth.sendTransaction(rawTransaction, (err: any, hash: any) => {
+    library.eth.sendTransaction(rawTransaction, (err: any, hash: string) => {
       if (err) {
         console.error(err);
         toast.error('Error sending transaction');
         return;
       }
-      setPendingTransaction(hash);
+      setPendingTransaction({ hash, type: eventCallback.SELL });
     });
   };
   return { buyCallback: buy, sellCallback: sell };
