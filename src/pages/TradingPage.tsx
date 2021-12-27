@@ -799,7 +799,8 @@ export default function TradingPage() {
                 </div>
                 {/* 5th row */}
                 <div className='col-span-2 mt-5 flex justify-center'>
-                  {selectedTokenInfo.allowance > 0 ? (
+                  {currentlySelectedTab === 'buy' ||
+                  selectedTokenInfo.allowance > 0 ? (
                     <button
                       onClick={() => {
                         if (currentlySelectedTab === 'buy') {
@@ -851,7 +852,7 @@ export default function TradingPage() {
                       className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
                       disabled={approve === undefined}
                     >
-                      Approve {selectedTokenInfo.symbol}
+                      Approve {selectedTokenInfo.symbol} swap
                     </button>
                   )}
                 </div>
