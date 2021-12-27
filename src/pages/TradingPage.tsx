@@ -342,7 +342,8 @@ export default function TradingPage() {
                 />
                 <div>
                   <p className='font-bold'>WOT</p>
-                  <span className='text-sm opacity-75'>APY - 20%</span>
+                  <p className='text-sm opacity-75'>APY - 20%</p>
+                  <p className='text-sm opacity-75'>Lockup time 1 year</p>
                 </div>
               </div>
               <div className='flex items-center justify-between mt-4'>
@@ -395,7 +396,12 @@ export default function TradingPage() {
                 />
                 <div>
                   <p className='font-bold'>WOT</p>
-                  <span className='text-sm opacity-75'>APY - 20%</span>
+                  <div className='w-full grid grid-cols-2 grid-rows-2'>
+                    <span className='text-sm opacity-75'>APY</span>
+                    <span className='text-sm opacity-75'>Unlocks In</span>
+                    <span className='text-sm opacity-75'>20%</span>
+                    <span className='text-sm opacity-75'>364:23:12:16</span>
+                  </div>
                 </div>
               </div>
               <div className='flex items-center justify-between mt-4'>
