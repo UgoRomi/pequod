@@ -99,8 +99,8 @@ export default function TradingPage() {
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
     'buy' | 'sell'
   >('buy');
-  const [amountFrom, setAmountFrom] = useState<number>(0);
-  const [amountTo, setAmountTo] = useState<number>(0);
+  const [amountFrom, setAmountFrom] = useState<string>('0');
+  const [amountTo, setAmountTo] = useState<string>('0');
   const [slippage, setSlippage] = useState<number>(1);
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [takeProfit, setTakeProfit] = useState<number>(0);
@@ -163,30 +163,33 @@ export default function TradingPage() {
     minute: '2-digit',
   });
 
-  const updateFrom = (value: number) => {
-    setAmountFrom(value);
+  const updateFrom = (value: string) => {
+    const valueNumeric = parseFloat(value);
+    setAmountFrom(value.toString());
     if (!selectedTokenInfo) return;
     if (currentlySelectedTab === 'buy') {
-      setAmountTo(value / selectedTokenInfo.priceBNB);
+      setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     } else {
-      setAmountTo(value * selectedTokenInfo.priceBNB);
+      setAmountTo((valueNumeric * selectedTokenInfo.priceBNB).toString());
     }
   };
 
-  const updateTo = (value: number) => {
-    setAmountTo(value);
+  const updateTo = (value: string) => {
+    const valueNumeric = parseFloat(value);
+
+    setAmountTo(value.toString());
     if (!selectedTokenInfo) return;
     if (currentlySelectedTab === 'buy') {
-      setAmountFrom(value * selectedTokenInfo.priceBNB);
+      setAmountFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
     } else {
-      setAmountTo(value / selectedTokenInfo.priceBNB);
+      setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     }
   };
 
-  const formatAmount = (amount: number): string => {
-    if (amount.toString().indexOf('e') === -1) return amount.toString();
+  const formatAmount = (amount: string): string => {
+    if (amount.toString().indexOf('e') === -1) return amount;
 
-    return amount.toFixed(15);
+    return parseFloat(amount).toFixed(15);
   };
 
   const formatPrice = (price: number): string => {
@@ -253,8 +256,8 @@ export default function TradingPage() {
 
   useEffect(() => {
     if (!Web3.utils.isAddress(tokenSearch)) return;
-    setAmountFrom(0);
-    setAmountTo(0);
+    setAmountFrom('0');
+    setAmountTo('0');
 
     const searchTokens = setTimeout(async () => {
       getTokenInfo(tokenSearch);
@@ -599,8 +602,8 @@ export default function TradingPage() {
                     )}
                     onClick={() => {
                       setCurrentlySelectedTab('buy');
-                      setAmountFrom(0);
-                      setAmountTo(0);
+                      setAmountFrom('0');
+                      setAmountTo('0');
                       setTakeProfit(0);
                       setStopLoss(0);
                     }}
@@ -619,8 +622,8 @@ export default function TradingPage() {
                     )}
                     onClick={() => {
                       setCurrentlySelectedTab('sell');
-                      setAmountFrom(0);
-                      setAmountTo(0);
+                      setAmountFrom('0');
+                      setAmountTo('0');
                       setTakeProfit(0);
                       setStopLoss(0);
                     }}
@@ -645,15 +648,21 @@ export default function TradingPage() {
                   </div>
                   <div className='mt-1'>
                     <input
-                      type='number'
+                      type='text'
                       name='amountFrom'
                       id='amountFrom'
-                      min='0'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                      inputMode='decimal'
+                      autoComplete='off'
+                      autoCorrect='off'
+                      pattern='^[0-9]*[.,]?[0-9]*$'
                       placeholder='0.0'
+                      minLength={1}
+                      maxLength={79}
+                      spellCheck='false'
+                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
                       disabled={!selectedTokenInfo.address}
                       value={formatAmount(amountFrom)}
-                      onChange={(e) => updateFrom(Number(e.target.value))}
+                      onChange={(e) => updateFrom(e.target.value)}
                     />
                   </div>
                   {/* <PercentagesGroup></PercentagesGroup> */}
@@ -675,15 +684,21 @@ export default function TradingPage() {
                   </div>
                   <div className='mt-1'>
                     <input
-                      type='number'
+                      type='text'
                       name='amountTo'
-                      min='0'
                       id='amountTo'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                      inputMode='decimal'
+                      autoComplete='off'
+                      autoCorrect='off'
+                      pattern='^[0-9]*[.,]?[0-9]*$'
                       placeholder='0.0'
+                      minLength={1}
+                      maxLength={79}
+                      spellCheck='false'
+                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
                       disabled={!selectedTokenInfo.address}
                       value={formatAmount(amountTo)}
-                      onChange={(e) => updateTo(Number(e.target.value))}
+                      onChange={(e) => updateTo(e.target.value)}
                     />
                   </div>
                 </div>
