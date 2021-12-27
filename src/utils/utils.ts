@@ -45,7 +45,11 @@ export async function validateSessionIfInvalid(
   const { data: messageToSign }: { data: string } = await pequodApiInstance.get(
     `/users/signMessage/${account}`
   );
-  const signedMessage = await web3.eth.sign(messageToSign, account);
+  const signedMessage = await web3.eth.personal.sign(
+    messageToSign,
+    account,
+    ''
+  );
   if (!signedMessage) return false;
   await pequodApiInstance.get(
     `/users/signedMessage/${account}/${signedMessage}`
