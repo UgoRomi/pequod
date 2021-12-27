@@ -171,7 +171,11 @@ export function useSwap(
     };
   };
 
-  const buy = async () => {
+  const buy = async (
+    setPendingTransaction: React.Dispatch<
+      React.SetStateAction<string | undefined>
+    >
+  ) => {
     const {
       amountOutMin,
       deadline,
@@ -207,11 +211,15 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      toast.success(`Transaction sent\nHash: ${hash}`);
+      setPendingTransaction(hash);
     });
   };
 
-  const sell = async () => {
+  const sell = async (
+    setPendingTransaction: React.Dispatch<
+      React.SetStateAction<string | undefined>
+    >
+  ) => {
     const {
       amountOutMin,
       deadline,
@@ -247,7 +255,7 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      toast.success(`Transaction sent\nHash: ${hash}`);
+      setPendingTransaction(hash);
     });
   };
   return { buyCallback: buy, sellCallback: sell };
