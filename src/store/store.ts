@@ -1,13 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import tradeDialogReducer from './tradeDialogSlice';
 import axiosInstancesReducer from './axiosInstancesSlice';
+import userInfoReducer from './userInfoSlice';
 
 export const store = configureStore({
   reducer: {
     tradeDialog: tradeDialogReducer,
     axiosInstances: axiosInstancesReducer,
+    userInfo: userInfoReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

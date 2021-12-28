@@ -2,45 +2,24 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   CogIcon,
-  LockClosedIcon,
   MinusIcon,
   PlusIcon,
   SearchIcon,
 } from '@heroicons/react/outline';
-import { classNames } from '../utils/utils';
+import { classNames, useApiCall } from '../utils/utils';
 import { useWeb3React } from '@web3-react/core';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import PairChart from '../components/PairChart';
 import Web3 from 'web3';
 import { PairDataTimeWindowEnum } from '../utils/chart';
 import {
-  getTokenPrice,
+  useGetTokenPrice,
   useAllowance,
   useApprove,
   useSwap,
 } from '../utils/contractsUtils';
-import { selectPequodApiInstance } from '../store/axiosInstancesSlice';
-import Carousel from 'react-multi-carousel';
-
-const responsive = {
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 4,
-    partialVisibilityGutter: 30,
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 2,
-    partialVisibilityGutter: 30,
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1.5,
-    partialVisibilityGutter: 30,
-  },
-};
 
 export enum eventCallback {
   PURCHASE,
@@ -124,22 +103,17 @@ export default function TradingPage() {
   const [pendingTransaction, setPendingTransaction] =
     useState<TransactionState>();
   const dispatch = useAppDispatch();
-  const { library, account } = useWeb3React();
-  const pequodApi = useAppSelector(selectPequodApiInstance);
+  const { library } = useWeb3React();
+  const pequodApiCall = useApiCall();
+  const getTokenPrice = useGetTokenPrice();
   const approve = useApprove(
     process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string,
     selectedTokenInfo.address
   );
-  useAllowance(
+  const checkSwapAllowance = useAllowance(
     selectedTokenInfo.address,
     process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-  ).then((allowance: number) => {
-    if (allowance === selectedTokenInfo.allowance) return;
-    setSelectedTokenInfo({
-      ...selectedTokenInfo,
-      allowance,
-    });
-  });
+  );
 
   useEffect(() => {
     // Wait for the allowance to be fetched
@@ -200,9 +174,12 @@ export default function TradingPage() {
 
   const getTokenInfo = useCallback(
     (tokenAddress: string) => {
-      pequodApi
-        .get(`tokens/info/${tokenAddress}`)
+      pequodApiCall(`tokens/info/${tokenAddress}`, { method: 'GET' })
         .then((res) => {
+          if (!res?.data) {
+            toast.error('Error retrieving token info, please retry');
+            return;
+          }
           const { data: response }: { data: TokenInfoResponse } = res;
           const { name, symbol, decimals } = response;
           setSelectedTokenInfo(
@@ -221,17 +198,21 @@ export default function TradingPage() {
           toast.error('Error retrieving token info, please retry');
         });
     },
-    [pequodApi]
+    [pequodApiCall]
   );
 
   // Get price history from our API
   useEffect(() => {
     if (!selectedTokenInfo.address) return;
-    pequodApi
-      .get(
-        `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/bnb`
-      )
+    pequodApiCall(
+      `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/bnb`,
+      { method: 'GET' }
+    )
       .then((res) => {
+        if (!res?.data) {
+          toast.error('Error retrieving token price history, please retry');
+          return;
+        }
         const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
         const priceHistory: GraphData[] = response.map((item) => ({
           time: new Date(item.date),
@@ -252,20 +233,32 @@ export default function TradingPage() {
           'Error retrieving token details from our API, please retry'
         );
       });
-  }, [selectedTokenInfo.address, timeWindow, pequodApi]);
+  }, [selectedTokenInfo.address, timeWindow, pequodApiCall]);
+
+  // Get the allowance for the selected token towards the pancake router
+  useEffect(() => {
+    checkSwapAllowance().then((allowance: number) => {
+      if (allowance === selectedTokenInfo.allowance) return;
+      setSelectedTokenInfo((selectedTokenInfo) => ({
+        ...selectedTokenInfo,
+        allowance,
+      }));
+    });
+  }, [checkSwapAllowance, selectedTokenInfo.allowance]);
 
   useEffect(() => {
-    if (!Web3.utils.isAddress(tokenSearch)) return;
+    if (
+      !Web3.utils.isAddress(tokenSearch) ||
+      tokenSearch.toUpperCase() ===
+        (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
+    )
+      return;
     setAmountFrom('0');
     setAmountTo('0');
 
     const searchTokens = setTimeout(async () => {
       getTokenInfo(tokenSearch);
-      const { BNBReserve, tokenReserve } = await getTokenPrice(
-        tokenSearch,
-        library,
-        account as string
-      );
+      const { BNBReserve, tokenReserve } = await getTokenPrice(tokenSearch);
 
       setSelectedTokenInfo((selectedTokenInfo) => ({
         ...selectedTokenInfo,
@@ -275,7 +268,9 @@ export default function TradingPage() {
     }, 200);
 
     return () => clearTimeout(searchTokens);
-  }, [tokenSearch, account, library, getTokenInfo]);
+    //TODO: fix this
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenSearch]);
 
   // Update price when decimals, BNBReserve, or tokenReserve change
   useEffect(() => {
@@ -328,127 +323,6 @@ export default function TradingPage() {
     <>
       <div>
         <div className='flex flex-col gap-11'>
-          <Carousel
-            itemClass='mx-4'
-            responsive={responsive}
-            slidesToSlide={1}
-            swipeable
-            draggable
-            infinite
-          >
-            <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full'>
-              <div className='flex items-center gap-4'>
-                <img
-                  src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'
-                  alt='WOT Logo'
-                  className='h-10'
-                />
-                <div>
-                  <p className='font-bold'>WOT</p>
-                  <p className='text-sm opacity-75'>APY - 20%</p>
-                  <p className='text-sm opacity-75'>Lockup time 1 year</p>
-                </div>
-              </div>
-              <div className='flex items-center justify-between mt-4'>
-                {false ? (
-                  <>
-                    <div className='text-xs w-2/3 flex justify-evenly'>
-                      <div>
-                        <p className='font-semibold'>Earned</p>
-                        <p>{100000}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(100000 * 1)}
-                        </p>
-                      </div>
-                      <div className='border-r' aria-hidden></div>
-                      <div>
-                        <p className='font-semibold'>Balance</p>
-                        <p>{10000000}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(10000000 * 1)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className='flex w-1/3 justify-center h-full'>
-                      <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
-                        <LockClosedIcon className='w-5' />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className='w-full flex justify-center'>
-                    <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
-                      Stake now
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full'>
-              <div className='flex items-center gap-4'>
-                <img
-                  src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'
-                  alt='WOT Logo'
-                  className='h-10'
-                />
-                <div>
-                  <p className='font-bold'>WOT</p>
-                  <div className='w-full grid grid-cols-2 grid-rows-2'>
-                    <span className='text-sm opacity-75'>APY</span>
-                    <span className='text-sm opacity-75'>Unlocks In</span>
-                    <span className='text-sm opacity-75'>20%</span>
-                    <span className='text-sm opacity-75'>364:23:12:16</span>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center justify-between mt-4'>
-                {true ? (
-                  <>
-                    <div className='text-xs w-2/3 flex justify-evenly'>
-                      <div>
-                        <p className='font-semibold'>Earned</p>
-                        <p>{100000}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(100000 * 1)}
-                        </p>
-                      </div>
-                      <div className='border-r' aria-hidden></div>
-                      <div>
-                        <p className='font-semibold'>Balance</p>
-                        <p>{10000000}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(10000000 * 1)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className='flex w-1/3 justify-center h-full'>
-                      <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
-                        <LockClosedIcon className='w-5' />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className='w-full flex justify-center'>
-                    <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
-                      Stake now
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Carousel>
           <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-gray-900 xl:p-5 xl:border-2 xl:border-purple-400 xl:rounded-md'>
             <div className='col-span-2 gap-2 xl:gap-0 grid grid-cols-buy'>
               <div className='flex-1 flex flex-col'>

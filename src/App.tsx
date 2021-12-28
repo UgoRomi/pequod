@@ -7,21 +7,9 @@ import TradingPage from './pages/TradingPage';
 import LoginPage from './pages/LoginPage';
 import PortfolioPage from './pages/PortfolioPage';
 import StakingPage from './pages/StakingPage';
-import { useAppSelector } from './store/hooks';
-import { selectPequodApiInstance } from './store/axiosInstancesSlice';
-import { useWeb3React } from '@web3-react/core';
-import { useEffect } from 'react';
-import { validateSessionIfInvalid } from './utils/utils';
 
 function App() {
   useEagerConnect();
-  const { account, library, active } = useWeb3React();
-  const pequodApi = useAppSelector(selectPequodApiInstance);
-
-  useEffect(() => {
-    if (!active || !account || !library || !pequodApi) return;
-    validateSessionIfInvalid(account, library, pequodApi);
-  }, [active, account, library, pequodApi]);
 
   return (
     <Routes>

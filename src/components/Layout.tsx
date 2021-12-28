@@ -5,25 +5,31 @@ import {
   ChartPieIcon,
   LogoutIcon,
   MenuAlt2Icon,
-  TicketIcon,
   XIcon,
 } from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
-import { classNames } from '../utils/utils';
+import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
 import logo from '../images/logo.png';
+import { useAppSelector } from '../store/hooks';
+import { selectUserSignedMessage } from '../store/userInfoSlice';
 
 export default function Layout({ children }: { children: JSX.Element }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
   const { logout } = useAuth();
   const location = useLocation();
+  const userSignedMessage = useAppSelector(selectUserSignedMessage);
+  const validateSessionIfInvalid = useValidateSessionIfInvalid();
+
+  const signMessageCallback = async () => {
+    validateSessionIfInvalid();
+  };
 
   const [navigation, setNavigation] = useState([
     { name: 'Trading', href: '/', icon: ChartPieIcon, current: false },
-    { name: 'Portfolio', href: '/portfolio', icon: TicketIcon, current: false },
     { name: 'Staking', href: '/staking', icon: CashIcon, current: false },
   ]);
 
@@ -37,6 +43,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
 
   return (
     <div>
+      {!userSignedMessage && (
+        <div className='z-50 bg-gray-500 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
+          <button onClick={async () => await signMessageCallback()}>
+            Sign the message
+          </button>
+        </div>
+      )}
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as='div'

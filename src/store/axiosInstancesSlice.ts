@@ -13,7 +13,7 @@ const initialState: AxiosInstancesState = {
 };
 
 export const axiosInterfacesSlice = createSlice({
-  name: 'tradeDialog',
+  name: 'axiosInterfaces',
   initialState,
   reducers: {
     initializePequodInstance: (state) => {

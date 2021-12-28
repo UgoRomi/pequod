@@ -48,50 +48,58 @@ interface UnitMap {
   tether: string;
 }
 
-export async function getTokenPrice(
-  token: string,
-  web3: any,
-  account: string | undefined
-) {
-  const BNBAddress = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
-  const pancakeFactoryAddress = '0xca143ce32fe78f1f7019d7d551a6402fc5350c73';
+export function useGetTokenPrice() {
+  const { library, account } = useWeb3React();
 
-  // Get token/BNB pair address
-  const factoryContract = new web3.eth.Contract(
-    PANCAKE_FACTORY_ABI,
-    pancakeFactoryAddress,
-    { from: account }
-  );
-  const pairAddress = await factoryContract.methods
-    .getPair(BNBAddress, token)
-    .call();
+  const getTokenPrice = async (token: string) => {
+    // Get token/BNB pair address
+    const factoryContract = new library.eth.Contract(
+      PANCAKE_FACTORY_ABI,
+      process.env.REACT_APP_PANCAKE_FACTORY_ADDRESS,
+      { from: account }
+    );
+    const pairAddress = await factoryContract.methods
+      .getPair(process.env.REACT_APP_BNB_ADDRESS, token)
+      .call();
 
-  //Get token price
-  const pairContract = new web3.eth.Contract(PANCAKE_PAIR_ABI, pairAddress, {
-    from: account,
-  });
-  // I have to check if BNB is the token 0 because it changes for every pair
-  const isBNBToken0 =
-    (await pairContract.methods.token0().call()) === BNBAddress;
-  const { _reserve0: reserve0, _reserve1: reserve1 } =
-    await pairContract.methods.getReserves().call();
-  return {
-    BNBReserve: isBNBToken0 ? reserve0 : reserve1,
-    tokenReserve: isBNBToken0 ? reserve1 : reserve0,
+    //Get token price
+    const pairContract = new library.eth.Contract(
+      PANCAKE_PAIR_ABI,
+      pairAddress,
+      {
+        from: account,
+      }
+    );
+    // I have to check if BNB is the token 0 because it changes for every pair
+    const isBNBToken0 =
+      (await pairContract.methods.token0().call()) ===
+      process.env.REACT_APP_BNB_ADDRESS;
+    const { _reserve0: reserve0, _reserve1: reserve1 } =
+      await pairContract.methods.getReserves().call();
+    return {
+      BNBReserve: isBNBToken0 ? reserve0 : reserve1,
+      tokenReserve: isBNBToken0 ? reserve1 : reserve0,
+    };
   };
+  return getTokenPrice;
 }
 
 // Get the current allowance for a given token
-export async function useAllowance(tokenAddress: string, spender: string) {
+export function useAllowance(tokenAddress: string, spender: string) {
   const { library, account, active } = useWeb3React();
-  if (!tokenAddress || !spender || !active) return 0;
-  const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
-    from: account,
-  });
-  const allowance = await tokenContract.methods
-    .allowance(account, spender)
-    .call();
-  return allowance;
+
+  const checkAllowance = async () => {
+    if (!tokenAddress || !spender || !active) return 0;
+    const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
+      from: account,
+    });
+    const allowance: number = await tokenContract.methods
+      .allowance(account, spender)
+      .call();
+    return allowance;
+  };
+
+  return checkAllowance;
 }
 
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
