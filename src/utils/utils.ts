@@ -41,16 +41,15 @@ export function useApiCall() {
 }
 
 export function useValidateSessionIfInvalid() {
-  //const getUserInfo = useUserInfo();
+  const getUserInfo = useUserInfo();
   const signMessage = useSignMessage();
   const userSignedMessage = useAppSelector(selectUserSignedMessage);
   const getMessageToSign = useGetMessageToSign();
   const updateSignedMessage = useUpdateSignedMessage();
 
   const validateSessionIfInvalid = async () => {
-    //const userData = await getUserInfo();
-    //if (userData.logged && !!userSignedMessage) return true;
-    if (userSignedMessage) return true;
+    const userData = await getUserInfo();
+    if (userData.logged && !!userSignedMessage) return true;
     const messageToSign = await getMessageToSign();
     const signedMessage = await signMessage(messageToSign);
     if (!signedMessage) return false;
@@ -67,7 +66,9 @@ export function useUserInfo() {
   const getUserInfo = async () => {
     // Check if the user is logged in
     const { data: userData }: { data: UserInfoResponse } =
-      await pequodApiInstance.get(`/users/${account}/info`);
+      await pequodApiInstance.get(
+        `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
+      );
     return userData;
   };
 
@@ -114,7 +115,9 @@ export function useUpdateSignedMessage() {
 
   const updateSignedMessage = async (signedMessage: string) => {
     dispatch(setSignedMessage(signedMessage));
-    await pequodApi.get(`/users/signedMessage/${account}/${signedMessage}`);
+    await pequodApi.get(
+      `/users/signedMessage/${account}/${process.env.REACT_APP_CHAIN_ID}/${signedMessage}`
+    );
   };
 
   return updateSignedMessage;

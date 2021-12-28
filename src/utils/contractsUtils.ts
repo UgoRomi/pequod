@@ -15,8 +15,12 @@ import BEP20_ABI from '../BEP20.json';
 import PANCAKE_FACTORY_ABI from '../pancakeFactoryABI.json';
 import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
 import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
+import MOBY_STAKING_ABI from '../mobyStakingABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
-import { eventCallback, TransactionState } from '../pages/TradingPage';
+import _ from 'lodash';
+import { useAppDispatch } from '../store/hooks';
+import { addTransaction } from '../store/transactionsSlice';
+import { EventType } from './consts';
 
 interface UnitMap {
   noether: string;
@@ -93,17 +97,17 @@ export function useAllowance(tokenAddress: string, spender: string) {
     const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
       from: account,
     });
-    const allowance: number = await tokenContract.methods
+    const allowance: string = await tokenContract.methods
       .allowance(account, spender)
       .call();
-    return allowance;
+    return parseFloat(allowance);
   };
 
   return checkAllowance;
 }
 
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
-export function useApprove(spender: string, tokenAddress: string) {
+export function useApprove(tokenAddress: string, spender: string) {
   const { library, account, active } = useWeb3React();
 
   if (!tokenAddress || !spender || !active) return undefined;
@@ -117,12 +121,25 @@ export function useApprove(spender: string, tokenAddress: string) {
   return approve;
 }
 
+function useGasPrice() {
+  const { library } = useWeb3React();
+
+  const getGasPrice = async () => {
+    const gasPrice = await library.eth.getGasPrice();
+    return gasPrice;
+  };
+
+  return getGasPrice;
+}
+
 export function useSwap(
   tokenAddress: string,
   amount: string,
   slippage: number
 ) {
   const { library, account } = useWeb3React();
+  const getGasPrice = useGasPrice();
+  const dispatch = useAppDispatch();
 
   const swapData = async (bnbInOrOut: 'in' | 'out') => {
     const provider = new JsonRpcProvider('https://bsc-dataseed.binance.org/');
@@ -169,7 +186,7 @@ export function useSwap(
       { from: account }
     );
     const nonce = await library.eth.getTransactionCount(account);
-    const gasPrice = await library.eth.getGasPrice();
+    const gasPrice = await getGasPrice();
     return {
       amountOutMin,
       deadline,
@@ -181,11 +198,7 @@ export function useSwap(
     };
   };
 
-  const buy = async (
-    setPendingTransaction: React.Dispatch<
-      React.SetStateAction<TransactionState | undefined>
-    >
-  ) => {
+  const buy = async () => {
     const {
       amountOutMin,
       deadline,
@@ -221,15 +234,11 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      setPendingTransaction({ hash, type: eventCallback.PURCHASE });
+      dispatch(addTransaction({ txHash: hash, type: EventType.BUY }));
     });
   };
 
-  const sell = async (
-    setPendingTransaction: React.Dispatch<
-      React.SetStateAction<TransactionState | undefined>
-    >
-  ) => {
+  const sell = async () => {
     const {
       amountOutMin,
       deadline,
@@ -265,8 +274,34 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      setPendingTransaction({ hash, type: eventCallback.SELL });
+      dispatch(addTransaction({ txHash: hash, type: EventType.SELL }));
     });
   };
   return { buyCallback: buy, sellCallback: sell };
+}
+
+export function useWotStake() {
+  const { library, account } = useWeb3React();
+  const getGasPrice = useGasPrice();
+  const dispatch = useAppDispatch();
+
+  const stake = async (
+    stakingContractAddress: string,
+    amount: number
+  ): Promise<{ success: boolean; txHash: string }> => {
+    const routerContract = new library.eth.Contract(
+      MOBY_STAKING_ABI,
+      stakingContractAddress,
+      { from: account }
+    );
+    const gasPrice = await getGasPrice();
+    const result = await routerContract.methods
+      .deposit(amount)
+      .send({ from: account, gasPrice });
+    const success = !_.isObject(result);
+    if (success)
+      dispatch(addTransaction({ txHash: result, type: EventType.STAKE }));
+    return { success, txHash: result };
+  };
+  return stake;
 }

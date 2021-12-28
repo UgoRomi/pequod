@@ -7,7 +7,6 @@ import {
   SearchIcon,
 } from '@heroicons/react/outline';
 import { classNames, useApiCall } from '../utils/utils';
-import { useWeb3React } from '@web3-react/core';
 import { useAppDispatch } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
@@ -20,17 +19,6 @@ import {
   useApprove,
   useSwap,
 } from '../utils/contractsUtils';
-
-export enum eventCallback {
-  PURCHASE,
-  SELL,
-  SET_TAKE_PROFIT,
-}
-
-export interface TransactionState {
-  hash: string | undefined;
-  type: eventCallback | undefined;
-}
 
 interface TokenSearchResult {
   name: string;
@@ -100,15 +88,12 @@ export default function TradingPage() {
   const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.DAY
   );
-  const [pendingTransaction, setPendingTransaction] =
-    useState<TransactionState>();
   const dispatch = useAppDispatch();
-  const { library } = useWeb3React();
   const pequodApiCall = useApiCall();
   const getTokenPrice = useGetTokenPrice();
   const approve = useApprove(
-    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string,
-    selectedTokenInfo.address
+    selectedTokenInfo.address,
+    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
   );
   const checkSwapAllowance = useAllowance(
     selectedTokenInfo.address,
@@ -140,7 +125,7 @@ export default function TradingPage() {
   const updateFrom = (value: string) => {
     const valueNumeric = parseFloat(value);
     setAmountFrom(value.toString());
-    if (!selectedTokenInfo) return;
+    if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     } else {
@@ -152,7 +137,7 @@ export default function TradingPage() {
     const valueNumeric = parseFloat(value);
 
     setAmountTo(value.toString());
-    if (!selectedTokenInfo) return;
+    if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
       setAmountFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
     } else {
@@ -293,31 +278,6 @@ export default function TradingPage() {
   const openDialog = () => {
     dispatch(openTradeSettingsDialog());
   };
-
-  useEffect(() => {
-    if (!pendingTransaction) return;
-    // Try to get the transaction receipt
-    // We try 10 times with increasing delay each time
-    // After 10 times, we give up
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => {
-        library.eth.getTransactionReceipt(
-          pendingTransaction,
-          (error: any, _result: any) => {
-            setPendingTransaction(undefined);
-            if (error) {
-              toast.error(`Transaction ${pendingTransaction} failed`);
-              return;
-            }
-            // TODO: Call the callback based on pendingTransaction.type
-            toast.success(`Transaction ${pendingTransaction} succeeded`);
-          }
-        );
-      }, i * 1500);
-    }
-    setPendingTransaction(undefined);
-    toast.error(`Transaction ${pendingTransaction} failed`);
-  }, [pendingTransaction, library.eth]);
 
   return (
     <>
@@ -678,9 +638,9 @@ export default function TradingPage() {
                     <button
                       onClick={() => {
                         if (currentlySelectedTab === 'buy') {
-                          buyCallback(setPendingTransaction);
+                          buyCallback();
                         } else {
-                          sellCallback(setPendingTransaction);
+                          sellCallback();
                         }
                       }}
                       className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
@@ -688,37 +648,10 @@ export default function TradingPage() {
                         !selectedTokenInfo ||
                         !selectedTokenInfo.address ||
                         !amountFrom ||
-                        !amountTo ||
-                        !!pendingTransaction
+                        !amountTo
                       }
                     >
-                      {pendingTransaction ? (
-                        <>
-                          <svg
-                            className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
-                            xmlns='http://www.w3.org/2000/svg'
-                            fill='none'
-                            viewBox='0 0 24 24'
-                          >
-                            <circle
-                              className='opacity-25'
-                              cx='12'
-                              cy='12'
-                              r='10'
-                              stroke='currentColor'
-                              stroke-width='4'
-                            ></circle>
-                            <path
-                              className='opacity-75'
-                              fill='currentColor'
-                              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                            ></path>
-                            Processing order...
-                          </svg>
-                        </>
-                      ) : (
-                        'Place Order'
-                      )}
+                      Place Order
                     </button>
                   ) : (
                     <button

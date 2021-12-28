@@ -23,6 +23,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const location = useLocation();
   const userSignedMessage = useAppSelector(selectUserSignedMessage);
   const validateSessionIfInvalid = useValidateSessionIfInvalid();
+  const [signInProgress, setSignInProgress] = useState(false);
 
   const signMessageCallback = async () => {
     validateSessionIfInvalid();
@@ -41,11 +42,20 @@ export default function Layout({ children }: { children: JSX.Element }) {
     );
   }, [location.pathname, navigation]);
 
+  const signMessage = async () => {
+    setSignInProgress(true);
+    await signMessageCallback();
+    setSignInProgress(false);
+  };
+
   return (
     <div>
       {!userSignedMessage && (
         <div className='z-50 bg-gray-500 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
-          <button onClick={async () => await signMessageCallback()}>
+          <button
+            disabled={signInProgress}
+            onClick={async () => await signMessage()}
+          >
             Sign the message
           </button>
         </div>
