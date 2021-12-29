@@ -8,6 +8,7 @@ import {
   setSignedMessage,
 } from '../store/userInfoSlice';
 import { UserInfoResponse } from './apiTypes';
+import { v4 as uuidV4 } from 'uuid';
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -32,6 +33,7 @@ export function useApiCall() {
         ...options.data,
         signature: userSignedMessage,
         chainID: process.env.REACT_APP_CHAIN_ID,
+        uuid: uuidV4(),
       },
     };
     return pequodApiInstance(url, newOptions);

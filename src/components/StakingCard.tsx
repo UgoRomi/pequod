@@ -12,6 +12,7 @@ export default function StakingCard({
   approveSpending,
   stakeTokens,
   stakingContractAddress,
+  stakeId,
 }: {
   apy: number;
   tokenSymbol: string;
@@ -22,12 +23,14 @@ export default function StakingCard({
   approveSpending: (() => void) | undefined;
   stakeTokens: (
     stakingContractAddress: string,
-    amount: number
+    amount: string,
+    stakeId: string
   ) => Promise<{
     success: boolean;
     txHash: string;
   }>;
   stakingContractAddress: string;
+  stakeId: string;
 }) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
@@ -163,7 +166,7 @@ export default function StakingCard({
             </div>
             <button
               onClick={() =>
-                stakeTokens(stakingContractAddress, parseFloat(stakeAmount))
+                stakeTokens(stakingContractAddress, stakeAmount, stakeId)
               }
               className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md h-10'
             >

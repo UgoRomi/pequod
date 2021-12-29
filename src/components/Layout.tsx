@@ -42,20 +42,17 @@ export default function Layout({ children }: { children: JSX.Element }) {
     );
   }, [location.pathname, navigation]);
 
-  const signMessage = async () => {
+  const signMessage = () => {
+    if (signInProgress) return;
     setSignInProgress(true);
-    await signMessageCallback();
-    setSignInProgress(false);
+    signMessageCallback().finally(() => setSignInProgress(false));
   };
 
   return (
     <div>
       {!userSignedMessage && (
         <div className='z-50 bg-gray-500 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
-          <button
-            disabled={signInProgress}
-            onClick={async () => await signMessage()}
-          >
+          <button disabled={signInProgress} onClick={signMessage}>
             Sign the message
           </button>
         </div>

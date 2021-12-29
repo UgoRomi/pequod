@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useUserInfo } from './utils/utils';
 import { useAppDispatch } from './store/hooks';
 import { setBnbAMount, setWotAMount } from './store/userInfoSlice';
+import { setBnbUsdPrice } from './store/pricesSlice';
 
 function App() {
   useEagerConnect();
@@ -25,6 +26,7 @@ function App() {
         switch (token.symbol) {
           case 'BNB':
             dispatch(setBnbAMount(token.amount));
+            dispatch(setBnbUsdPrice(token.currentPrice));
             break;
           case process.env.REACT_APP_WOT_SYMBOL:
             dispatch(setWotAMount(token.amount));

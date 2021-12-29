@@ -2,21 +2,25 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { EventType } from '../utils/consts';
 import { RootState } from './store';
 
-interface TransactionsState {
-  transactions: { txHash: string; type: EventType }[];
+interface PendingTransactionsState {
+  transactions: { txHash: string; type: EventType; addedTimestamp: number }[];
 }
 
-const initialState: TransactionsState = {
+const initialState: PendingTransactionsState = {
   transactions: [],
 };
 
-export const transactionsSlice = createSlice({
-  name: 'transactions',
+export const pendingTransactionsSlice = createSlice({
+  name: 'pendingTransactions',
   initialState,
   reducers: {
     addTransaction: (
       state,
-      action: PayloadAction<{ txHash: string; type: EventType }>
+      action: PayloadAction<{
+        txHash: string;
+        type: EventType;
+        addedTimestamp: number;
+      }>
     ) => {
       state.transactions.push(action.payload);
     },
@@ -28,11 +32,12 @@ export const transactionsSlice = createSlice({
   },
 });
 
-export const { addTransaction, removeTransaction } = transactionsSlice.actions;
+export const { addTransaction, removeTransaction } =
+  pendingTransactionsSlice.actions;
 
 // #region Selectors
 export const selectPendingTransactions = (state: RootState) =>
-  state.transactions.transactions;
+  state.pendingTransactions.transactions;
 // #endregion
 
-export default transactionsSlice.reducer;
+export default pendingTransactionsSlice.reducer;

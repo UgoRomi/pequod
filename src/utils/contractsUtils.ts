@@ -17,10 +17,11 @@ import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
 import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
 import MOBY_STAKING_ABI from '../mobyStakingABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
-import _ from 'lodash';
 import { useAppDispatch } from '../store/hooks';
 import { addTransaction } from '../store/transactionsSlice';
 import { EventType } from './consts';
+import { useStakeEvent } from './events';
+import { useValidateSessionIfInvalid } from './utils';
 
 interface UnitMap {
   noether: string;
@@ -234,7 +235,13 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      dispatch(addTransaction({ txHash: hash, type: EventType.BUY }));
+      dispatch(
+        addTransaction({
+          txHash: hash,
+          type: EventType.BUY,
+          addedTimestamp: Date.now(),
+        })
+      );
     });
   };
 
@@ -274,7 +281,13 @@ export function useSwap(
         toast.error('Error sending transaction');
         return;
       }
-      dispatch(addTransaction({ txHash: hash, type: EventType.SELL }));
+      dispatch(
+        addTransaction({
+          txHash: hash,
+          type: EventType.SELL,
+          addedTimestamp: Date.now(),
+        })
+      );
     });
   };
   return { buyCallback: buy, sellCallback: sell };
@@ -283,25 +296,47 @@ export function useSwap(
 export function useWotStake() {
   const { library, account } = useWeb3React();
   const getGasPrice = useGasPrice();
-  const dispatch = useAppDispatch();
+  const stakeEvent = useStakeEvent();
+  const validateSessionIfInvalid = useValidateSessionIfInvalid();
 
   const stake = async (
     stakingContractAddress: string,
-    amount: number
+    amount: string,
+    stakeId: string
   ): Promise<{ success: boolean; txHash: string }> => {
+    const valid = await validateSessionIfInvalid();
+    if (!valid) return { success: false, txHash: '' };
     const routerContract = new library.eth.Contract(
       MOBY_STAKING_ABI,
       stakingContractAddress,
       { from: account }
     );
     const gasPrice = await getGasPrice();
-    const result = await routerContract.methods
-      .deposit(amount)
-      .send({ from: account, gasPrice });
-    const success = !_.isObject(result);
-    if (success)
-      dispatch(addTransaction({ txHash: result, type: EventType.STAKE }));
-    return { success, txHash: result };
+    try {
+      const result = await routerContract.methods
+        .deposit(amount)
+        .send({ from: account, gasPrice });
+      toast.success(`${amount} ${process.env.REACT_APP_WOT_SYMBOL} Staked`);
+      const gasUsed = library.utils.fromWei(
+        (result.gasUsed * gasPrice).toString()
+      );
+
+      stakeEvent(
+        stakeId,
+        process.env.REACT_APP_WOT_ADDRESS as string,
+        amount,
+        result.transactionHash,
+        gasUsed
+      );
+      return { success: true, txHash: result.transactionHash };
+    } catch (e) {
+      toast.error(
+        `There was an error staking your ${process.env.REACT_APP_WOT_SYMBOL}\nPlease retry`
+      );
+      console.error(e);
+      return { success: false, txHash: '' };
+    }
+    // No need to use
   };
   return stake;
 }

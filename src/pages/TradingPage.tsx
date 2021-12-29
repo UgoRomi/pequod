@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import {
-  CogIcon,
-  MinusIcon,
-  PlusIcon,
-  SearchIcon,
-} from '@heroicons/react/outline';
+import { CogIcon, SearchIcon } from '@heroicons/react/outline';
 import { classNames, useApiCall } from '../utils/utils';
 import { useAppDispatch } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
@@ -69,8 +64,6 @@ export default function TradingPage() {
   const [amountFrom, setAmountFrom] = useState<string>('0');
   const [amountTo, setAmountTo] = useState<string>('0');
   const [slippage, setSlippage] = useState<number>(1);
-  const [stopLoss, setStopLoss] = useState<number>(0);
-  const [takeProfit, setTakeProfit] = useState<number>(0);
   const [hoverValue, setHoverValue] = useState<number | undefined>();
   const [hoverDate, setHoverDate] = useState<string | undefined>();
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
@@ -438,8 +431,6 @@ export default function TradingPage() {
                       setCurrentlySelectedTab('buy');
                       setAmountFrom('0');
                       setAmountTo('0');
-                      setTakeProfit(0);
-                      setStopLoss(0);
                     }}
                   >
                     Buy
@@ -458,8 +449,6 @@ export default function TradingPage() {
                       setCurrentlySelectedTab('sell');
                       setAmountFrom('0');
                       setAmountTo('0');
-                      setTakeProfit(0);
-                      setStopLoss(0);
                     }}
                   >
                     Sell
@@ -537,101 +526,6 @@ export default function TradingPage() {
                   </div>
                 </div>
                 {/* 4th row */}
-                <div className='mr-5'>
-                  <label
-                    htmlFor='takeProfit'
-                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                  >
-                    Take Profit (%)
-                  </label>
-                  <div className='mt-1 flex rounded-md shadow-sm'>
-                    <button
-                      type='button'
-                      onClick={() =>
-                        setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1)
-                      }
-                      disabled={!selectedTokenInfo.address}
-                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
-                    >
-                      <MinusIcon
-                        className='h-4 w-4 text-gray-500'
-                        aria-hidden='true'
-                      />
-                    </button>
-                    <div className='relative flex items-stretch flex-grow focus-within:z-10'>
-                      <input
-                        type='number'
-                        name='takeProfit'
-                        id='takeProfit'
-                        min='0'
-                        value={takeProfit}
-                        disabled={!selectedTokenInfo.address}
-                        onChange={(e) => setTakeProfit(Number(e.target.value))}
-                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300 disabled:opacity-80 disabled:cursor-not-allowed'
-                        placeholder='0'
-                      />
-                    </div>
-                    <button
-                      type='button'
-                      onClick={() => setTakeProfit(takeProfit + 1)}
-                      disabled={!selectedTokenInfo.address}
-                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
-                    >
-                      <PlusIcon
-                        className='h-4 w-4 text-gray-500'
-                        aria-hidden='true'
-                      />
-                    </button>
-                  </div>
-                </div>
-                <div className='ml-5'>
-                  <label
-                    htmlFor='stopLoss'
-                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                  >
-                    Stop Loss (%)
-                  </label>
-                  <div className='mt-1 flex rounded-md shadow-sm'>
-                    <button
-                      type='button'
-                      onClick={() =>
-                        setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1)
-                      }
-                      disabled={!selectedTokenInfo.address}
-                      className='relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-l-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
-                    >
-                      <MinusIcon
-                        className='h-4 w-4 text-gray-500'
-                        aria-hidden='true'
-                      />
-                    </button>
-                    <div className='relative flex items-stretch flex-grow focus-within:z-10'>
-                      <input
-                        type='number'
-                        name='stopLoss'
-                        id='stopLoss'
-                        min='0'
-                        value={stopLoss}
-                        onChange={(e) => setStopLoss(Number(e.target.value))}
-                        disabled={!selectedTokenInfo.address}
-                        className='focus:ring-purple-500 focus:border-purple-500 block w-full px-5 sm:text-sm border-gray-300 disabled:opacity-80 disabled:cursor-not-allowed'
-                        placeholder='0'
-                      />
-                    </div>
-                    <button
-                      type='button'
-                      onClick={() => setStopLoss(stopLoss + 1)}
-                      disabled={!selectedTokenInfo.address}
-                      className='-ml-px relative inline-flex items-center space-x-2 p-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-80 disabled:cursor-not-allowed'
-                    >
-                      <PlusIcon
-                        className='h-4 w-4 text-gray-500'
-                        aria-hidden='true'
-                      />
-                    </button>
-                  </div>
-                </div>
-                {/* 5th row */}
                 <div className='col-span-2 mt-5 flex justify-center'>
                   {currentlySelectedTab === 'buy' ||
                   selectedTokenInfo.allowance > 0 ? (

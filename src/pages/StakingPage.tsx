@@ -62,6 +62,7 @@ export default function StakingPage() {
           stakingContractAddress={
             process.env.REACT_APP_WOT_STAKING_20_ADDRESS as string
           }
+          stakeId='1'
         ></StakingCard>
       )}
       {userWotBalance > WOT_STAKING_MIN_AMOUNT_2 && (
@@ -77,6 +78,7 @@ export default function StakingPage() {
           stakingContractAddress={
             process.env.REACT_APP_WOT_STAKING_100_ADDRESS as string
           }
+          stakeId='0'
         ></StakingCard>
       )}
     </div>

@@ -3,13 +3,15 @@ import tradeDialogReducer from './tradeDialogSlice';
 import axiosInstancesReducer from './axiosInstancesSlice';
 import userInfoReducer from './userInfoSlice';
 import transactionsReducer from './transactionsSlice';
+import pricesReducer from './pricesSlice';
 
 export const store = configureStore({
   reducer: {
     tradeDialog: tradeDialogReducer,
     axiosInstances: axiosInstancesReducer,
     userInfo: userInfoReducer,
-    transactions: transactionsReducer,
+    pendingTransactions: transactionsReducer,
+    prices: pricesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
