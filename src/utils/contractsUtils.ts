@@ -53,19 +53,30 @@ interface UnitMap {
   tether: string;
 }
 
-export function useGetTokenPrice() {
+function useGetPairAddress() {
   const { library, account } = useWeb3React();
 
-  const getTokenPrice = async (token: string) => {
-    // Get token/BNB pair address
+  const getPairAddress = async (tokenAddress: string) => {
     const factoryContract = new library.eth.Contract(
       PANCAKE_FACTORY_ABI,
       process.env.REACT_APP_PANCAKE_FACTORY_ADDRESS,
       { from: account }
     );
     const pairAddress = await factoryContract.methods
-      .getPair(process.env.REACT_APP_BNB_ADDRESS, token)
+      .getPair(process.env.REACT_APP_BNB_ADDRESS, tokenAddress)
       .call();
+    return pairAddress;
+  };
+  return getPairAddress;
+}
+
+export function useGetTokenPrice() {
+  const { library, account } = useWeb3React();
+  const getPairAddress = useGetPairAddress();
+
+  const getTokenPrice = async (tokenAddress: string) => {
+    // Get token/BNB pair address
+    const pairAddress = await getPairAddress(tokenAddress);
 
     //Get token price
     const pairContract = new library.eth.Contract(
@@ -143,20 +154,21 @@ export function useSwap(
   const dispatch = useAppDispatch();
 
   const swapData = async (bnbInOrOut: 'in' | 'out') => {
-    const provider = new JsonRpcProvider('https://bsc-dataseed.binance.org/');
-    const token = await Fetcher.fetchTokenData(
-      ChainId.MAINNET,
-      tokenAddress,
+    const provider = new JsonRpcProvider(process.env.REACT_APP_CHAIN_RPC_URL);
+    const chainId =
+      process.env.REACT_APP_CHAIN_ID === '56'
+        ? ChainId.MAINNET
+        : ChainId.TESTNET;
+    const token = await Fetcher.fetchTokenData(chainId, tokenAddress, provider);
+    const weth = await Fetcher.fetchTokenData(
+      chainId,
+      process.env.REACT_APP_BNB_ADDRESS as string,
       provider
     );
-    const pair = await Fetcher.fetchPairData(
-      token,
-      WETH[token.chainId],
-      provider
-    );
+    const pair = await Fetcher.fetchPairData(token, weth, provider);
     // Input must be WETH for buy and token for sell
-    const input = bnbInOrOut === 'in' ? WETH[token.chainId] : token;
-    const output = bnbInOrOut === 'in' ? token : WETH[token.chainId];
+    const input = bnbInOrOut === 'in' ? weth : token;
+    const output = bnbInOrOut === 'in' ? token : weth;
     const route = new Route([pair], input, output);
 
     // Get which unit to convert from

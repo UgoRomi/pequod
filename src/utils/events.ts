@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useAppSelector } from '../store/hooks';
 import { selectBnbUsdPrice } from '../store/pricesSlice';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
-import { StakeRequest } from '../types/eventsTypes';
+import { StakeEventRequest } from '../types/eventsTypes';
 import { useApiCall } from './utils';
 
 export function useStakeEvent() {
@@ -18,7 +18,7 @@ export function useStakeEvent() {
     txHash: string,
     gasSpent: number
   ) => {
-    const requestBody: StakeRequest = {
+    const requestBody: StakeEventRequest = {
       wallet: account as string,
       signature: userSignature,
       stakeInfo: {

@@ -152,7 +152,10 @@ export default function TradingPage() {
 
   const getTokenInfo = useCallback(
     (tokenAddress: string) => {
-      pequodApiCall(`tokens/info/${tokenAddress}`, { method: 'GET' })
+      pequodApiCall(
+        `tokens/info/${tokenAddress}/${process.env.REACT_APP_CHAIN_ID}`,
+        { method: 'GET' }
+      )
         .then((res) => {
           if (!res?.data) {
             toast.error('Error retrieving token info, please retry');
@@ -183,7 +186,7 @@ export default function TradingPage() {
   useEffect(() => {
     if (!selectedTokenInfo.address) return;
     pequodApiCall(
-      `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/bnb`,
+      `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/${process.env.REACT_APP_CHAIN_ID}/bnb`,
       { method: 'GET' }
     )
       .then((res) => {
@@ -211,7 +214,9 @@ export default function TradingPage() {
           'Error retrieving token details from our API, please retry'
         );
       });
-  }, [selectedTokenInfo.address, timeWindow, pequodApiCall]);
+    // TODO: Resolve dependency cycle
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTokenInfo.address, timeWindow]);
 
   // Get the allowance for the selected token towards the pancake router
   useEffect(() => {
@@ -416,9 +421,9 @@ export default function TradingPage() {
               )}
             </div>
             <div className='flex h-100 justify-center items-center col-span-2 xl:col-span-1'>
-              <div className=' grid grid-cols-2 gap-y-4 xl:border-l px-5 xl:px-28'>
+              <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
                 {/* 1st row */}
-                <div className='flex justify-center border-r'>
+                <div className='flex justify-center'>
                   <button
                     type='button'
                     className={classNames(
@@ -436,7 +441,7 @@ export default function TradingPage() {
                     Buy
                   </button>
                 </div>
-                <div className='flex justify-center border-l'>
+                <div className='flex justify-center'>
                   <button
                     type='button'
                     className={classNames(
