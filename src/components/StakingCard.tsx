@@ -1,4 +1,4 @@
-import { ChevronUpIcon } from '@heroicons/react/outline';
+import { ChevronUpIcon, ExclamationCircleIcon } from '@heroicons/react/outline';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { useEffect, useState } from 'react';
 import { AvailableFarmState } from '../store/farmsSlice';
@@ -140,7 +140,7 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
               </button>
             ) : (
               <button
-                className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md lg:w-32'
+                className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'
                 onClick={approveSpending}
               >
                 Approve Staking
@@ -183,7 +183,14 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
               </div>
             </div>
           )}
-          <div className='border-t-2 mt-2 pt-2 flex justify-around items-end'>
+          <div className='border-t-2 mt-2 pt-2 flex flex-wrap justify-around items-end gap-y-3'>
+            {userFarm && (
+              <span className='w-full text-xl font-bold flex items-center justify-center gap-3 text-purple-500'>
+                <ExclamationCircleIcon className='h-20 lg:h-10' />
+                Adding more {userFarm?.tokenSymbol} to the staking pool will
+                reset the lockup period
+              </span>
+            )}
             <div>
               <label
                 htmlFor='stakingAmount'

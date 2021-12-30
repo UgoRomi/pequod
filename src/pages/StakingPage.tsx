@@ -23,7 +23,6 @@ export default function StakingPage() {
   const [loadingFarms, setLoadingFarms] = useState(true);
 
   const userWotBalance = useAppSelector(selectUserWotAmount);
-  console.log(userWotBalance);
 
   useEffect(() => {
     getUserInfo().then((res) => {

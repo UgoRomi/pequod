@@ -40,7 +40,7 @@ function App() {
       });
 
       // Save the current user farms to the store
-      const userFarms = res.pequodFarms.map((farm): FarmState => {
+      const userFarms = res?.pequodFarms?.map((farm): FarmState => {
         return {
           id: parseInt(farm.id),
           tokenAddress: farm.token.address,
@@ -53,7 +53,7 @@ function App() {
           farmContractAddress: farm.address,
         };
       });
-      dispatch(addUserFarms(userFarms));
+      if (userFarms) dispatch(addUserFarms(userFarms));
     });
   }, [active, dispatch, getUserInfo]);
 
