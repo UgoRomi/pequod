@@ -57,9 +57,10 @@ export default function StakingCard({
 
   const stake = () => {
     setStakingInProgress(true);
+    // TODO: Allow the user to stake fractions of a token
     stakeWot(
       farmGeneralData.farmContractAddress,
-      stakeAmount,
+      Math.floor(parseFloat(stakeAmount)).toString(),
       farmGeneralData.id
     ).finally(() => {
       setStakingInProgress(false);
