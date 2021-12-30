@@ -3,6 +3,7 @@ import useAuth from '../hooks/useAuth';
 import { ReactComponent as MetamaskStackedLogo } from '../images/metamask-logo-stacked.svg';
 import { ReactComponent as WalletConnectLogo } from '../images/walletconnect-logo.svg';
 import { connectorLocalStorageKey, ConnectorNames } from '../utils/connectors';
+import logo from '../images/logo.png';
 
 export default function LoginPage() {
   const location = useLocation();
@@ -21,9 +22,13 @@ export default function LoginPage() {
   return (
     <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0 bg-gray-600'>
       <div className='w-full sm:mx-auto sm:w-full sm:max-w-md bg-gray-100 rounded-md shadow-lg'>
-        <h1 className='text-purple-400 text-5xl text-center p-5 font-bold'>
-          Pequod
-        </h1>
+        <div className='flex justify-center items-center w-full py-4'>
+          <img
+            className='flex-shrink-0 max-h-14'
+            src={logo}
+            alt='Pequod Logo'
+          />
+        </div>
         <p className='text-gray-800 text-xl font-semibold text-center'>
           Connect your wallet
         </p>

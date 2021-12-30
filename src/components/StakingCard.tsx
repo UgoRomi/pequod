@@ -26,6 +26,7 @@ export default function StakingCard({
     useState<number>(0);
 
   const [stakingInProgress, setStakingInProgress] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
   const getAllowance = useAllowance();
   const approve = useApprove();
   const stakeWot = useWotStake();
@@ -48,12 +49,14 @@ export default function StakingCard({
   });
 
   const approveSpending = () => {
-    approve(
-      farmGeneralData.tokenAddress,
-      farmGeneralData.farmContractAddress
-    ).then((res) => {
-      setAllowed(res);
-    });
+    setIsApproving(true);
+    approve(farmGeneralData.tokenAddress, farmGeneralData.farmContractAddress)
+      .then((res) => {
+        setAllowed(res);
+      })
+      .finally(() => {
+        setIsApproving(false);
+      });
   };
 
   const stake = () => {
@@ -179,10 +182,18 @@ export default function StakingCard({
               </button>
             ) : (
               <button
+                disabled={isApproving}
                 className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'
                 onClick={approveSpending}
               >
-                Approve Staking
+                {isApproving ? (
+                  <>
+                    <Spinner className='h-5 text-white' />
+                    Approving...
+                  </>
+                ) : (
+                  'Approve spending'
+                )}
               </button>
             )}
           </>

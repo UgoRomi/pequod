@@ -1,6 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { CashIcon, LogoutIcon } from '@heroicons/react/outline';
+import {
+  CashIcon,
+  ChevronDownIcon,
+  LogoutIcon,
+} from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
@@ -85,12 +89,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         <DarkModeToggle />
                         <Menu as='div' className='ml-3 relative'>
                           <div>
-                            <Menu.Button className='max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
-                              <span className='inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-400 hover:bg-purple-500 dark:text-gray-200 dark:bg-purple-500 dark:hover:bg-purple-600 focus:outline-none'>
+                            <Menu.Button className='max-w-xs text-white px-4 bg-gray-700 bg-opacity-30 shadow-sm flex items-center text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                              <span className='inline-flex items-center py-2 border border-transparent text-base font-medium rounded-md focus:outline-none'>
                                 {account?.slice(0, 6) +
                                   '...' +
                                   account?.slice(37)}
                               </span>
+                              <ChevronDownIcon className='ml-2 h-4' />
                             </Menu.Button>
                           </div>
                           <Transition
