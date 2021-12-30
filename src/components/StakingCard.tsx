@@ -7,9 +7,16 @@ import { RootState } from '../store/store';
 import { updateUserFarm } from '../store/userInfoSlice';
 import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
 import { secondsToDhms } from '../utils/utils';
+import PercentagesGroup, { Percentages } from './PercentagesGroup';
 import Spinner from './Spinner';
 
-export default function StakingCard({ stakeId }: { stakeId: number }) {
+export default function StakingCard({
+  stakeId,
+  userTokenBalance,
+}: {
+  stakeId: number;
+  userTokenBalance: number;
+}) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
   const [allowed, setAllowed] = useState(false);
@@ -67,6 +74,23 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
     }, 1000);
     return () => clearTimeout(timeout);
   });
+
+  const percentageButtonClicked = (percentage: Percentages) => {
+    switch (percentage) {
+      case Percentages['25%']:
+        setStakeAmount((userTokenBalance * 0.25).toFixed(4));
+        break;
+      case Percentages['50%']:
+        setStakeAmount((userTokenBalance * 0.5).toFixed(4));
+        break;
+      case Percentages['75%']:
+        setStakeAmount((userTokenBalance * 0.75).toFixed(4));
+        break;
+      case Percentages['100%']:
+        setStakeAmount(userTokenBalance.toFixed(4));
+        break;
+    }
+  };
 
   return (
     <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full'>
@@ -183,7 +207,7 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
               </div>
             </div>
           )}
-          <div className='border-t-2 mt-2 pt-2 flex flex-wrap justify-around items-end gap-y-3'>
+          <div className='border-t-2 mt-2 pt-2 flex flex-wrap justify-around items-center gap-y-3'>
             {userFarm && (
               <span className='w-full text-xl font-bold flex items-center justify-center gap-3 text-purple-500'>
                 <ExclamationCircleIcon className='h-20 lg:h-10' />
@@ -212,6 +236,10 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
                 className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
                 value={stakeAmount}
                 onChange={(e) => setStakeAmount(e.target.value)}
+              />
+              <PercentagesGroup
+                darkModeClass='text-gray-700'
+                buttonClickCallback={percentageButtonClicked}
               />
             </div>
             <button

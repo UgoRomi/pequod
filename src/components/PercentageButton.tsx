@@ -1,17 +1,27 @@
 import { classNames } from '../utils/utils';
+import { Percentages } from './PercentagesGroup';
 
 export default function PercentageButton({
-  text,
   active,
   setActive,
+  percentage,
+  buttonClickCallback,
+  darkModeClass = 'text-gray-200',
 }: {
-  text: string;
   active: boolean;
   setActive: () => void;
+  percentage: Percentages;
+  buttonClickCallback: (percentage: Percentages) => void;
+  darkModeClass: string;
 }) {
+  const buttonClick = () => {
+    setActive();
+    buttonClickCallback(percentage);
+  };
+
   return (
     <div
-      onClick={setActive}
+      onClick={buttonClick}
       className='flex flex-col justify-center cursor-pointer'
     >
       <button
@@ -22,8 +32,10 @@ export default function PercentageButton({
       >
         {' '}
       </button>
-      <span className='w-full flex justify-center text-gray-700 dark:text-gray-200'>
-        {text}
+      <span
+        className={`w-full flex justify-center text-gray-700 dark:${darkModeClass}`}
+      >
+        {percentage}%
       </span>
     </div>
   );
