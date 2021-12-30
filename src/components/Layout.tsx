@@ -1,12 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import {
-  CashIcon,
-  ChartPieIcon,
-  LogoutIcon,
-  MenuAlt2Icon,
-  XIcon,
-} from '@heroicons/react/outline';
+import { CashIcon, LogoutIcon, XIcon } from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
@@ -28,8 +22,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const [signInProgress, setSignInProgress] = useState(false);
 
   const [navigation, setNavigation] = useState([
-    { name: 'Trading', href: '/', icon: ChartPieIcon, current: false },
-    { name: 'Staking', href: '/staking', icon: CashIcon, current: false },
+    { name: 'Staking', href: '/', icon: CashIcon, current: false },
   ]);
 
   useEffect(() => {
@@ -178,16 +171,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
       </div>
       <div className='md:pl-64 flex flex-col flex-1'>
         <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-900 shadow'>
-          <button
-            type='button'
-            className='px-4 text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden'
-            onClick={() => setSidebarOpen(true)}
-          >
-            <span className='sr-only'>Open sidebar</span>
-            <MenuAlt2Icon className='h-6 w-6' aria-hidden='true' />
-          </button>
-          <div className='flex-1 px-4 flex justify-between items-center'>
-            <div className='flex-1 flex'></div>
+          <div className='flex-1 px-4 flex justify-between md:justify-end items-center'>
             <DarkModeToggle />
             <div className='ml-4 flex items-center md:ml-6'>
               {/* Profile dropdown */}

@@ -13,9 +13,11 @@ import Spinner from './Spinner';
 export default function StakingCard({
   stakeId,
   userTokenBalance,
+  disabled = false,
 }: {
   stakeId: number;
   userTokenBalance: number;
+  disabled: boolean;
 }) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
@@ -102,7 +104,10 @@ export default function StakingCard({
   };
 
   return (
-    <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full'>
+    <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full relative'>
+      {disabled && (
+        <div className='absolute top-0 left-0 w-full h-full bg-gray-600 bg-opacity-60 z-10 box-border rounded-sm'></div>
+      )}
       <div className='flex items-center gap-4 lg:gap-7'>
         <img
           src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'

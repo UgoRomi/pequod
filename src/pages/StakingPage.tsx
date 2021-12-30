@@ -83,12 +83,12 @@ export default function StakingPage() {
   return (
     <div className='grid w-full grid-cols-1 gap-3'>
       {availableFarms.map((farm) => {
-        if (farm.id === 0 && userWotBalance < 2000000000) return <></>;
         return (
           <StakingCard
             key={farm.id}
             stakeId={farm.id}
             userTokenBalance={userWotBalance}
+            disabled={farm.id === 0}
           ></StakingCard>
         );
       })}
