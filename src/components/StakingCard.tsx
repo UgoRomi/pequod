@@ -20,6 +20,9 @@ export default function StakingCard({
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
   const [allowed, setAllowed] = useState(false);
+  const [percentageButtonActive, setPercentageButtonActive] =
+    useState<number>(0);
+
   const [stakingInProgress, setStakingInProgress] = useState(false);
   const getAllowance = useAllowance();
   const approve = useApprove();
@@ -90,6 +93,12 @@ export default function StakingCard({
         setStakeAmount(userTokenBalance.toFixed(4));
         break;
     }
+  };
+
+  const updateStakeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStakeAmount(event.target.value);
+    const stakeAmount = parseFloat(event.target.value);
+    setPercentageButtonActive(4 * (stakeAmount / userTokenBalance));
   };
 
   return (
@@ -235,11 +244,13 @@ export default function StakingCard({
                 spellCheck='false'
                 className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
                 value={stakeAmount}
-                onChange={(e) => setStakeAmount(e.target.value)}
+                onChange={updateStakeAmount}
               />
               <PercentagesGroup
                 darkModeClass='text-gray-700'
                 buttonClickCallback={percentageButtonClicked}
+                active={percentageButtonActive}
+                setActive={setPercentageButtonActive}
               />
             </div>
             <button
