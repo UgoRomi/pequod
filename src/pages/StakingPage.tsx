@@ -27,7 +27,7 @@ export default function StakingPage() {
   useEffect(() => {
     getUserInfo().then((res) => {
       // Save the current user farms to the store
-      const userFarms = res?.pequodFarms.map((farm): FarmState => {
+      const userFarms = res?.pequodFarms?.map((farm): FarmState => {
         return {
           id: parseInt(farm.id),
           tokenAddress: farm.token.address,
