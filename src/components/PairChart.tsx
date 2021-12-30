@@ -60,9 +60,6 @@ export default function PairChart({
 }: SwapLineChartProps) {
   const colors = getChartColors({ isChangePositive });
 
-  // if (!data || data.length === 0) {
-  //   return <LineChartLoader />;
-  // }
   return (
     <ResponsiveContainer>
       <AreaChart

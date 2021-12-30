@@ -101,10 +101,10 @@ export function useGetTokenPrice() {
 }
 
 // Get the current allowance for a given token
-export function useAllowance(tokenAddress: string, spender: string) {
+export function useAllowance() {
   const { library, account, active } = useWeb3React();
 
-  const checkAllowance = async () => {
+  const checkAllowance = async (tokenAddress: string, spender: string) => {
     if (!tokenAddress || !spender || !active) return 0;
     const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
       from: account,
@@ -119,16 +119,22 @@ export function useAllowance(tokenAddress: string, spender: string) {
 }
 
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
-export function useApprove(tokenAddress: string, spender: string) {
+export function useApprove() {
   const { library, account, active } = useWeb3React();
 
-  if (!tokenAddress || !spender || !active) return undefined;
+  const approve = async (
+    tokenAddress: string,
+    spender: string
+  ): Promise<boolean> => {
+    if (!tokenAddress || !spender || !active) return false;
 
-  const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
-    from: account,
-  });
-  const approve = () => {
-    tokenContract.methods.approve(spender, MaxUint256).send({ from: account });
+    const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
+      from: account,
+    });
+    await tokenContract.methods
+      .approve(spender, MaxUint256)
+      .send({ from: account });
+    return true;
   };
   return approve;
 }
@@ -314,7 +320,7 @@ export function useWotStake() {
   const stake = async (
     stakingContractAddress: string,
     amount: string,
-    stakeId: string
+    stakeId: number
   ): Promise<{ success: boolean; txHash: string }> => {
     const valid = await validateSessionIfInvalid();
     if (!valid) return { success: false, txHash: '' };

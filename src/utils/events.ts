@@ -12,7 +12,7 @@ export function useStakeEvent() {
   const bnbUsdPrice = useAppSelector(selectBnbUsdPrice);
 
   const stake = async (
-    stakeId: string,
+    stakeId: number,
     tokenAddress: string,
     tokenAmount: string,
     txHash: string,
@@ -22,7 +22,7 @@ export function useStakeEvent() {
       wallet: account as string,
       signature: userSignature,
       stakeInfo: {
-        stakeId,
+        stakeId: stakeId.toString(),
       },
       token: {
         address: tokenAddress,

@@ -1,74 +1,115 @@
 import { ChevronUpIcon } from '@heroicons/react/outline';
 import { LockClosedIcon } from '@heroicons/react/solid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { AvailableFarmState } from '../store/farmsSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { RootState } from '../store/store';
+import { updateUserFarm } from '../store/userInfoSlice';
+import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
+import { secondsToDhms } from '../utils/utils';
+import Spinner from './Spinner';
 
-export default function StakingCard({
-  apy,
-  tokenSymbol,
-  amountEarned,
-  tokenPriceValue,
-  amountStaked,
-  allowed,
-  approveSpending,
-  stakeTokens,
-  stakingContractAddress,
-  stakeId,
-}: {
-  apy: number;
-  tokenSymbol: string;
-  amountEarned: number;
-  tokenPriceValue: number;
-  amountStaked: number;
-  allowed: boolean;
-  approveSpending: (() => void) | undefined;
-  stakeTokens: (
-    stakingContractAddress: string,
-    amount: string,
-    stakeId: string
-  ) => Promise<{
-    success: boolean;
-    txHash: string;
-  }>;
-  stakingContractAddress: string;
-  stakeId: string;
-}) {
+export default function StakingCard({ stakeId }: { stakeId: number }) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
+  const [allowed, setAllowed] = useState(false);
+  const [stakingInProgress, setStakingInProgress] = useState(false);
+  const getAllowance = useAllowance();
+  const approve = useApprove();
+  const stakeWot = useWotStake();
+  const dispatch = useAppDispatch();
+  const farmGeneralData = useAppSelector((state: RootState) =>
+    state.farms.available.find((farm) => farm.id === stakeId)
+  ) as AvailableFarmState;
+
+  const userFarm = useAppSelector((state: RootState) =>
+    state.userInfo.farms.find((farm) => farm.id === stakeId)
+  );
+
+  useEffect(() => {
+    getAllowance(
+      farmGeneralData.tokenAddress,
+      farmGeneralData.farmContractAddress
+    ).then((res) => {
+      setAllowed(res > 0);
+    });
+  });
+
+  const approveSpending = () => {
+    approve(
+      farmGeneralData.tokenAddress,
+      farmGeneralData.farmContractAddress
+    ).then((res) => {
+      setAllowed(res);
+    });
+  };
+
+  const stake = () => {
+    setStakingInProgress(true);
+    stakeWot(
+      farmGeneralData.farmContractAddress,
+      stakeAmount,
+      farmGeneralData.id
+    ).finally(() => {
+      setStakingInProgress(false);
+    });
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!userFarm) return;
+      dispatch(
+        updateUserFarm({
+          ...userFarm,
+          unStakingTimeInSeconds: userFarm.unStakingTimeInSeconds - 1,
+        })
+      );
+    }, 1000);
+    return () => clearTimeout(timeout);
+  });
 
   return (
     <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full'>
-      <div className='flex items-center gap-4'>
+      <div className='flex items-center gap-4 lg:gap-7'>
         <img
           src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'
           alt='WOT Logo'
           className='h-10'
         />
         <div>
-          <p className='font-bold'>{tokenSymbol}</p>
-          <p className='text-sm opacity-75'>APY - {apy}%</p>
-          <p className='text-sm opacity-75'>Lockup time 1 year</p>
+          <p className='font-bold'>{farmGeneralData.tokenSymbol}</p>
+          <p className='text-sm opacity-75'>APY - {farmGeneralData.apy}%</p>
+          <p className='text-sm opacity-75'>Lockup time: 1 year</p>
         </div>
-        {amountStaked > 0 ? (
+        {userFarm ? (
           <>
             <div className='hidden lg:block'>
               <p className='font-semibold'>Earned</p>
-              <p>{amountEarned}</p>
-              <p>
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(amountEarned * tokenPriceValue)}
-              </p>
+              <p>{userFarm.amountEarned.toFixed(5)}</p>
+              {userFarm.tokenUSDPrice !== Infinity && (
+                <p>
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(userFarm.amountEarned * userFarm.tokenUSDPrice)}
+                </p>
+              )}
             </div>
             <div className='hidden lg:block'>
               <p className='font-semibold'>Total in staking</p>
-              <p>{amountStaked}</p>
-              <p>
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(amountStaked * tokenPriceValue)}
-              </p>
+              <p>{userFarm.totalAmount.toFixed(5)}</p>
+              {userFarm.tokenUSDPrice !== Infinity && (
+                <p>
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(userFarm.totalAmount * userFarm.tokenUSDPrice)}
+                </p>
+              )}
+            </div>
+            <div className='hidden lg:block'>
+              <p className='font-semibold'>Unlocks in</p>
+              <p>{secondsToDhms(userFarm.unStakingTimeInSeconds)}</p>
             </div>
             <button
               onClick={() => setStakingFormIsOpen(!stakingFormIsOpen)}
@@ -110,33 +151,35 @@ export default function StakingCard({
       </div>
       {stakingFormIsOpen && (
         <div className='flex flex-col my-3'>
-          {amountStaked > 0 && (
+          {userFarm && (
             <div className='lg:hidden grid grid-cols-1 gap-4'>
               <div className='flex gap-x-6 flex-wrap'>
                 <p className='font-semibold w-full'>Earned</p>
-                <span>
-                  {tokenSymbol}: {amountEarned}
-                </span>
-                <span>
-                  USD:{' '}
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                  }).format(amountEarned * tokenPriceValue)}
-                </span>
+                <span>{userFarm.amountEarned}</span>
+                {userFarm.tokenUSDPrice !== Infinity && (
+                  <span>
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(userFarm.amountEarned * userFarm.tokenUSDPrice)}
+                  </span>
+                )}
               </div>
               <div className='flex gap-x-6 flex-wrap'>
                 <p className='font-semibold w-full'>Total in staking</p>
-                <p>
-                  {tokenSymbol}: {amountStaked}
-                </p>
-                <p>
-                  USD:{' '}
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                  }).format(amountStaked * tokenPriceValue)}
-                </p>
+                <p>{userFarm.totalAmount}</p>
+                {userFarm.tokenUSDPrice !== Infinity && (
+                  <p>
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(userFarm.totalAmount * userFarm.tokenUSDPrice)}
+                  </p>
+                )}
+              </div>
+              <div className='flex gap-x-6 flex-wrap'>
+                <p className='font-semibold w-full'>Unlocks in</p>
+                <p>{secondsToDhms(userFarm.unStakingTimeInSeconds)}</p>
               </div>
             </div>
           )}
@@ -146,7 +189,7 @@ export default function StakingCard({
                 htmlFor='stakingAmount'
                 className='block text-sm font-medium text-gray-700'
               >
-                Stake {tokenSymbol}
+                Stake {farmGeneralData.tokenSymbol}
               </label>
               <input
                 type='text'
@@ -159,18 +202,28 @@ export default function StakingCard({
                 minLength={1}
                 maxLength={79}
                 spellCheck='false'
-                className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
                 value={stakeAmount}
                 onChange={(e) => setStakeAmount(e.target.value)}
               />
             </div>
             <button
-              onClick={() =>
-                stakeTokens(stakingContractAddress, stakeAmount, stakeId)
+              disabled={
+                !stakeAmount ||
+                parseFloat(stakeAmount) === 0 ||
+                stakingInProgress
               }
-              className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md h-10'
+              onClick={stake}
+              className='flex bg-purple-400 text-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
             >
-              Stake Now
+              {stakingInProgress ? (
+                <>
+                  <Spinner />
+                  Staking...
+                </>
+              ) : (
+                'Stake Now'
+              )}
             </button>
           </div>
         </div>

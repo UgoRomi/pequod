@@ -4,6 +4,7 @@ import axiosInstancesReducer from './axiosInstancesSlice';
 import userInfoReducer from './userInfoSlice';
 import transactionsReducer from './transactionsSlice';
 import pricesReducer from './pricesSlice';
+import farmsReducer from './farmsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     userInfo: userInfoReducer,
     pendingTransactions: transactionsReducer,
     prices: pricesReducer,
+    farms: farmsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

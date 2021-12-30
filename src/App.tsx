@@ -11,7 +11,12 @@ import { useWeb3React } from '@web3-react/core';
 import { useEffect } from 'react';
 import { useUserInfo } from './utils/utils';
 import { useAppDispatch } from './store/hooks';
-import { setBnbAMount, setWotAMount } from './store/userInfoSlice';
+import {
+  addUserFarms,
+  FarmState,
+  setBnbAMount,
+  setWotAMount,
+} from './store/userInfoSlice';
 import { setBnbUsdPrice } from './store/pricesSlice';
 
 function App() {
@@ -33,6 +38,22 @@ function App() {
             break;
         }
       });
+
+      // Save the current user farms to the store
+      const userFarms = res.pequodFarms.map((farm): FarmState => {
+        return {
+          id: parseInt(farm.id),
+          tokenAddress: farm.token.address,
+          tokenUSDPrice: parseFloat(farm.token.priceInUsd),
+          amountEarned: farm.totalEarningInToken,
+          farmPercentageAPY: farm.farmPercentageAPY,
+          totalAmount: parseFloat(farm.amount),
+          unStakingTimeInSeconds: parseInt(farm.unStakingTimeInSeconds),
+          tokenSymbol: farm.token.symbol,
+          farmContractAddress: farm.address,
+        };
+      });
+      dispatch(addUserFarms(userFarms));
     });
   }, [active, dispatch, getUserInfo]);
 

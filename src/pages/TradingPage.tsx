@@ -84,14 +84,8 @@ export default function TradingPage() {
   const dispatch = useAppDispatch();
   const pequodApiCall = useApiCall();
   const getTokenPrice = useGetTokenPrice();
-  const approve = useApprove(
-    selectedTokenInfo.address,
-    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-  );
-  const checkSwapAllowance = useAllowance(
-    selectedTokenInfo.address,
-    process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-  );
+  const approve = useApprove();
+  const checkSwapAllowance = useAllowance();
 
   useEffect(() => {
     // Wait for the allowance to be fetched
@@ -220,14 +214,21 @@ export default function TradingPage() {
 
   // Get the allowance for the selected token towards the pancake router
   useEffect(() => {
-    checkSwapAllowance().then((allowance: number) => {
+    checkSwapAllowance(
+      selectedTokenInfo.address,
+      process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+    ).then((allowance: number) => {
       if (allowance === selectedTokenInfo.allowance) return;
       setSelectedTokenInfo((selectedTokenInfo) => ({
         ...selectedTokenInfo,
         allowance,
       }));
     });
-  }, [checkSwapAllowance, selectedTokenInfo.allowance]);
+  }, [
+    checkSwapAllowance,
+    selectedTokenInfo.allowance,
+    selectedTokenInfo.address,
+  ]);
 
   useEffect(() => {
     if (
@@ -554,7 +555,12 @@ export default function TradingPage() {
                     </button>
                   ) : (
                     <button
-                      onClick={approve}
+                      onClick={() =>
+                        approve(
+                          selectedTokenInfo.address,
+                          process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+                        )
+                      }
                       className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
                       disabled={approve === undefined}
                     >
