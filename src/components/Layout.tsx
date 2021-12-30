@@ -9,6 +9,8 @@ import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
 import Spinner from './Spinner';
 import DarkModeToggle from './DarkModeToggle';
+import logo from '../images/logo.png';
+import logoSmall from '../images/logo-small.png';
 
 export default function Layout({ children }: { children: JSX.Element }) {
   const { account } = useWeb3React();
@@ -66,9 +68,16 @@ export default function Layout({ children }: { children: JSX.Element }) {
                 <div className='max-w-7xl mx-auto px-2 sm:px-4 lg:px-8'>
                   <div className='relative h-16 flex items-center justify-between lg:border-b lg:border-purple-400 lg:border-opacity-25'>
                     <div className='px-2 flex items-center lg:px-0'>
-                      <div className='flex-shrink-0 text-2xl font-bold text-purple-400'>
-                        Pequod
-                      </div>
+                      <img
+                        className='flex-shrink-0 max-h-11 hidden md:block'
+                        src={logo}
+                        alt='Pequod Logo'
+                      />
+                      <img
+                        className='flex-shrink-0 max-h-14 md:hidden'
+                        src={logoSmall}
+                        alt='Pequod Logo'
+                      />
                     </div>
                     <div className='block ml-4'>
                       <div className='flex items-center'>

@@ -10,6 +10,7 @@ import { formatTokenAmount, secondsToDhms } from '../utils/utils';
 import PercentagesGroup, { Percentages } from './PercentagesGroup';
 import { subMilliseconds } from 'date-fns';
 import Spinner from './Spinner';
+import { ReactComponent as TokenLogo } from '../images/wot-logo.svg';
 
 export default function StakingCard({
   stakeId,
@@ -113,11 +114,7 @@ export default function StakingCard({
   return (
     <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full relative'>
       <div className='flex items-center gap-4 lg:gap-7'>
-        <img
-          src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'
-          alt='WOT Logo'
-          className='h-10'
-        />
+        <TokenLogo className='h-10 w-10' />
         <div>
           <p className='font-bold'>{farmGeneralData.tokenSymbol}</p>
           <p className='text-sm opacity-75'>APY - {farmGeneralData.apy}%</p>
