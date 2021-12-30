@@ -83,7 +83,7 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
         </div>
         {userFarm ? (
           <>
-            <div className='hidden lg:block'>
+            <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Earned</p>
               <p>{userFarm.amountEarned.toFixed(5)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
@@ -95,7 +95,7 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
                 </p>
               )}
             </div>
-            <div className='hidden lg:block'>
+            <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Total in staking</p>
               <p>{userFarm.totalAmount.toFixed(5)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
@@ -107,7 +107,7 @@ export default function StakingCard({ stakeId }: { stakeId: number }) {
                 </p>
               )}
             </div>
-            <div className='hidden lg:block'>
+            <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Unlocks in</p>
               <p>{secondsToDhms(userFarm.unStakingTimeInSeconds)}</p>
             </div>

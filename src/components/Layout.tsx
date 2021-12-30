@@ -16,6 +16,7 @@ import logo from '../images/logo.png';
 import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
 import Spinner from './Spinner';
+import DarkModeToggle from './DarkModeToggle';
 
 export default function Layout({ children }: { children: JSX.Element }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -185,8 +186,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
             <span className='sr-only'>Open sidebar</span>
             <MenuAlt2Icon className='h-6 w-6' aria-hidden='true' />
           </button>
-          <div className='flex-1 px-4 flex justify-between'>
+          <div className='flex-1 px-4 flex justify-between items-center'>
             <div className='flex-1 flex'></div>
+            <DarkModeToggle />
             <div className='ml-4 flex items-center md:ml-6'>
               {/* Profile dropdown */}
               <Menu as='div' className='ml-3 relative'>
