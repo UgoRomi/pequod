@@ -27,7 +27,7 @@ export default function StakingPage() {
   useEffect(() => {
     getUserInfo().then((res) => {
       // Save the current user farms to the store
-      const userFarms = res.pequodFarms.map((farm): FarmState => {
+      const userFarms = res?.pequodFarms.map((farm): FarmState => {
         return {
           id: parseInt(farm.id),
           tokenAddress: farm.token.address,
@@ -40,7 +40,7 @@ export default function StakingPage() {
           farmContractAddress: farm.address,
         };
       });
-      dispatch(addUserFarms(userFarms));
+      if (userFarms) dispatch(addUserFarms(userFarms));
     });
   }, [dispatch, getUserInfo]);
 
@@ -70,12 +70,10 @@ export default function StakingPage() {
     // TODO: Fix dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
-
-  if (loadingFarms && !availableFarms) {
+  if (loadingFarms && !availableFarms.length) {
     return (
-      <div className='flex justify-center items-center dark:text-white z-10 w-full h-full text-3xl'>
-        <Spinner />
-        Loading...
+      <div className='flex justify-center w-full h-full'>
+        <Spinner className='h-10 text-gray-800' />
       </div>
     );
   }
@@ -88,7 +86,7 @@ export default function StakingPage() {
             key={farm.id}
             stakeId={farm.id}
             userTokenBalance={userWotBalance}
-            disabled={farm.id === 0}
+            disabled={farm.id === 0 && userWotBalance < 2000000000}
           ></StakingCard>
         );
       })}

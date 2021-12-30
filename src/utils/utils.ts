@@ -51,7 +51,7 @@ export function useValidateSessionIfInvalid() {
 
   const validateSessionIfInvalid = async () => {
     const userData = await getUserInfo();
-    if (userData.logged && !!userSignedMessage) return true;
+    if (userData?.logged && !!userSignedMessage) return true;
     const messageToSign = await getMessageToSign();
     const signedMessage = await signMessage(messageToSign);
     if (!signedMessage) return false;
@@ -63,10 +63,11 @@ export function useValidateSessionIfInvalid() {
 }
 
 export function useUserInfo() {
-  const { account } = useWeb3React();
+  const { account, active } = useWeb3React();
   const pequodApiInstance = useAppSelector(selectPequodApiInstance);
   const getUserInfo = async () => {
     // Check if the user is logged in
+    if (!active) return;
     const { data: userData }: { data: UserInfoResponse } =
       await pequodApiInstance.get(
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`

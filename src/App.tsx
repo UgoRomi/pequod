@@ -25,7 +25,7 @@ function App() {
 
   useEffect(() => {
     getUserInfo().then((res) => {
-      res.personalWallet?.tokens?.forEach((token) => {
+      res?.personalWallet?.tokens?.forEach((token) => {
         switch (token.symbol) {
           case 'BNB':
             dispatch(setBnbAMount(token.amount));

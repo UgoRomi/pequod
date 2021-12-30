@@ -8,6 +8,7 @@ import { updateUserFarm } from '../store/userInfoSlice';
 import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
 import { secondsToDhms } from '../utils/utils';
 import PercentagesGroup, { Percentages } from './PercentagesGroup';
+import { subMilliseconds } from 'date-fns';
 import Spinner from './Spinner';
 
 export default function StakingCard({
@@ -103,6 +104,13 @@ export default function StakingCard({
     setPercentageButtonActive(4 * (stakeAmount / userTokenBalance));
   };
 
+  const formatUnStakingTime = (unStakingTimeInSeconds: number) => {
+    const unStakingDate = new Date(unStakingTimeInSeconds * 1000);
+    const timeToUnstake =
+      subMilliseconds(unStakingDate, Date.now()).getTime() / 1000;
+    return secondsToDhms(timeToUnstake);
+  };
+
   return (
     <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full relative'>
       {disabled && (
@@ -147,7 +155,7 @@ export default function StakingCard({
             </div>
             <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Unlocks in</p>
-              <p>{secondsToDhms(userFarm.unStakingTimeInSeconds)}</p>
+              <p>{formatUnStakingTime(userFarm.unStakingTimeInSeconds)}</p>
             </div>
             <button
               onClick={() => setStakingFormIsOpen(!stakingFormIsOpen)}
@@ -217,7 +225,7 @@ export default function StakingCard({
               </div>
               <div className='flex gap-x-6 flex-wrap'>
                 <p className='font-semibold w-full'>Unlocks in</p>
-                <p>{secondsToDhms(userFarm.unStakingTimeInSeconds)}</p>
+                <p>{formatUnStakingTime(userFarm.unStakingTimeInSeconds)}</p>
               </div>
             </div>
           )}
@@ -269,7 +277,7 @@ export default function StakingCard({
             >
               {stakingInProgress ? (
                 <>
-                  <Spinner />
+                  <Spinner className='text-white h-5' />
                   Staking...
                 </>
               ) : (
