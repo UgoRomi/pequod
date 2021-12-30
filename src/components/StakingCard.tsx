@@ -121,7 +121,7 @@ export default function StakingCard({
         <div>
           <p className='font-bold'>{farmGeneralData.tokenSymbol}</p>
           <p className='text-sm opacity-75'>APY - {farmGeneralData.apy}%</p>
-          <p className='text-sm opacity-75'>Lockup time: 1 year</p>
+          <p className='text-sm opacity-75'>Lock-Up Period: 1 year</p>
         </div>
         {userFarm ? (
           <>
