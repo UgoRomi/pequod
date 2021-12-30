@@ -53,6 +53,7 @@ export interface AvailableFarmResponse {
   active: boolean;
   periodInSeconds: number;
   timesToUnstake: number;
+  minimumToStake: number;
   token: {
     address: string;
     symbol: string;

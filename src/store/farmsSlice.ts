@@ -8,6 +8,7 @@ export interface AvailableFarmState {
   lockupTime: number;
   tokenSymbol: string;
   tokenAddress: string;
+  minimumToStake: number;
 }
 interface FarmsState {
   available: AvailableFarmState[];

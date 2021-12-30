@@ -134,3 +134,7 @@ export function secondsToDhms(seconds: number) {
 
   return `${d}d ${h}h ${m}m ${s}s`;
 }
+
+export function formatTokenAmount(amount: number) {
+  return new Intl.NumberFormat('en-US', {}).format(amount);
+}

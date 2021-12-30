@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { RootState } from '../store/store';
 import { updateUserFarm } from '../store/userInfoSlice';
 import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
-import { secondsToDhms } from '../utils/utils';
+import { formatTokenAmount, secondsToDhms } from '../utils/utils';
 import PercentagesGroup, { Percentages } from './PercentagesGroup';
 import { subMilliseconds } from 'date-fns';
 import Spinner from './Spinner';
@@ -14,11 +14,9 @@ import Spinner from './Spinner';
 export default function StakingCard({
   stakeId,
   userTokenBalance,
-  disabled = false,
 }: {
   stakeId: number;
   userTokenBalance: number;
-  disabled: boolean;
 }) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
   const [stakeAmount, setStakeAmount] = useState('0');
@@ -113,9 +111,6 @@ export default function StakingCard({
 
   return (
     <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full relative'>
-      {disabled && (
-        <div className='absolute top-0 left-0 w-full h-full bg-gray-600 bg-opacity-60 z-10 box-border rounded-sm'></div>
-      )}
       <div className='flex items-center gap-4 lg:gap-7'>
         <img
           src='https://upload.wikimedia.org/wikipedia/commons/5/51/Mr._Smiley_Face.svg'
@@ -131,7 +126,7 @@ export default function StakingCard({
           <>
             <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Earned</p>
-              <p>{userFarm.amountEarned.toFixed(5)}</p>
+              <p>{formatTokenAmount(userFarm.amountEarned)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
                 <p>
                   {new Intl.NumberFormat('en-US', {
@@ -143,7 +138,7 @@ export default function StakingCard({
             </div>
             <div className='hidden lg:block self-start'>
               <p className='font-semibold'>Total in staking</p>
-              <p>{userFarm.totalAmount.toFixed(5)}</p>
+              <p>{formatTokenAmount(userFarm.totalAmount)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
                 <p>
                   {new Intl.NumberFormat('en-US', {
@@ -201,7 +196,7 @@ export default function StakingCard({
             <div className='lg:hidden grid grid-cols-1 gap-4'>
               <div className='flex gap-x-6 flex-wrap'>
                 <p className='font-semibold w-full'>Earned</p>
-                <span>{userFarm.amountEarned}</span>
+                <span>{formatTokenAmount(userFarm.amountEarned)}</span>
                 {userFarm.tokenUSDPrice !== Infinity && (
                   <span>
                     {new Intl.NumberFormat('en-US', {
@@ -213,7 +208,7 @@ export default function StakingCard({
               </div>
               <div className='flex gap-x-6 flex-wrap'>
                 <p className='font-semibold w-full'>Total in staking</p>
-                <p>{userFarm.totalAmount}</p>
+                <p>{formatTokenAmount(userFarm.totalAmount)}</p>
                 {userFarm.tokenUSDPrice !== Infinity && (
                   <p>
                     {new Intl.NumberFormat('en-US', {
@@ -238,39 +233,51 @@ export default function StakingCard({
               </span>
             )}
             <div>
-              <label
-                htmlFor='stakingAmount'
-                className='block text-sm font-medium text-gray-700'
-              >
-                Stake {farmGeneralData.tokenSymbol}
-              </label>
-              <input
-                type='text'
-                name='stakingAmount'
-                inputMode='decimal'
-                autoComplete='off'
-                autoCorrect='off'
-                pattern='^[0-9]*[.,]?[0-9]*$'
-                placeholder='0.0'
-                minLength={1}
-                maxLength={79}
-                spellCheck='false'
-                className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
-                value={stakeAmount}
-                onChange={updateStakeAmount}
-              />
-              <PercentagesGroup
-                darkModeClass='text-gray-700'
-                buttonClickCallback={percentageButtonClicked}
-                active={percentageButtonActive}
-                setActive={setPercentageButtonActive}
-              />
+              <div className='md:w-max'>
+                <label
+                  htmlFor='stakingAmount'
+                  className='block text-sm font-medium text-gray-700'
+                >
+                  Stake {farmGeneralData.tokenSymbol}
+                </label>
+                <input
+                  type='text'
+                  name='stakingAmount'
+                  inputMode='decimal'
+                  autoComplete='off'
+                  autoCorrect='off'
+                  pattern='^[0-9]*[.,]?[0-9]*$'
+                  placeholder={farmGeneralData.minimumToStake.toString()}
+                  minLength={1}
+                  maxLength={79}
+                  spellCheck='false'
+                  className='shadow-sm w-full focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
+                  value={stakeAmount}
+                  onChange={updateStakeAmount}
+                />
+                <PercentagesGroup
+                  darkModeClass='text-gray-700'
+                  buttonClickCallback={percentageButtonClicked}
+                  active={percentageButtonActive}
+                  setActive={setPercentageButtonActive}
+                />
+              </div>
+              {!userFarm && (
+                <p className='mt-2 text-sm text-gray-500'>
+                  You need to stake at least{' '}
+                  {formatTokenAmount(farmGeneralData.minimumToStake)}{' '}
+                  {farmGeneralData.tokenSymbol}.
+                </p>
+              )}
             </div>
+
             <button
               disabled={
                 !stakeAmount ||
                 parseFloat(stakeAmount) === 0 ||
-                stakingInProgress
+                stakingInProgress ||
+                (parseFloat(stakeAmount) < farmGeneralData.minimumToStake &&
+                  !userFarm?.totalAmount)
               }
               onClick={stake}
               className='flex bg-purple-400 text-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'

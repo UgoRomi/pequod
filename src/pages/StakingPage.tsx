@@ -60,6 +60,7 @@ export default function StakingPage() {
               lockupTime: farm.periodInSeconds,
               tokenSymbol: farm.token.symbol,
               tokenAddress: farm.token.address,
+              minimumToStake: farm.minimumToStake,
             };
           }
         );
@@ -86,7 +87,6 @@ export default function StakingPage() {
             key={farm.id}
             stakeId={farm.id}
             userTokenBalance={userWotBalance}
-            disabled={farm.id === 0 && userWotBalance < 2000000000}
           ></StakingCard>
         );
       })}
