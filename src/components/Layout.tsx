@@ -1,22 +1,27 @@
 import { Fragment, useEffect, useState } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import {
-  CashIcon,
-  ChevronDownIcon,
-  LogoutIcon,
-} from '@heroicons/react/outline';
+import { Dialog, Menu, Transition } from '@headlessui/react';
+import { CashIcon, LogoutIcon, XIcon, ChartPieIcon, DocumentDuplicateIcon } from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
+import logo from '../images/logo2.png';
+import wotLogo from '../images/wot-logo.svg';
 import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
 import Spinner from './Spinner';
 import DarkModeToggle from './DarkModeToggle';
-import logo from '../images/logo.png';
-import logoSmall from '../images/logo-small.png';
 
+import { toast } from 'react-toastify';
+
+import {
+  selectUserWotAmount,
+} from '../store/userInfoSlice';
 export default function Layout({ children }: { children: JSX.Element }) {
+
+  const userTokenBalance = useAppSelector(selectUserWotAmount);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
   const { logout } = useAuth();
   const location = useLocation();
@@ -25,7 +30,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const [signInProgress, setSignInProgress] = useState(false);
 
   const [navigation, setNavigation] = useState([
-    { name: 'Staking', href: '/', icon: CashIcon, current: false },
+    { name: 'Trading', href: '/', icon: ChartPieIcon, current: false },
+    { name: 'Staking', href: '/staking', icon: CashIcon, current: false },
   ]);
 
   useEffect(() => {
@@ -41,9 +47,20 @@ export default function Layout({ children }: { children: JSX.Element }) {
     validateSessionIfInvalid().finally(() => setSignInProgress(false));
   };
 
+  const copyToClipboard = (e: any) => {
+    e.preventDefault();
+    /* Get the text field */
+    const accountUser = account ? account : "";
+    navigator.clipboard.writeText(accountUser);
+
+    /* Alert the copied text */
+
+    toast.success('Text copied');
+  }
+
   return (
     <>
-      <div className='min-h-full'>
+      <div className='min-h-full bg-pequod-dark'>
         {!userSignedMessage && (
           <div className='z-50 bg-gray-800 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
             <button
@@ -62,94 +79,181 @@ export default function Layout({ children }: { children: JSX.Element }) {
             </button>
           </div>
         )}
-        <div className='bg-gray-800 dark:bg-gray-700 pb-32'>
-          <Disclosure
-            as='nav'
-            className='bg-gray-800 dark:bg-gray-700 border-b border-purple-300 border-opacity-25 lg:border-none'
+        <Transition.Root show={sidebarOpen} as={Fragment}>
+          <Dialog
+            as='div'
+            className='fixed inset-0 flex z-40 md:hidden'
+            onClose={setSidebarOpen}
           >
-            {({ open }) => (
-              <>
-                <div className='max-w-7xl mx-auto px-2 sm:px-4 lg:px-8'>
-                  <div className='relative h-16 flex items-center justify-between lg:border-b lg:border-purple-400 lg:border-opacity-25'>
-                    <div className='px-2 flex items-center lg:px-0'>
-                      <img
-                        className='flex-shrink-0 max-h-11 hidden md:block'
-                        src={logo}
-                        alt='Pequod Logo'
-                      />
-                      <img
-                        className='flex-shrink-0 max-h-14 md:hidden'
-                        src={logoSmall}
-                        alt='Pequod Logo'
-                      />
-                    </div>
-                    <div className='block ml-4'>
-                      <div className='flex items-center'>
-                        {/* Profile dropdown */}
-                        <DarkModeToggle />
-                        <Menu as='div' className='ml-3 relative'>
-                          <div>
-                            <Menu.Button className='max-w-xs text-white px-4 bg-gray-700 bg-opacity-30 shadow-sm flex items-center text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
-                              <span className='inline-flex items-center py-2 border border-transparent text-base font-medium rounded-md focus:outline-none'>
-                                {account?.slice(0, 6) +
-                                  '...' +
-                                  account?.slice(37)}
-                              </span>
-                              <ChevronDownIcon className='ml-2 h-4' />
-                            </Menu.Button>
-                          </div>
-                          <Transition
-                            as={Fragment}
-                            enter='transition ease-out duration-100'
-                            enterFrom='transform opacity-0 scale-95'
-                            enterTo='transform opacity-100 scale-100'
-                            leave='transition ease-in duration-75'
-                            leaveFrom='transform opacity-100 scale-100'
-                            leaveTo='transform opacity-0 scale-95'
-                          >
-                            <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                              <Menu.Item onClick={logout}>
-                                {({ active }) => (
-                                  <span
-                                    className={classNames(
-                                      active
-                                        ? 'bg-gray-100 dark:bg-gray-900'
-                                        : '',
-                                      'flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer'
-                                    )}
-                                  >
-                                    <LogoutIcon
-                                      className='mr-2 h-5'
-                                      aria-hidden='true'
-                                    />
-                                    Disconnect
-                                  </span>
-                                )}
-                              </Menu.Item>
-                            </Menu.Items>
-                          </Transition>
-                        </Menu>
-                      </div>
-                    </div>
+            <Transition.Child
+              as={Fragment}
+              enter='transition-opacity ease-linear duration-300'
+              enterFrom='opacity-0'
+              enterTo='opacity-100'
+              leave='transition-opacity ease-linear duration-300'
+              leaveFrom='opacity-100'
+              leaveTo='opacity-0'
+            >
+              <Dialog.Overlay className='fixed inset-0 bg-gray-600 bg-opacity-75' />
+            </Transition.Child>
+            <Transition.Child
+              as={Fragment}
+              enter='transition ease-in-out duration-300 transform'
+              enterFrom='-translate-x-full'
+              enterTo='translate-x-0'
+              leave='transition ease-in-out duration-300 transform'
+              leaveFrom='translate-x-0'
+              leaveTo='-translate-x-full'
+            >
+              <div className='relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-500'>
+                <Transition.Child
+                  as={Fragment}
+                  enter='ease-in-out duration-300'
+                  enterFrom='opacity-0'
+                  enterTo='opacity-100'
+                  leave='ease-in-out duration-300'
+                  leaveFrom='opacity-100'
+                  leaveTo='opacity-0'
+                >
+                  <div className='absolute top-0 right-0 -mr-12 pt-2'>
+                    <button
+                      type='button'
+                      className='ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white'
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <span className='sr-only'>Close sidebar</span>
+                      <XIcon className='h-6 w-6 text-white' aria-hidden='true' />
+                    </button>
                   </div>
+                </Transition.Child>
+                <div className='flex-shrink-0 flex items-center px-4'>
+                  <img className='h-8 w-auto' src={logo} alt='Pequod Logo' />
                 </div>
-              </>
-            )}
-          </Disclosure>
-          <header className='py-10'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-              <h1 className='text-3xl font-bold text-white'>Dashboard</h1>
+                <div className='mt-5 flex-1 h-0 overflow-y-auto'>
+                  <nav className='px-2 space-y-1'>
+                    {navigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={classNames(
+                          item.current
+                            ? 'bg-purple-400 text-white dark:bg-purple-500 dark:text-gray-200'
+                            : 'text-purple-100 hover:bg-purple-500',
+                          'group flex items-center px-2 py-2 text-base font-medium rounded-md'
+                        )}
+                      >
+                        <item.icon
+                          className='mr-4 flex-shrink-0 h-6 w-6 text-purple-300'
+                          aria-hidden='true'
+                        />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            </Transition.Child>
+            <div className='flex-shrink-0 w-14' aria-hidden='true'>
+              {/* Dummy element to force sidebar to shrink to fit close icon */}
             </div>
-          </header>
-        </div>
+          </Dialog>
+        </Transition.Root>
 
-        <main className='-mt-32'>
-          <div className='max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8'>
-            <div className='bg-white rounded-lg shadow px-5 py-6 sm:px-6'>
-              {children}
+        {/* Static sidebar for desktop */}
+        <div className='hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0'>
+          {/* Sidebar component, swap this element with another sidebar if you like */}
+          <div className='flex flex-col flex-grow pt-5 bg-pequod-gray border-r border-pequod-white overflow-y-auto'>
+            <div className='flex items-center flex-shrink-0 px-4'>
+              <img className='w-full' src={logo} alt='Pequod logo' />
+            </div>
+            <div className='sticky top-0 z-10 flex-shrink-0 flex h-20 flex-col justify-center items-center'>
+              <div className='flex-1 flex justify-center items-center'>
+                <div className='flex items-center'>
+                  {/* Profile dropdown */}
+                  <Menu as='div' className='relative'>
+                    <div>
+                      <Menu.Button className='max-w-xs flex items-center border b-2  text-sm rounded-full bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                        <span className='sr-only'>Open user menu</span>
+                        <span className='inline-flex items-center px-5 py-1 border border-transparent text-base font-medium rounded-full shadow-sm text-whitebg-transparent hover:bg-purple-500 dark:text-gray-200 dark:bg-transparent dark:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                          {account?.slice(0, 6) + '...' + account?.slice(37)}
+                        </span>
+                        <DocumentDuplicateIcon
+                          className='mr-3 flex-shrink-0 h-6 w-6 text-white'
+                          aria-hidden='true'
+                          onClick={(e) => copyToClipboard(e)} />
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter='transition ease-out duration-100'
+                      enterFrom='transform opacity-0 scale-95'
+                      enterTo='transform opacity-100 scale-100'
+                      leave='transition ease-in duration-75'
+                      leaveFrom='transform opacity-100 scale-100'
+                      leaveTo='transform opacity-0 scale-95'
+                    >
+                      <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                        <Menu.Item onClick={logout}>
+                          {({ active }) => (
+                            <span
+                              className={classNames(
+                                active ? 'bg-gray-100 dark:bg-gray-900' : '',
+                                'flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer'
+                              )}
+                            >
+                              <LogoutIcon className='mr-2 h-5' aria-hidden='true' />
+                              Disconnect
+                            </span>
+                          )}
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+                </div>
+              </div>
+              <span className="flex flex-row text-white"><img alt="logo wot" src={wotLogo} className="mr-2" width="20" />{userTokenBalance}</span>
+            </div>
+
+            <div className='mt-5 flex-1 flex flex-col'>
+              <nav className='flex-1 space-y-1'>
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={classNames(
+                      item.current
+                        ? 'bg-pequod-white-300 text-white border-l-4 border-pequod-pink'
+                        : 'text-purple-100 hover:bg-purple-500 pl-3',
+                      'group flex items-center px-2 py-3 text-sm font-medium justify-center'
+                    )}
+                  >
+                    <item.icon
+                      className='mr-3 flex-shrink-0 h-6 w-6 text-pequod-pink'
+                      aria-hidden='true'
+                    />
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            <div className="py-10 flex justify-center">
+              <DarkModeToggle />
             </div>
           </div>
-        </main>
+        </div>
+        <div className='md:pl-64 flex flex-col flex-1'>
+          <div className='sticky top-0 z-10 flex-shrink-0 flex h-16'>
+
+          </div>
+
+          <main>
+            <div className='py-6'>
+              <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
+                {children}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </>
   );

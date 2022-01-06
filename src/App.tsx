@@ -16,6 +16,7 @@ import {
   setWotAMount,
 } from './store/userInfoSlice';
 import { setBnbUsdPrice } from './store/pricesSlice';
+import TradingPage from './pages/TradingPage';
 
 function App() {
   useEagerConnect();
@@ -59,6 +60,16 @@ function App() {
     <Routes>
       <Route
         path='/'
+        element={
+          <RequireAuth>
+            <Layout>
+              <TradingPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path='/staking'
         element={
           <RequireAuth>
             <Layout>

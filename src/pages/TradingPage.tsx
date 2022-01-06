@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CogIcon, SearchIcon } from '@heroicons/react/outline';
+import { CogIcon, SearchIcon, PlusIcon } from '@heroicons/react/outline';
 import { classNames, useApiCall } from '../utils/utils';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import PairChart from '../components/PairChart';
 import Web3 from 'web3';
+import Carousel from 'react-multi-carousel';
 import { PairDataTimeWindowEnum } from '../utils/chart';
 import {
   useGetTokenPrice,
@@ -14,6 +15,12 @@ import {
   useApprove,
   useSwap,
 } from '../utils/contractsUtils';
+import wotLogo from '../images/wot-logo.svg';
+
+import {
+  selectUserWotAmount,
+} from '../store/userInfoSlice';
+import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 
 interface TokenSearchResult {
   name: string;
@@ -52,12 +59,31 @@ interface GraphData {
   time: Date;
   value: number;
 }
+interface AvailableStaking {
+  active: boolean;
+  address: string;
+  apy: number;
+  id: number;
+  minimumToStake: number;
+  periodInSeconds: number;
+  timesToUnstake: number;
+  token: any;
+  stakeInfo: any;
+}
+
 
 export default function TradingPage() {
+
+
+  const userTokenBalance = useAppSelector(selectUserWotAmount);
   const [tokenSearch, setTokenSearch] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
+  const [percentageButtonActive, setPercentageButtonActive] =
+    useState<number>(0);
+  const [stakeAmount, setStakeAmount] = useState('25');
+
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
     'buy' | 'sell'
   >('buy');
@@ -67,6 +93,7 @@ export default function TradingPage() {
   const [hoverValue, setHoverValue] = useState<number | undefined>();
   const [hoverDate, setHoverDate] = useState<string | undefined>();
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
+  const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
     name: '',
     address: '',
@@ -159,13 +186,13 @@ export default function TradingPage() {
           const { name, symbol, decimals } = response;
           setSelectedTokenInfo(
             (selectedTokenInfo) =>
-              ({
-                ...selectedTokenInfo,
-                name,
-                symbol,
-                decimals: decimals,
-                address: tokenAddress,
-              } as TokenDetails)
+            ({
+              ...selectedTokenInfo,
+              name,
+              symbol,
+              decimals: decimals,
+              address: tokenAddress,
+            } as TokenDetails)
           );
         })
         .catch((err) => {
@@ -175,6 +202,23 @@ export default function TradingPage() {
     },
     [pequodApiCall]
   );
+
+
+  useEffect(() => {
+    pequodApiCall(
+      `/farms/${process.env.REACT_APP_CHAIN_ID}/available`,
+      { method: 'GET' }
+    ).then((res) => {
+      setStaking(res?.data);
+    })
+      .catch((err) => {
+        console.error(err);
+        // toast.error(
+        //   'There was an error retrieving available staking options\nPlease try reloading this page'
+        // );
+      });
+  }, []);
+
 
   // Get price history from our API
   useEffect(() => {
@@ -196,10 +240,10 @@ export default function TradingPage() {
         setPriceHistory(priceHistory);
         setSelectedTokenInfo(
           (selectedTokenInfo) =>
-            ({
-              ...selectedTokenInfo,
-              priceBNB: priceHistory[priceHistory.length - 1].value,
-            } as TokenDetails)
+          ({
+            ...selectedTokenInfo,
+            priceBNB: priceHistory[priceHistory.length - 1].value,
+          } as TokenDetails)
         );
       })
       .catch((err) => {
@@ -234,7 +278,7 @@ export default function TradingPage() {
     if (
       !Web3.utils.isAddress(tokenSearch) ||
       tokenSearch.toUpperCase() ===
-        (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
+      (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
     )
       return;
     setAmountFrom('0');
@@ -278,17 +322,133 @@ export default function TradingPage() {
     dispatch(openTradeSettingsDialog());
   };
 
+  const responsive = {
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 4,
+      partialVisibilityGutter: 30,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 2,
+      partialVisibilityGutter: 30,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1.5,
+      partialVisibilityGutter: 30,
+    },
+  };
+
+  const percentageButtonClicked = (percentage: Percentages) => {
+    switch (percentage) {
+      case Percentages['25%']:
+        setStakeAmount((userTokenBalance * 0.25).toFixed(4));
+        break;
+      case Percentages['50%']:
+        setStakeAmount((userTokenBalance * 0.5).toFixed(4));
+        break;
+      case Percentages['75%']:
+        setStakeAmount((userTokenBalance * 0.75).toFixed(4));
+        break;
+      case Percentages['100%']:
+        setStakeAmount(userTokenBalance.toFixed(4));
+        break;
+    }
+  };
+
+  const updateStakeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStakeAmount(event.target.value);
+    const stakeAmount = parseFloat(event.target.value);
+    setPercentageButtonActive(4 * (stakeAmount / userTokenBalance));
+  };
+
   return (
     <>
       <div>
+
+        <span className="text-white text-xl ml-4">Trading</span>
+        <Carousel
+          itemClass='mx-4 mt-4'
+          responsive={responsive}
+          slidesToSlide={1}
+          swipeable
+          draggable
+          infinite
+        >
+          {staking.map((token, i) => (
+            <div
+              key={i}
+              className='rounded-md border border-white-400 bg-gradient-to-r from-pequod-gray via-pequod-gray to-transparent text-white shadow-md px-4 py-2 h-full'
+            >
+              <div className='flex items-center gap-4'>
+                <img
+                  src={token.token.image ? token.token.image : wotLogo}
+                  alt={token.token.name}
+                  className='h-10'
+                />
+                <div>
+                  <p className='font-bold'>{token.token.symbol}</p>
+                  <span className='text-sm opacity-75'>
+                    APY - {token.apy}%
+                  </span>
+                </div>
+              </div>
+              <div className='flex items-center justify-between mt-4'>
+                {token.stakeInfo && token.stakeInfo.userAmountInStaking ? token.stakeInfo.userAmountInStaking : 0 > 0 ? (
+                  <>
+                    <div className='text-xs w-2/3 flex justify-evenly'>
+                      <div>
+                        <p className='font-semibold'>Earned</p>
+                        <p>{token.stakeInfo.totalEarned}</p>
+                        <p>
+                          {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD',
+                          }).format(token.stakeInfo.totalEarned * token.token.tokenPriceUSD)}
+                        </p>
+                      </div>
+                      <div className='border-r' aria-hidden></div>
+                      <div>
+                        <p className='font-semibold'>Balance</p>
+                        <p>{token.stakeInfo.totalBalance}</p>
+                        <p>
+                          {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD',
+                          }).format(token.stakeInfo.totalBalance * token.token.tokenPriceUSD)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex w-1/3 justify-center h-full'>
+                      <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
+                        <PlusIcon className='w-5' />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className='text-sm'>
+                      <p className='font-semibold'>Total staking</p>
+                      <p>{token.stakeInfo && token.stakeInfo.totalAmountInStaking ? token.stakeInfo.totalAmountInStaking : 0}</p>
+                    </div>
+                    <button className='border bg-pequod-dark text-white py-2 px-4 rounded-md'>
+                      Stake now
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </Carousel>
+
+
         <div className='flex flex-col gap-11'>
-          <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-gray-900 xl:p-5 xl:border-2 xl:border-purple-400 xl:rounded-md'>
+          <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-pequod-dark xl:p-5 xl:rounded-md'>
             <div className='col-span-2 gap-2 xl:gap-0 grid grid-cols-buy'>
               <div className='flex-1 flex flex-col'>
-                <p className='font-bold m-auto mb-3 text-md text-gray-800 dark:text-gray-200'>
-                  Search token
-                </p>
-                <form className='w-full flex justify-center md:ml-0'>
+                <span className="text-white text-xl mb-4">Search token</span>
+                <form className='w-full flex justify-left md:ml-0'>
                   <label htmlFor='search-field' className='sr-only'>
                     Search
                   </label>
@@ -298,7 +458,7 @@ export default function TradingPage() {
                     </div>
                     <input
                       id='search-field'
-                      className='block w-full h-full pl-10 pr-3 py-2 dark:bg-gray-900 bg-white xl:bg-purple-50 text-gray-600 xl:dark:text-gray-600 dark:text-gray-200 focus:outline-none focus:ring focus:ring-purple-400 placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
+                      className='block w-full h-full pl-10 pr-3 py-2 border b-1 bg-transparent text-white focus:outline-none focus:ring focus:ring-purple-400 placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
                       placeholder='0xe861....'
                       type='search'
                       name='search'
@@ -421,7 +581,7 @@ export default function TradingPage() {
                 </div>
               )}
             </div>
-            <div className='flex h-100 justify-center items-center col-span-2 xl:col-span-1'>
+            <div className='flex h-100 justify-center items-start col-span-1'>
               <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
                 {/* 1st row */}
                 <div className='flex justify-center'>
@@ -429,9 +589,9 @@ export default function TradingPage() {
                     type='button'
                     className={classNames(
                       currentlySelectedTab === 'buy'
-                        ? 'bg-purple-100 border-transparent dark:bg-purple-400 dark:text-purple-100'
-                        : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
-                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                        ? 'border border-pequod-white text-white font-bold'
+                        : 'text-white',
+                      'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-200 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
                     )}
                     onClick={() => {
                       setCurrentlySelectedTab('buy');
@@ -439,7 +599,7 @@ export default function TradingPage() {
                       setAmountTo('0');
                     }}
                   >
-                    Buy
+                    BUY
                   </button>
                 </div>
                 <div className='flex justify-center'>
@@ -447,9 +607,9 @@ export default function TradingPage() {
                     type='button'
                     className={classNames(
                       currentlySelectedTab === 'sell'
-                        ? 'bg-purple-100 border-transparent dark:bg-purple-400 dark:text-purple-100'
-                        : 'bg-white border-purple-200 dark:border-purple-400 dark:bg-gray-100',
-                      'border-2 w-28 justify-center inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-purple-700 dark:hover:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                        ? 'border border-pequod-white text-white font-bold'
+                        : 'text-white',
+                      'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-500 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
                     )}
                     onClick={() => {
                       setCurrentlySelectedTab('sell');
@@ -457,7 +617,7 @@ export default function TradingPage() {
                       setAmountTo('0');
                     }}
                   >
-                    Sell
+                    SELL
                   </button>
                 </div>
                 {/* 2nd row */}
@@ -471,8 +631,8 @@ export default function TradingPage() {
                       {currentlySelectedTab === 'buy'
                         ? '(BNB)'
                         : selectedTokenInfo?.symbol
-                        ? `(${selectedTokenInfo?.symbol})`
-                        : ''}
+                          ? `(${selectedTokenInfo?.symbol})`
+                          : ''}
                     </label>
                   </div>
                   <div className='mt-1'>
@@ -494,7 +654,12 @@ export default function TradingPage() {
                       onChange={(e) => updateFrom(e.target.value)}
                     />
                   </div>
-                  {/* <PercentagesGroup></PercentagesGroup> */}
+                  <PercentagesGroup
+                    darkModeClass='text-gray-700'
+                    buttonClickCallback={percentageButtonClicked}
+                    active={percentageButtonActive}
+                    setActive={setPercentageButtonActive}
+                  />
                 </div>
                 {/* 3rd row */}
                 <div className='col-span-2 w-full mx-auto'>
@@ -534,7 +699,7 @@ export default function TradingPage() {
                 {/* 4th row */}
                 <div className='col-span-2 mt-5 flex justify-center'>
                   {currentlySelectedTab === 'buy' ||
-                  selectedTokenInfo.allowance > 0 ? (
+                    selectedTokenInfo.allowance > 0 ? (
                     <button
                       onClick={() => {
                         if (currentlySelectedTab === 'buy') {
@@ -543,7 +708,7 @@ export default function TradingPage() {
                           sellCallback();
                         }
                       }}
-                      className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                      className='border b-2 w-full text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
                       disabled={
                         !selectedTokenInfo ||
                         !selectedTokenInfo.address ||
