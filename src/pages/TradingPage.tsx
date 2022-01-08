@@ -17,9 +17,7 @@ import {
 } from '../utils/contractsUtils';
 import wotLogo from '../images/wot-logo.svg';
 
-import {
-  selectUserWotAmount,
-} from '../store/userInfoSlice';
+import { selectUserWotAmount } from '../store/userInfoSlice';
 import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 
 interface TokenSearchResult {
@@ -71,10 +69,7 @@ interface AvailableStaking {
   stakeInfo: any;
 }
 
-
 export default function TradingPage() {
-
-
   const userTokenBalance = useAppSelector(selectUserWotAmount);
   const [tokenSearch, setTokenSearch] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -82,7 +77,7 @@ export default function TradingPage() {
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
-  const [stakeAmount, setStakeAmount] = useState('25');
+  const [, setStakeAmount] = useState('25');
 
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
     'buy' | 'sell'
@@ -125,6 +120,7 @@ export default function TradingPage() {
   const { buyCallback, sellCallback } = useSwap(
     selectedTokenInfo.address,
     amountFrom.toString(),
+    amountTo.toString(),
     slippage
   );
 
@@ -186,13 +182,13 @@ export default function TradingPage() {
           const { name, symbol, decimals } = response;
           setSelectedTokenInfo(
             (selectedTokenInfo) =>
-            ({
-              ...selectedTokenInfo,
-              name,
-              symbol,
-              decimals: decimals,
-              address: tokenAddress,
-            } as TokenDetails)
+              ({
+                ...selectedTokenInfo,
+                name,
+                symbol,
+                decimals: decimals,
+                address: tokenAddress,
+              } as TokenDetails)
           );
         })
         .catch((err) => {
@@ -203,22 +199,22 @@ export default function TradingPage() {
     [pequodApiCall]
   );
 
-
   useEffect(() => {
-    pequodApiCall(
-      `/farms/${process.env.REACT_APP_CHAIN_ID}/available`,
-      { method: 'GET' }
-    ).then((res) => {
-      setStaking(res?.data);
+    pequodApiCall(`/farms/${process.env.REACT_APP_CHAIN_ID}/available`, {
+      method: 'GET',
     })
+      .then((res) => {
+        setStaking(res?.data);
+      })
       .catch((err) => {
         console.error(err);
-        // toast.error(
-        //   'There was an error retrieving available staking options\nPlease try reloading this page'
-        // );
+        toast.error(
+          'There was an error retrieving available staking options\nPlease try reloading this page'
+        );
       });
+    // TODO: Resolve dependency cycle
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   // Get price history from our API
   useEffect(() => {
@@ -240,10 +236,10 @@ export default function TradingPage() {
         setPriceHistory(priceHistory);
         setSelectedTokenInfo(
           (selectedTokenInfo) =>
-          ({
-            ...selectedTokenInfo,
-            priceBNB: priceHistory[priceHistory.length - 1].value,
-          } as TokenDetails)
+            ({
+              ...selectedTokenInfo,
+              priceBNB: priceHistory[priceHistory.length - 1].value,
+            } as TokenDetails)
         );
       })
       .catch((err) => {
@@ -278,7 +274,7 @@ export default function TradingPage() {
     if (
       !Web3.utils.isAddress(tokenSearch) ||
       tokenSearch.toUpperCase() ===
-      (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
+        (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
     )
       return;
     setAmountFrom('0');
@@ -357,17 +353,10 @@ export default function TradingPage() {
     }
   };
 
-  const updateStakeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setStakeAmount(event.target.value);
-    const stakeAmount = parseFloat(event.target.value);
-    setPercentageButtonActive(4 * (stakeAmount / userTokenBalance));
-  };
-
   return (
     <>
       <div>
-
-        <span className="text-white text-xl ml-4">Trading</span>
+        <span className='text-white text-xl ml-4'>Trading</span>
         <Carousel
           itemClass='mx-4 mt-4'
           responsive={responsive}
@@ -389,13 +378,13 @@ export default function TradingPage() {
                 />
                 <div>
                   <p className='font-bold'>{token.token.symbol}</p>
-                  <span className='text-sm opacity-75'>
-                    APY - {token.apy}%
-                  </span>
+                  <span className='text-sm opacity-75'>APY - {token.apy}%</span>
                 </div>
               </div>
               <div className='flex items-center justify-between mt-4'>
-                {token.stakeInfo && token.stakeInfo.userAmountInStaking ? token.stakeInfo.userAmountInStaking : 0 > 0 ? (
+                {token.stakeInfo && token.stakeInfo.userAmountInStaking ? (
+                  token.stakeInfo.userAmountInStaking
+                ) : false ? (
                   <>
                     <div className='text-xs w-2/3 flex justify-evenly'>
                       <div>
@@ -405,7 +394,10 @@ export default function TradingPage() {
                           {new Intl.NumberFormat('en-US', {
                             style: 'currency',
                             currency: 'USD',
-                          }).format(token.stakeInfo.totalEarned * token.token.tokenPriceUSD)}
+                          }).format(
+                            token.stakeInfo.totalEarned *
+                              token.token.tokenPriceUSD
+                          )}
                         </p>
                       </div>
                       <div className='border-r' aria-hidden></div>
@@ -416,7 +408,10 @@ export default function TradingPage() {
                           {new Intl.NumberFormat('en-US', {
                             style: 'currency',
                             currency: 'USD',
-                          }).format(token.stakeInfo.totalBalance * token.token.tokenPriceUSD)}
+                          }).format(
+                            token.stakeInfo.totalBalance *
+                              token.token.tokenPriceUSD
+                          )}
                         </p>
                       </div>
                     </div>
@@ -430,7 +425,11 @@ export default function TradingPage() {
                   <>
                     <div className='text-sm'>
                       <p className='font-semibold'>Total staking</p>
-                      <p>{token.stakeInfo && token.stakeInfo.totalAmountInStaking ? token.stakeInfo.totalAmountInStaking : 0}</p>
+                      <p>
+                        {token.stakeInfo && token.stakeInfo.totalAmountInStaking
+                          ? token.stakeInfo.totalAmountInStaking
+                          : 0}
+                      </p>
                     </div>
                     <button className='border bg-pequod-dark text-white py-2 px-4 rounded-md'>
                       Stake now
@@ -442,12 +441,11 @@ export default function TradingPage() {
           ))}
         </Carousel>
 
-
         <div className='flex flex-col gap-11'>
           <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-pequod-dark xl:p-5 xl:rounded-md'>
             <div className='col-span-2 gap-2 xl:gap-0 grid grid-cols-buy'>
               <div className='flex-1 flex flex-col'>
-                <span className="text-white text-xl mb-4">Search token</span>
+                <span className='text-white text-xl mb-4'>Search token</span>
                 <form className='w-full flex justify-left md:ml-0'>
                   <label htmlFor='search-field' className='sr-only'>
                     Search
@@ -631,8 +629,8 @@ export default function TradingPage() {
                       {currentlySelectedTab === 'buy'
                         ? '(BNB)'
                         : selectedTokenInfo?.symbol
-                          ? `(${selectedTokenInfo?.symbol})`
-                          : ''}
+                        ? `(${selectedTokenInfo?.symbol})`
+                        : ''}
                     </label>
                   </div>
                   <div className='mt-1'>
@@ -699,7 +697,7 @@ export default function TradingPage() {
                 {/* 4th row */}
                 <div className='col-span-2 mt-5 flex justify-center'>
                   {currentlySelectedTab === 'buy' ||
-                    selectedTokenInfo.allowance > 0 ? (
+                  selectedTokenInfo.allowance > 0 ? (
                     <button
                       onClick={() => {
                         if (currentlySelectedTab === 'buy') {

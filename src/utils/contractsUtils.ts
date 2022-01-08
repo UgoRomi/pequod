@@ -1,15 +1,4 @@
 import { useWeb3React } from '@web3-react/core';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import {
-  Fetcher,
-  ChainId,
-  WETH,
-  Trade,
-  TokenAmount,
-  TradeType,
-  Percent,
-  Route,
-} from '@pancakeswap/sdk';
 import { toast } from 'react-toastify';
 import BEP20_ABI from '../BEP20.json';
 import PANCAKE_FACTORY_ABI from '../pancakeFactoryABI.json';
@@ -17,41 +6,8 @@ import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
 import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
 import MOBY_STAKING_ABI from '../mobyStakingABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
-import { useAppDispatch } from '../store/hooks';
-import { addTransaction } from '../store/transactionsSlice';
-import { EventType } from './consts';
 import { useStakeEvent } from './events';
 import { useValidateSessionIfInvalid } from './utils';
-
-interface UnitMap {
-  noether: string;
-  wei: string;
-  kwei: string;
-  Kwei: string;
-  babbage: string;
-  femtoether: string;
-  mwei: string;
-  Mwei: string;
-  lovelace: string;
-  picoether: string;
-  gwei: string;
-  Gwei: string;
-  shannon: string;
-  nanoether: string;
-  nano: string;
-  szabo: string;
-  microether: string;
-  micro: string;
-  finney: string;
-  milliether: string;
-  milli: string;
-  ether: string;
-  kether: string;
-  grand: string;
-  mether: string;
-  gether: string;
-  tether: string;
-}
 
 function useGetPairAddress() {
   const { library, account } = useWeb3React();
@@ -152,161 +108,110 @@ function useGasPrice() {
 
 export function useSwap(
   tokenAddress: string,
-  amount: string,
+  amountFrom: string,
+  amountTo: string,
   slippage: number
 ) {
   const { library, account } = useWeb3React();
   const getGasPrice = useGasPrice();
-  const dispatch = useAppDispatch();
 
-  const swapData = async (bnbInOrOut: 'in' | 'out') => {
-    const provider = new JsonRpcProvider(process.env.REACT_APP_CHAIN_RPC_URL);
-    const chainId =
-      process.env.REACT_APP_CHAIN_ID === '56'
-        ? ChainId.MAINNET
-        : ChainId.TESTNET;
-    const token = await Fetcher.fetchTokenData(chainId, tokenAddress, provider);
-    const weth = await Fetcher.fetchTokenData(
-      chainId,
-      process.env.REACT_APP_BNB_ADDRESS as string,
-      provider
-    );
-    const pair = await Fetcher.fetchPairData(token, weth, provider);
-    // Input must be WETH for buy and token for sell
-    const input = bnbInOrOut === 'in' ? weth : token;
-    const output = bnbInOrOut === 'in' ? token : weth;
-    const route = new Route([pair], input, output);
-
-    // Get which unit to convert from
-    const units = library.utils.unitMap as UnitMap;
-    let unit = units.wei;
-    for (const [key, value] of Object.entries(units)) {
-      if (value.length === token.decimals + 1) unit = key;
-    }
-
-    const tradeAmount =
-      bnbInOrOut === 'out'
-        ? new TokenAmount(input, library.utils.toWei(amount, unit))
-        : new TokenAmount(input, library.utils.toWei(amount));
-
-    const trade = new Trade(route, tradeAmount, TradeType.EXACT_INPUT);
-
-    // Slippage
-    const slippageTolerance = new Percent((slippage * 100).toString(), '10000');
-    const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw;
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
-    const value = trade.maximumAmountIn(slippageTolerance).raw;
-
-    // get router ABI
-
+  const swapData = async () => {
     const routerContract = new library.eth.Contract(
       PANCAKE_ROUTER_ABI,
       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
       { from: account }
     );
-    const nonce = await library.eth.getTransactionCount(account);
+
+    // 1. Calculate the minimum amount out
+    const minimumAmountOut =
+      parseFloat(amountTo) - (parseFloat(amountTo) * slippage) / 100;
+    // 2. Get deadline
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+
+    // 3. Get the token to swap to/from
+    const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
+      from: account,
+    });
+    const tokenDecimals = await tokenContract.methods.decimals().call();
+
     const gasPrice = await getGasPrice();
     return {
-      amountOutMin,
+      minimumAmountOut,
       deadline,
-      value,
-      nonce,
+      amountFrom,
       routerContract,
-      token,
+      tokenAddress,
       gasPrice,
+      tokenDecimals,
     };
   };
 
-  const buy = async () => {
+  const buy = async (): Promise<{ success: boolean; txHash: string }> => {
     const {
-      amountOutMin,
+      minimumAmountOut,
       deadline,
-      value,
-      nonce,
+      amountFrom,
       routerContract,
-      token,
+      tokenAddress,
       gasPrice,
-    } = await swapData('in');
-
-    const path = [WETH[token.chainId].address, token.address];
-    const data =
-      routerContract.methods.swapExactETHForTokensSupportingFeeOnTransferTokens(
-        library.utils.toHex(amountOutMin.toString()),
-        path,
-        account,
-        library.utils.toHex(deadline)
-      );
-
-    const rawTransaction = {
-      from: account,
-      gasPrice: library.utils.toHex(gasPrice),
-      gas: library.utils.toHex(580000),
-      to: process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
-      value: library.utils.toHex(value.toString()),
-      data: data.encodeABI(),
-      nonce: library.utils.toHex(nonce),
-    };
-
-    library.eth.sendTransaction(rawTransaction, (err: any, hash: string) => {
-      if (err) {
-        console.error(err);
-        toast.error('Error sending transaction');
-        return;
-      }
-      dispatch(
-        addTransaction({
-          txHash: hash,
-          type: EventType.BUY,
-          addedTimestamp: Date.now(),
-        })
-      );
-    });
+      tokenDecimals,
+    } = await swapData();
+    try {
+      const path = [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
+      const result = await routerContract.methods
+        .swapExactETHForTokensSupportingFeeOnTransferTokens(
+          library.utils
+            .toBN(Math.floor(minimumAmountOut))
+            .mul(library.utils.toBN(Math.pow(10, tokenDecimals)))
+            .toString(),
+          path,
+          account,
+          deadline
+        )
+        .send({
+          from: account,
+          gasPrice,
+          value: library.utils.toWei(amountFrom),
+        });
+      return { success: true, txHash: result.transactionHash };
+    } catch (error) {
+      toast.error(`There was an error in the transaction\nPlease retry`);
+      console.error(error);
+      return { success: false, txHash: '' };
+    }
   };
 
-  const sell = async () => {
+  const sell = async (): Promise<{ success: boolean; txHash: string }> => {
     const {
-      amountOutMin,
+      minimumAmountOut,
       deadline,
-      value,
-      nonce,
+      amountFrom,
       routerContract,
-      token,
+      tokenAddress,
       gasPrice,
-    } = await swapData('out');
+      tokenDecimals,
+    } = await swapData();
+    try {
+      const path = [tokenAddress, process.env.REACT_APP_BNB_ADDRESS];
 
-    const path = [token.address, WETH[token.chainId].address];
-    const data =
-      routerContract.methods.swapExactTokensForETHSupportingFeeOnTransferTokens(
-        library.utils.toHex(value.toString()),
-        library.utils.toHex(amountOutMin.toString()),
-        path,
-        account,
-        library.utils.toHex(deadline)
-      );
-
-    const rawTransaction = {
-      from: account,
-      gasPrice: library.utils.toHex(gasPrice),
-      gas: library.utils.toHex(1000000),
-      to: process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS,
-      data: data.encodeABI(),
-      nonce: library.utils.toHex(nonce),
-    };
-
-    library.eth.sendTransaction(rawTransaction, (err: any, hash: string) => {
-      if (err) {
-        console.error(err);
-        toast.error('Error sending transaction');
-        return;
-      }
-      dispatch(
-        addTransaction({
-          txHash: hash,
-          type: EventType.SELL,
-          addedTimestamp: Date.now(),
-        })
-      );
-    });
+      const result = await routerContract.methods
+        .swapExactTokensForETHSupportingFeeOnTransferTokens(
+          library.utils
+            .toBN(amountFrom)
+            .mul(library.utils.toBN(Math.pow(10, tokenDecimals)))
+            .toString(),
+          Math.floor(minimumAmountOut * Math.pow(10, 8)),
+          path,
+          account,
+          deadline
+        )
+        .send({ from: account, gasPrice });
+      return { success: true, txHash: result.transactionHash };
+    } catch (error) {
+      toast.error(`There was an error in the transaction\nPlease retry`);
+      console.error(error);
+      return { success: false, txHash: '' };
+    }
   };
   return { buyCallback: buy, sellCallback: sell };
 }
@@ -347,11 +252,11 @@ export function useWotStake() {
         gasUsed
       );
       return { success: true, txHash: result.transactionHash };
-    } catch (e) {
+    } catch (error) {
       toast.error(
         `There was an error staking your ${process.env.REACT_APP_WOT_SYMBOL}\nPlease retry`
       );
-      console.error(e);
+      console.error(error);
       return { success: false, txHash: '' };
     }
     // No need to use
