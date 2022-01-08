@@ -84,7 +84,7 @@ export default function TradingPage() {
   >('buy');
   const [amountFrom, setAmountFrom] = useState<string>('0');
   const [amountTo, setAmountTo] = useState<string>('0');
-  const [slippage, setSlippage] = useState<number>(1);
+  const [slippage, setSlippage] = useState<number>(15);
   const [hoverValue, setHoverValue] = useState<number | undefined>();
   const [hoverDate, setHoverDate] = useState<string | undefined>();
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
