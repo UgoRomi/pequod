@@ -6,7 +6,7 @@ import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
 import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
 import MOBY_STAKING_ABI from '../mobyStakingABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
-import { useStakeEvent } from './events';
+import { useBuyEvent, useSellEvent, useStakeEvent } from './events';
 import { useValidateSessionIfInvalid } from './utils';
 
 function useGetPairAddress() {
@@ -114,6 +114,8 @@ export function useSwap(
 ) {
   const { library, account } = useWeb3React();
   const getGasPrice = useGasPrice();
+  const sellEvent = useSellEvent();
+  const buyEvent = useBuyEvent();
 
   const swapData = async () => {
     const routerContract = new library.eth.Contract(
@@ -173,6 +175,17 @@ export function useSwap(
           gasPrice,
           value: library.utils.toWei(amountFrom),
         });
+      toast.success(`Swap successful!`);
+      const gasUsed = library.utils.fromWei(
+        (result.gasUsed * gasPrice).toString()
+      );
+      buyEvent(
+        tokenAddress,
+        minimumAmountOut.toString(),
+        parseFloat(amountFrom),
+        result.transactionHash,
+        gasUsed
+      );
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
       toast.error(`There was an error in the transaction\nPlease retry`);
@@ -206,6 +219,17 @@ export function useSwap(
           deadline
         )
         .send({ from: account, gasPrice });
+      toast.success(`Swap successful!`);
+      const gasUsed = library.utils.fromWei(
+        (result.gasUsed * gasPrice).toString()
+      );
+      sellEvent(
+        tokenAddress,
+        minimumAmountOut.toString(),
+        parseFloat(amountFrom),
+        result.transactionHash,
+        gasUsed
+      );
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
       toast.error(`There was an error in the transaction\nPlease retry`);

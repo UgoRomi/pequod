@@ -1,6 +1,5 @@
 export interface StakeEventRequest {
   wallet: string;
-  signature: string;
   stakeInfo: { stakeId: string };
   token: { address: string; amount: string };
   txInfo: {
