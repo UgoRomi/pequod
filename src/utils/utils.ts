@@ -19,14 +19,23 @@ export function getLocale() {
   return navigator.language;
 }
 
-export function useApiCall() {
+export function useEventCall() {
   const validateSessionIfInvalid = useValidateSessionIfInvalid();
+  const apiCall = useApiCall();
+
+  const eventCall = async (url: string, options: AxiosRequestConfig) => {
+    const valid = await validateSessionIfInvalid();
+    if (!valid) return;
+    return apiCall(url, options);
+  };
+  return eventCall;
+}
+
+export function useApiCall() {
   const pequodApiInstance = useAppSelector(selectPequodApiInstance);
   const userSignedMessage = useAppSelector(selectUserSignedMessage);
 
-  const apiCall = async (url: string, options: AxiosRequestConfig) => {
-    const valid = await validateSessionIfInvalid();
-    if (!valid) return;
+  const apiCall = (url: string, options: AxiosRequestConfig) => {
     const newOptions: AxiosRequestConfig = {
       ...options,
       data: {

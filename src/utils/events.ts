@@ -6,10 +6,10 @@ import {
   SellEventRequest,
   StakeEventRequest,
 } from '../types/eventsTypes';
-import { useApiCall } from './utils';
+import { useEventCall } from './utils';
 
 export function useStakeEvent() {
-  const apiCall = useApiCall();
+  const eventCall = useEventCall();
   const { account } = useWeb3React();
   const bnbUsdPrice = useAppSelector(selectBnbUsdPrice);
 
@@ -35,7 +35,7 @@ export function useStakeEvent() {
         gasSpentInUsdt: (gasSpent * bnbUsdPrice).toString(),
       },
     };
-    apiCall(`/events/stake`, {
+    eventCall(`/events/stake`, {
       method: 'POST',
       data: requestBody,
     });
@@ -44,7 +44,7 @@ export function useStakeEvent() {
 }
 
 export function useBuyEvent() {
-  const apiCall = useApiCall();
+  const eventCall = useEventCall();
   const { account } = useWeb3React();
   const bnbUsdPrice = useAppSelector(selectBnbUsdPrice);
 
@@ -69,7 +69,7 @@ export function useBuyEvent() {
         gasSpentInUsdt: (gasSpent * bnbUsdPrice).toString(),
       },
     };
-    apiCall(`/events/purchase`, {
+    eventCall(`/events/purchase`, {
       method: 'POST',
       data: requestBody,
     });
@@ -78,7 +78,7 @@ export function useBuyEvent() {
 }
 
 export function useSellEvent() {
-  const apiCall = useApiCall();
+  const eventCall = useEventCall();
   const { account } = useWeb3React();
   const bnbUsdPrice = useAppSelector(selectBnbUsdPrice);
 
@@ -103,7 +103,7 @@ export function useSellEvent() {
         gasSpentInUsdt: (gasSpent * bnbUsdPrice).toString(),
       },
     };
-    apiCall(`/events/sell`, {
+    eventCall(`/events/sell`, {
       method: 'POST',
       data: requestBody,
     });
