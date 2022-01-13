@@ -4,7 +4,6 @@ import { SearchIcon, PlusIcon } from '@heroicons/react/outline';
 import { classNames, useApiCall } from '../utils/utils';
 import { useAppSelector } from '../store/hooks';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
-import PairChart from '../components/PairChart';
 import Web3 from 'web3';
 import Carousel from 'react-multi-carousel';
 import { PairDataTimeWindowEnum } from '../utils/chart';
@@ -19,6 +18,7 @@ import wotLogo from '../images/wot-logo.svg';
 import { selectUserBnbAmount } from '../store/userInfoSlice';
 import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 import { RootState } from '../store/store';
+import TradingPageChart from '../components/TradingPageChart';
 
 interface TokenSearchResult {
   name: string;
@@ -53,7 +53,7 @@ interface PairPriceHistoryApiResponse {
   volume: number;
 }
 
-interface GraphData {
+export interface GraphData {
   time: Date;
   value: number;
 }
@@ -477,7 +477,11 @@ export default function TradingPage() {
               </form>
             </div>
           </div>
-          <div className='col-span-2 hidden xl:flex xl:col-span-1 items-end'>
+          <TradingPageChart
+            priceHistory={priceHistory}
+            className='block xl:hidden col-span-2 xl:col-span-1'
+          />
+          <div className='col-span-2 flex xl:col-span-1 items-end xl:px-28'>
             <div className='w-full flex justify-center'>
               <button
                 type='button'
@@ -485,7 +489,7 @@ export default function TradingPage() {
                   currentlySelectedTab === 'buy'
                     ? 'border-pequod-white font-bold'
                     : '',
-                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
+                  'text-pequod-white border border-transparent w-full justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('buy');
@@ -502,7 +506,7 @@ export default function TradingPage() {
                   currentlySelectedTab === 'sell'
                     ? 'border border-pequod-white font-bold'
                     : '',
-                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
+                  'text-pequod-white border border-transparent w-full justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('sell');
@@ -514,56 +518,12 @@ export default function TradingPage() {
               </button>
             </div>
           </div>
-          <div
-            className={classNames(
-              !priceHistory?.length ? 'hidden lg:block' : '',
-              'col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-pequod-white'
-            )}
-          >
-            {!!priceHistory?.length && (
-              <div style={{ height: '90%', width: '100%', minHeight: '190px' }}>
-                <PairChart data={priceHistory} />
-              </div>
-            )}
-          </div>
-          <div className='col-span-2 flex xl:hidden xl:col-span-1 items-end'>
-            <div className='w-full flex justify-center'>
-              <button
-                type='button'
-                className={classNames(
-                  currentlySelectedTab === 'buy'
-                    ? 'border-pequod-white font-bold'
-                    : '',
-                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
-                )}
-                onClick={() => {
-                  setCurrentlySelectedTab('buy');
-                  updateFrom('0');
-                  setAmountTo('0');
-                }}
-              >
-                BUY
-              </button>
-              <div className='border border-pequod-white mx-4'> </div>
-              <button
-                type='button'
-                className={classNames(
-                  currentlySelectedTab === 'sell'
-                    ? 'border border-pequod-white font-bold'
-                    : '',
-                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
-                )}
-                onClick={() => {
-                  setCurrentlySelectedTab('sell');
-                  updateFrom('0');
-                  setAmountTo('0');
-                }}
-              >
-                SELL
-              </button>
-            </div>
-          </div>
-          <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 px-5 xl:px-28'>
+          <TradingPageChart
+            priceHistory={priceHistory}
+            className='hidden xl:block col-span-2 xl:col-span-1'
+          />
+
+          <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 xl:px-28'>
             {/* 1st row */}
             <div className='w-full mx-auto'>
               <div className='flex justify-between'>
