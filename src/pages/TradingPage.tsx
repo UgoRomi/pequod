@@ -420,7 +420,7 @@ export default function TradingPage() {
                           : 0}
                       </p>
                     </div>
-                    <button className='border bg-pequod-dark text-white py-2 px-4 rounded-md'>
+                    <button className='border bg-pequod-dark text-pequod-white py-2 px-4 rounded-md'>
                       Stake now
                     </button>
                   </>
@@ -431,14 +431,16 @@ export default function TradingPage() {
         </Carousel>
 
         <div className='grid grid-cols-buy gap-y-8 xl:bg-pequod-dark xl:p-5 xl:rounded-md'>
-          <div className='col-span-2 xl:col-span-1 gap-2 xl:gap-0 grid grid-cols-buy'>
+          <div className='col-span-2 xl:col-span-1 gap-y-2 xl:gap-0 grid grid-cols-buy'>
             <div className='flex-1 flex flex-col'>
-              <span className='text-white text-xl mb-4'>Search token</span>
+              <span className='text-pequod-white text-xl mb-4'>
+                Search token
+              </span>
               <form className='w-full flex justify-left md:ml-0'>
                 <label htmlFor='search-field' className='sr-only'>
                   Search
                 </label>
-                <div className='relative w-full text-gray-400 focus-within:text-gray-600 max-w-xl'>
+                <div className='relative w-full text-pequod-white xl:pr-3'>
                   <div className='absolute inset-y-0 left-2 flex items-center pointer-events-none'>
                     <SearchIcon className='h-5 w-5' aria-hidden='true' />
                   </div>
@@ -454,7 +456,7 @@ export default function TradingPage() {
                     onBlur={() => setSearchFocused(false)}
                   />
                   {searchResults?.length > 0 && searchFocused && (
-                    <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-white'>
+                    <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-pequod-white'>
                       {searchResults.map((token) => (
                         <div
                           className='cursor-pointer'
@@ -475,7 +477,7 @@ export default function TradingPage() {
               </form>
             </div>
           </div>
-          <div className='col-span-2 xl:col-span-1 flex items-end'>
+          <div className='col-span-2 hidden xl:flex xl:col-span-1 items-end'>
             <div className='w-full flex justify-center'>
               <button
                 type='button'
@@ -523,6 +525,43 @@ export default function TradingPage() {
                 <PairChart data={priceHistory} />
               </div>
             )}
+          </div>
+          <div className='col-span-2 flex xl:hidden xl:col-span-1 items-end'>
+            <div className='w-full flex justify-center'>
+              <button
+                type='button'
+                className={classNames(
+                  currentlySelectedTab === 'buy'
+                    ? 'border-pequod-white font-bold'
+                    : '',
+                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
+                )}
+                onClick={() => {
+                  setCurrentlySelectedTab('buy');
+                  updateFrom('0');
+                  setAmountTo('0');
+                }}
+              >
+                BUY
+              </button>
+              <div className='border border-pequod-white mx-4'> </div>
+              <button
+                type='button'
+                className={classNames(
+                  currentlySelectedTab === 'sell'
+                    ? 'border border-pequod-white font-bold'
+                    : '',
+                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
+                )}
+                onClick={() => {
+                  setCurrentlySelectedTab('sell');
+                  updateFrom('0');
+                  setAmountTo('0');
+                }}
+              >
+                SELL
+              </button>
+            </div>
           </div>
           <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 px-5 xl:px-28'>
             {/* 1st row */}
