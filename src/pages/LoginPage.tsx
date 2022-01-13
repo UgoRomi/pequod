@@ -20,8 +20,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0 bg-gray-600'>
-      <div className='w-full sm:mx-auto sm:w-full sm:max-w-md bg-gray-100 rounded-md shadow-lg'>
+    <div className='h-full flex flex-col justify-center items-center px-4 sm:px-0 bg-pequod-dark'>
+      <div className='w-full sm:mx-auto sm:w-full sm:max-w-md bg-pequod-gray rounded-md shadow-lg'>
         <div className='flex justify-center items-center w-full py-4'>
           <img
             className='flex-shrink-0 max-h-14'
@@ -29,7 +29,7 @@ export default function LoginPage() {
             alt='Pequod Logo'
           />
         </div>
-        <p className='text-gray-800 text-xl font-semibold text-center'>
+        <p className='text-pequod-white text-xl font-semibold text-center'>
           Connect your wallet
         </p>
         <div className='py-8 px-4 sm:rounded-lg sm:px-10 flex flex-col gap-5'>
@@ -38,7 +38,7 @@ export default function LoginPage() {
             onClick={() => connectToWallet(ConnectorNames.Injected)}
           >
             <MetamaskStackedLogo className='h-28 mx-auto' />
-            <span className='font-semibold text-purple-500'>
+            <span className='font-semibold text-pequod-gray'>
               Connect using metamask
             </span>
           </div>
@@ -47,7 +47,7 @@ export default function LoginPage() {
             onClick={() => connectToWallet(ConnectorNames.WalletConnect)}
           >
             <WalletConnectLogo className='h-16 mx-auto mb-6' />
-            <span className='font-semibold text-purple-500'>
+            <span className='font-semibold text-pequod-gray'>
               Connect using WalletConnect
             </span>
           </div>
