@@ -16,8 +16,9 @@ import {
 } from '../utils/contractsUtils';
 import wotLogo from '../images/wot-logo.svg';
 
-import { selectUserWotAmount } from '../store/userInfoSlice';
+import { selectUserBnbAmount } from '../store/userInfoSlice';
 import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
+import { RootState } from '../store/store';
 
 interface TokenSearchResult {
   name: string;
@@ -69,14 +70,12 @@ interface AvailableStaking {
 }
 
 export default function TradingPage() {
-  const userTokenBalance = useAppSelector(selectUserWotAmount);
   const [tokenSearch, setTokenSearch] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
-  const [, setStakeAmount] = useState('25');
 
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
     'buy' | 'sell'
@@ -104,6 +103,17 @@ export default function TradingPage() {
   const getTokenPrice = useGetTokenPrice();
   const approve = useApprove();
   const checkSwapAllowance = useAllowance();
+  const userBnbBalance = useAppSelector(selectUserBnbAmount);
+  const userSelectedTokenBalance: number = useAppSelector(
+    (state: RootState) =>
+      state.userInfo?.tokens?.find(
+        (token) =>
+          token.address.toUpperCase() ===
+          selectedTokenInfo.address.toUpperCase()
+      )?.amount || 0
+  );
+  const fromTokenBalance =
+    currentlySelectedTab === 'buy' ? userBnbBalance : userSelectedTokenBalance;
 
   useEffect(() => {
     // Wait for the allowance to be fetched
@@ -123,6 +133,7 @@ export default function TradingPage() {
   const updateFrom = (value: string) => {
     const valueNumeric = parseFloat(value);
     setAmountFrom(value.toString());
+    setPercentageButtonActive(100 / (fromTokenBalance / valueNumeric));
     if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
@@ -137,7 +148,7 @@ export default function TradingPage() {
     setAmountTo(value.toString());
     if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
-      setAmountFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
+      updateFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
     } else {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     }
@@ -259,7 +270,7 @@ export default function TradingPage() {
         (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
     )
       return;
-    setAmountFrom('0');
+    updateFrom('0');
     setAmountTo('0');
 
     const searchTokens = setTimeout(async () => {
@@ -317,16 +328,16 @@ export default function TradingPage() {
   const percentageButtonClicked = (percentage: Percentages) => {
     switch (percentage) {
       case Percentages['25%']:
-        setStakeAmount((userTokenBalance * 0.25).toFixed(4));
+        updateFrom(formatAmount((fromTokenBalance * 0.25).toString()));
         break;
       case Percentages['50%']:
-        setStakeAmount((userTokenBalance * 0.5).toFixed(4));
+        updateFrom(formatAmount((fromTokenBalance * 0.5).toString()));
         break;
       case Percentages['75%']:
-        setStakeAmount((userTokenBalance * 0.75).toFixed(4));
+        updateFrom(formatAmount((fromTokenBalance * 0.7500001).toString()));
         break;
       case Percentages['100%']:
-        setStakeAmount(userTokenBalance.toFixed(4));
+        updateFrom(formatAmount(fromTokenBalance.toString()));
         break;
     }
   };
@@ -476,7 +487,7 @@ export default function TradingPage() {
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('buy');
-                  setAmountFrom('0');
+                  updateFrom('0');
                   setAmountTo('0');
                 }}
               >
@@ -493,7 +504,7 @@ export default function TradingPage() {
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('sell');
-                  setAmountFrom('0');
+                  updateFrom('0');
                   setAmountTo('0');
                 }}
               >
@@ -540,7 +551,7 @@ export default function TradingPage() {
                     minLength={1}
                     maxLength={79}
                     spellCheck='false'
-                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
                     disabled={!selectedTokenInfo.address}
                     value={formatAmount(amountFrom)}
                     onChange={(e) => updateFrom(e.target.value)}
@@ -551,6 +562,7 @@ export default function TradingPage() {
                   buttonClickCallback={percentageButtonClicked}
                   active={percentageButtonActive}
                   setActive={setPercentageButtonActive}
+                  disabled={!selectedTokenInfo.address}
                 />
               </div>
               {/* 3rd row */}
@@ -581,7 +593,7 @@ export default function TradingPage() {
                     minLength={1}
                     maxLength={79}
                     spellCheck='false'
-                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
                     disabled={!selectedTokenInfo.address}
                     value={formatAmount(amountTo)}
                     onChange={(e) => updateTo(e.target.value)}

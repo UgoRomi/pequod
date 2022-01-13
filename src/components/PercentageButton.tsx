@@ -6,15 +6,18 @@ export default function PercentageButton({
   setActive,
   percentage,
   buttonClickCallback,
-  darkModeClass = 'text-gray-200',
+  darkModeClass,
+  disabled,
 }: {
   active: boolean;
   setActive: () => void;
   percentage: Percentages;
   buttonClickCallback: (percentage: Percentages) => void;
   darkModeClass: string;
+  disabled: boolean;
 }) {
   const buttonClick = () => {
+    if (disabled) return;
     setActive();
     buttonClickCallback(percentage);
   };
@@ -22,13 +25,17 @@ export default function PercentageButton({
   return (
     <div
       onClick={buttonClick}
-      className='flex flex-col justify-center cursor-pointer'
+      className={classNames(
+        disabled ? 'cursor-default opacity-70' : 'cursor-pointer',
+        'flex flex-col justify-center '
+      )}
     >
       <button
         className={classNames(
           active ? 'bg-pequod-purple' : 'bg-pequod-white',
-          'h-2 rounded-lg w-full'
+          'h-2 rounded-lg w-full disabled:cursor-default'
         )}
+        disabled={disabled}
       >
         {' '}
       </button>

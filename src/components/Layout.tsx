@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 
 import { selectUserWotAmount } from '../store/userInfoSlice';
 export default function Layout({ children }: { children: JSX.Element }) {
-  const userTokenBalance = useAppSelector(selectUserWotAmount);
+  const userWotBalance = useAppSelector(selectUserWotAmount);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
   const { logout } = useAuth();
@@ -222,7 +222,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               </div>
               <span className='flex flex-row text-white'>
                 <img alt='logo wot' src={wotLogo} className='mr-2' width='20' />
-                {userTokenBalance}
+                {userWotBalance}
               </span>
             </div>
 
@@ -235,7 +235,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     className={classNames(
                       item.current
                         ? 'bg-pequod-white-300 text-white border-l-4 border-pequod-pink'
-                        : 'text-purple-100 hover:bg-purple-500 pl-3',
+                        : 'text-purple-100 hover:bg-pequod-purple pl-3',
                       'group flex items-center px-2 py-3 text-sm font-medium justify-center'
                     )}
                   >

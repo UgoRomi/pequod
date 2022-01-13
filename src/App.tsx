@@ -12,8 +12,8 @@ import { useAppDispatch } from './store/hooks';
 import {
   addUserFarms,
   FarmState,
-  setBnbAMount,
-  setWotAMount,
+  setUserTokens,
+  UserToken,
 } from './store/userInfoSlice';
 import { setBnbUsdPrice } from './store/pricesSlice';
 import TradingPage from './pages/TradingPage';
@@ -26,17 +26,18 @@ function App() {
 
   useEffect(() => {
     getUserInfo().then((res) => {
-      res?.personalWallet?.tokens?.forEach((token) => {
-        switch (token.symbol) {
-          case 'BNB':
-            dispatch(setBnbAMount(token.amount));
-            dispatch(setBnbUsdPrice(token.currentPrice));
-            break;
-          case process.env.REACT_APP_WOT_SYMBOL:
-            dispatch(setWotAMount(token.amount));
-            break;
-        }
-      });
+      const bnbUsdPrice =
+        res?.personalWallet?.tokens?.find(
+          (token) => token.address === process.env.REACT_APP_BNB_ADDRESS
+        )?.currentPrice || 0;
+      dispatch(setBnbUsdPrice(bnbUsdPrice));
+      const userTokens: UserToken[] =
+        res?.personalWallet?.tokens.map((token) => ({
+          address: token.address,
+          symbol: token.symbol,
+          amount: token.amount,
+        })) || [];
+      dispatch(setUserTokens(userTokens));
 
       // Save the current user farms to the store
       const userFarms = res?.pequodFarms?.map((farm): FarmState => {

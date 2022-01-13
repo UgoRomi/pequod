@@ -12,29 +12,30 @@ export interface FarmState {
   amountEarned: number;
   unStakingTimeInSeconds: number;
 }
+
+export interface UserToken {
+  address: string;
+  symbol: string;
+  amount: number;
+}
 interface UserInfoState {
-  bnbAmount: number;
-  wotAmount: number;
   signedMessage: string;
   farms: FarmState[];
+  tokens: UserToken[];
 }
 
 const initialState: UserInfoState = {
-  bnbAmount: 0,
-  wotAmount: 0,
   signedMessage: '',
   farms: [],
+  tokens: [],
 };
 
 export const userInfoSlice = createSlice({
   name: 'userInfo',
   initialState,
   reducers: {
-    setBnbAMount: (state, action: PayloadAction<number>) => {
-      state.bnbAmount = action.payload;
-    },
-    setWotAMount: (state, action: PayloadAction<number>) => {
-      state.wotAmount = action.payload;
+    setUserTokens: (state, action: PayloadAction<UserToken[]>) => {
+      state.tokens = action.payload;
     },
     setSignedMessage: (state, action: PayloadAction<string>) => {
       state.signedMessage = action.payload;
@@ -55,19 +56,21 @@ export const userInfoSlice = createSlice({
   },
 });
 
-export const {
-  setBnbAMount,
-  setWotAMount,
-  setSignedMessage,
-  addUserFarms,
-  updateUserFarm,
-} = userInfoSlice.actions;
+export const { setSignedMessage, addUserFarms, updateUserFarm, setUserTokens } =
+  userInfoSlice.actions;
 
 // #region Selectors
 export const selectUserBnbAmount = (state: RootState) =>
-  state.userInfo.bnbAmount;
+  state.userInfo.tokens.find(
+    (token) =>
+      token.address.toUpperCase() ===
+      process.env.REACT_APP_BNB_ADDRESS?.toUpperCase()
+  )?.amount || 0;
 export const selectUserWotAmount = (state: RootState) =>
-  state.userInfo.wotAmount;
+  state.userInfo.tokens.find(
+    (token) => token.address === process.env.REACT_APP_WOT_ADDRESS
+  )?.amount || 0;
+export const selectUserTokens = (state: RootState) => state.userInfo.tokens;
 export const selectUserSignedMessage = (state: RootState) =>
   state.userInfo.signedMessage;
 // #endregion
