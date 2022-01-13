@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { CogIcon, SearchIcon, PlusIcon } from '@heroicons/react/outline';
+import { SearchIcon, PlusIcon } from '@heroicons/react/outline';
 import { classNames, useApiCall } from '../utils/utils';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { openTradeSettingsDialog } from '../store/tradeDialogSlice';
+import { useAppSelector } from '../store/hooks';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import PairChart from '../components/PairChart';
 import Web3 from 'web3';
@@ -84,7 +83,7 @@ export default function TradingPage() {
   >('buy');
   const [amountFrom, setAmountFrom] = useState<string>('0');
   const [amountTo, setAmountTo] = useState<string>('0');
-  const [slippage, setSlippage] = useState<number>(15);
+  const [slippage, setSlippage] = useState<number>(30);
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
   const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
@@ -101,7 +100,6 @@ export default function TradingPage() {
   const [timeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.WEEK
   );
-  const dispatch = useAppDispatch();
   const pequodApiCall = useApiCall();
   const getTokenPrice = useGetTokenPrice();
   const approve = useApprove();
@@ -298,10 +296,6 @@ export default function TradingPage() {
     selectedTokenInfo.tokenReserve,
   ]);
 
-  const openDialog = () => {
-    dispatch(openTradeSettingsDialog());
-  };
-
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
@@ -425,222 +419,211 @@ export default function TradingPage() {
           ))}
         </Carousel>
 
-        <div className='flex flex-col gap-11'>
-          <div className='grid grid-rows-buy grid-cols-2 gap-y-8 xl:bg-white xl:dark:bg-pequod-dark xl:p-5 xl:rounded-md'>
-            <div className='col-span-2 gap-2 xl:gap-0 grid grid-cols-buy'>
-              <div className='flex-1 flex flex-col'>
-                <span className='text-white text-xl mb-4'>Search token</span>
-                <form className='w-full flex justify-left md:ml-0'>
-                  <label htmlFor='search-field' className='sr-only'>
-                    Search
-                  </label>
-                  <div className='relative w-full text-gray-400 focus-within:text-gray-600 max-w-xl'>
-                    <div className='absolute inset-y-0 left-2 flex items-center pointer-events-none'>
-                      <SearchIcon className='h-5 w-5' aria-hidden='true' />
-                    </div>
-                    <input
-                      id='search-field'
-                      className='block w-full h-full pl-10 pr-3 py-2 border b-1 bg-transparent text-white focus:outline-none focus:ring focus:ring-purple-400 placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
-                      placeholder='0xe861....'
-                      type='search'
-                      name='search'
-                      value={tokenSearch}
-                      onChange={(e) => setTokenSearch(e.target.value)}
-                      onFocus={() => setSearchFocused(true)}
-                      onBlur={() => setSearchFocused(false)}
-                    />
-                    {searchResults?.length > 0 && searchFocused && (
-                      <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-white'>
-                        {searchResults.map((token, i) => (
-                          <div
-                            className='cursor-pointer'
-                            onClick={() => getTokenInfo(token.address)}
-                            key={token.address}
-                          >
-                            <span className='p-1 text-md text-gray-800 font-semibold'>
-                              {token.name} - ${token.symbol}
-                            </span>
-                            <span className='block text-sm text-gray-600 overflow-hidden'>
-                              {token.address}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+        <div className='grid grid-cols-buy gap-y-8 xl:bg-white xl:dark:bg-pequod-dark xl:p-5 xl:rounded-md'>
+          <div className='col-span-2 xl:col-span-1 gap-2 xl:gap-0 grid grid-cols-buy'>
+            <div className='flex-1 flex flex-col'>
+              <span className='text-white text-xl mb-4'>Search token</span>
+              <form className='w-full flex justify-left md:ml-0'>
+                <label htmlFor='search-field' className='sr-only'>
+                  Search
+                </label>
+                <div className='relative w-full text-gray-400 focus-within:text-gray-600 max-w-xl'>
+                  <div className='absolute inset-y-0 left-2 flex items-center pointer-events-none'>
+                    <SearchIcon className='h-5 w-5' aria-hidden='true' />
                   </div>
-                </form>
-              </div>
-              <div className='flex justify-center items-end'>
-                <button
-                  type='button'
-                  onClick={openDialog}
-                  className='inline-flex items-center p-3 border border-transparent rounded-md max-h-12 shadow-sm text-white bg-purple-400 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
-                >
-                  <CogIcon className='h-6 w-6' aria-hidden='true' />
-                </button>
-              </div>
-            </div>
-            <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-gray-700 dark:text-gray-200'>
-              {!!priceHistory?.length && (
-                <div
-                  style={{ height: '90%', width: '100%', minHeight: '190px' }}
-                >
-                  <PairChart data={priceHistory} />
-                </div>
-              )}
-            </div>
-            <div className='flex h-100 justify-center items-start col-span-2 xl:col-span-1'>
-              <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
-                {/* 1st row */}
-                <div className='flex justify-center'>
-                  <button
-                    type='button'
-                    className={classNames(
-                      currentlySelectedTab === 'buy'
-                        ? 'border border-pequod-white text-white font-bold'
-                        : 'text-white',
-                      'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-200 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
-                    )}
-                    onClick={() => {
-                      setCurrentlySelectedTab('buy');
-                      setAmountFrom('0');
-                      setAmountTo('0');
-                    }}
-                  >
-                    BUY
-                  </button>
-                </div>
-                <div className='flex justify-center'>
-                  <button
-                    type='button'
-                    className={classNames(
-                      currentlySelectedTab === 'sell'
-                        ? 'border border-pequod-white text-white font-bold'
-                        : 'text-white',
-                      'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-500 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
-                    )}
-                    onClick={() => {
-                      setCurrentlySelectedTab('sell');
-                      setAmountFrom('0');
-                      setAmountTo('0');
-                    }}
-                  >
-                    SELL
-                  </button>
-                </div>
-                {/* 2nd row */}
-                <div className='col-span-2 w-full mx-auto'>
-                  <div className='flex justify-between'>
-                    <label
-                      htmlFor='amountFrom'
-                      className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                    >
-                      Total{' '}
-                      {currentlySelectedTab === 'buy'
-                        ? '(BNB)'
-                        : selectedTokenInfo?.symbol
-                        ? `(${selectedTokenInfo?.symbol})`
-                        : ''}
-                    </label>
-                  </div>
-                  <div className='mt-1'>
-                    <input
-                      type='text'
-                      name='amountFrom'
-                      id='amountFrom'
-                      inputMode='decimal'
-                      autoComplete='off'
-                      autoCorrect='off'
-                      pattern='^[0-9]*[.,]?[0-9]*$'
-                      placeholder='0.0'
-                      minLength={1}
-                      maxLength={79}
-                      spellCheck='false'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
-                      disabled={!selectedTokenInfo.address}
-                      value={formatAmount(amountFrom)}
-                      onChange={(e) => updateFrom(e.target.value)}
-                    />
-                  </div>
-                  <PercentagesGroup
-                    darkModeClass='text-gray-700'
-                    buttonClickCallback={percentageButtonClicked}
-                    active={percentageButtonActive}
-                    setActive={setPercentageButtonActive}
+                  <input
+                    id='search-field'
+                    className='block w-full h-full pl-10 pr-3 py-2 border b-1 bg-transparent text-white focus:outline-none focus:ring focus:ring-pequod-purple placeholder-gray-400 focus:placeholder-gray-400 sm:text-sm rounded-md'
+                    placeholder='0xe861....'
+                    type='search'
+                    name='search'
+                    value={tokenSearch}
+                    onChange={(e) => setTokenSearch(e.target.value)}
+                    onFocus={() => setSearchFocused(true)}
+                    onBlur={() => setSearchFocused(false)}
                   />
-                </div>
-                {/* 3rd row */}
-                <div className='col-span-2 w-full mx-auto'>
-                  <div className='flex justify-between'>
-                    <label
-                      htmlFor='amountTo'
-                      className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                    >
-                      Total{' '}
-                      {currentlySelectedTab === 'buy'
-                        ? selectedTokenInfo?.symbol
-                          ? `(${selectedTokenInfo?.symbol})`
-                          : ''
-                        : '(BNB)'}
-                    </label>
-                  </div>
-                  <div className='mt-1'>
-                    <input
-                      type='text'
-                      name='amountTo'
-                      id='amountTo'
-                      inputMode='decimal'
-                      autoComplete='off'
-                      autoCorrect='off'
-                      pattern='^[0-9]*[.,]?[0-9]*$'
-                      placeholder='0.0'
-                      minLength={1}
-                      maxLength={79}
-                      spellCheck='false'
-                      className='shadow-sm focus:outline-none focus:ring focus:ring-purple-400 block w-full sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
-                      disabled={!selectedTokenInfo.address}
-                      value={formatAmount(amountTo)}
-                      onChange={(e) => updateTo(e.target.value)}
-                    />
-                  </div>
-                </div>
-                {/* 4th row */}
-                <div className='col-span-2 mt-5 flex justify-center'>
-                  {currentlySelectedTab === 'buy' ||
-                  selectedTokenInfo.allowance > 0 ? (
-                    <button
-                      onClick={() => {
-                        if (currentlySelectedTab === 'buy') {
-                          buyCallback();
-                        } else {
-                          sellCallback();
-                        }
-                      }}
-                      className='border b-2 w-full text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
-                      disabled={
-                        !selectedTokenInfo ||
-                        !selectedTokenInfo.address ||
-                        !amountFrom ||
-                        !amountTo
-                      }
-                    >
-                      Place Order
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() =>
-                        approve(
-                          selectedTokenInfo.address,
-                          process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-                        )
-                      }
-                      className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
-                      disabled={approve === undefined}
-                    >
-                      Approve {selectedTokenInfo.symbol} swap
-                    </button>
+                  {searchResults?.length > 0 && searchFocused && (
+                    <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-white'>
+                      {searchResults.map((token) => (
+                        <div
+                          className='cursor-pointer'
+                          onClick={() => getTokenInfo(token.address)}
+                          key={token.address}
+                        >
+                          <span className='p-1 text-md text-gray-800 font-semibold'>
+                            {token.name} - ${token.symbol}
+                          </span>
+                          <span className='block text-sm text-gray-600 overflow-hidden'>
+                            {token.address}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
+              </form>
+            </div>
+          </div>
+          <div className='col-span-2 xl:col-span-1 flex items-end'>
+            <div className='w-full flex justify-center'>
+              <button
+                type='button'
+                className={classNames(
+                  currentlySelectedTab === 'buy'
+                    ? 'border border-pequod-white text-white font-bold'
+                    : 'text-white',
+                  'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-200 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
+                )}
+                onClick={() => {
+                  setCurrentlySelectedTab('buy');
+                  setAmountFrom('0');
+                  setAmountTo('0');
+                }}
+              >
+                BUY
+              </button>
+              <div className='border border-pequod-white mx-4'> </div>
+              <button
+                type='button'
+                className={classNames(
+                  currentlySelectedTab === 'sell'
+                    ? 'border border-pequod-white text-white font-bold'
+                    : 'text-white',
+                  'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-500 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
+                )}
+                onClick={() => {
+                  setCurrentlySelectedTab('sell');
+                  setAmountFrom('0');
+                  setAmountTo('0');
+                }}
+              >
+                SELL
+              </button>
+            </div>
+          </div>
+          <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-gray-700 dark:text-gray-200'>
+            {!!priceHistory?.length && (
+              <div style={{ height: '90%', width: '100%', minHeight: '190px' }}>
+                <PairChart data={priceHistory} />
+              </div>
+            )}
+          </div>
+          <div className='flex h-100 justify-center items-start col-span-2 xl:col-span-1'>
+            <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
+              {/* 1st row */}
+
+              {/* 2nd row */}
+              <div className='col-span-2 w-full mx-auto'>
+                <div className='flex justify-between'>
+                  <label
+                    htmlFor='amountFrom'
+                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
+                  >
+                    Total{' '}
+                    {currentlySelectedTab === 'buy'
+                      ? '(BNB)'
+                      : selectedTokenInfo?.symbol
+                      ? `(${selectedTokenInfo?.symbol})`
+                      : ''}
+                  </label>
+                </div>
+                <div className='mt-1'>
+                  <input
+                    type='text'
+                    name='amountFrom'
+                    id='amountFrom'
+                    inputMode='decimal'
+                    autoComplete='off'
+                    autoCorrect='off'
+                    pattern='^[0-9]*[.,]?[0-9]*$'
+                    placeholder='0.0'
+                    minLength={1}
+                    maxLength={79}
+                    spellCheck='false'
+                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                    disabled={!selectedTokenInfo.address}
+                    value={formatAmount(amountFrom)}
+                    onChange={(e) => updateFrom(e.target.value)}
+                  />
+                </div>
+                <PercentagesGroup
+                  darkModeClass='text-gray-700'
+                  buttonClickCallback={percentageButtonClicked}
+                  active={percentageButtonActive}
+                  setActive={setPercentageButtonActive}
+                />
+              </div>
+              {/* 3rd row */}
+              <div className='col-span-2 w-full mx-auto'>
+                <div className='flex justify-between'>
+                  <label
+                    htmlFor='amountTo'
+                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
+                  >
+                    Total{' '}
+                    {currentlySelectedTab === 'buy'
+                      ? selectedTokenInfo?.symbol
+                        ? `(${selectedTokenInfo?.symbol})`
+                        : ''
+                      : '(BNB)'}
+                  </label>
+                </div>
+                <div className='mt-1'>
+                  <input
+                    type='text'
+                    name='amountTo'
+                    id='amountTo'
+                    inputMode='decimal'
+                    autoComplete='off'
+                    autoCorrect='off'
+                    pattern='^[0-9]*[.,]?[0-9]*$'
+                    placeholder='0.0'
+                    minLength={1}
+                    maxLength={79}
+                    spellCheck='false'
+                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed'
+                    disabled={!selectedTokenInfo.address}
+                    value={formatAmount(amountTo)}
+                    onChange={(e) => updateTo(e.target.value)}
+                  />
+                </div>
+              </div>
+              {/* 4th row */}
+              <div className='col-span-2 mt-5 flex justify-center'>
+                {currentlySelectedTab === 'buy' ||
+                selectedTokenInfo.allowance > 0 ? (
+                  <button
+                    onClick={() => {
+                      if (currentlySelectedTab === 'buy') {
+                        buyCallback();
+                      } else {
+                        sellCallback();
+                      }
+                    }}
+                    className='border b-2 w-full text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                    disabled={
+                      !selectedTokenInfo ||
+                      !selectedTokenInfo.address ||
+                      !amountFrom ||
+                      !amountTo
+                    }
+                  >
+                    Place Order
+                  </button>
+                ) : (
+                  <button
+                    onClick={() =>
+                      approve(
+                        selectedTokenInfo.address,
+                        process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+                      )
+                    }
+                    className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                    disabled={approve === undefined}
+                  >
+                    Approve {selectedTokenInfo.symbol} swap
+                  </button>
+                )}
               </div>
             </div>
           </div>

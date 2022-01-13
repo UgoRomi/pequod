@@ -26,7 +26,7 @@ export default function PercentageButton({
     >
       <button
         className={classNames(
-          active ? 'bg-purple-400' : 'bg-purple-100',
+          active ? 'bg-pequod-purple' : 'bg-pequod-white',
           'h-2 rounded-lg w-full'
         )}
       >

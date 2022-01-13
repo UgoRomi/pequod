@@ -41,7 +41,7 @@ export function useApiCall() {
       data: {
         ...options.data,
         signature: userSignedMessage,
-        chainID: process.env.REACT_APP_CHAIN_ID,
+        chainId: process.env.REACT_APP_CHAIN_ID,
         uuid: uuidV4(),
       },
     };

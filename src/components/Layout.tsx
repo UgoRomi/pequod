@@ -66,13 +66,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
         {!userSignedMessage && (
           <div className='z-50 bg-gray-800 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
             <button
-              className='flex bg-purple-500 text-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
+              className='flex bg-pequod-purple text-pequod-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
               disabled={signInProgress}
               onClick={signMessage}
             >
               {signInProgress ? (
                 <>
-                  <Spinner className='text-white h-5' />
+                  <Spinner className='text-pequod-white h-5' />
                   <span>Signing in...</span>
                 </>
               ) : (
