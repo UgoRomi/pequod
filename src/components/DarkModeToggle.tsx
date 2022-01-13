@@ -27,12 +27,15 @@ export default function DarkModeToggle() {
 
   return (
     <>
-      <span className={classNames(
-        enabled
-          ? 'opacity-30'
-          : 'opacity-100',
-        'text-white pr-4'
-      )}> Light </span>
+      <span
+        className={classNames(
+          enabled ? 'opacity-30' : 'opacity-100',
+          'text-white pr-4'
+        )}
+      >
+        {' '}
+        Light{' '}
+      </span>
 
       <Switch
         checked={enabled}
@@ -74,12 +77,15 @@ export default function DarkModeToggle() {
         </span>
       </Switch>
 
-      <span className={classNames(
-        !enabled
-          ? 'opacity-30'
-          : 'opacity-100',
-        'text-white pl-4'
-      )}> Dark </span>
+      <span
+        className={classNames(
+          !enabled ? 'opacity-30' : 'opacity-100',
+          'text-white pl-4'
+        )}
+      >
+        {' '}
+        Dark{' '}
+      </span>
     </>
   );
 }

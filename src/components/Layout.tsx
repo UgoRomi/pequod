@@ -1,6 +1,12 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { CashIcon, LogoutIcon, XIcon, ChartPieIcon, DocumentDuplicateIcon } from '@heroicons/react/outline';
+import {
+  CashIcon,
+  LogoutIcon,
+  XIcon,
+  ChartPieIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
@@ -11,15 +17,11 @@ import wotLogo from '../images/wot-logo.svg';
 import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
 import Spinner from './Spinner';
-import DarkModeToggle from './DarkModeToggle';
 
 import { toast } from 'react-toastify';
 
-import {
-  selectUserWotAmount,
-} from '../store/userInfoSlice';
+import { selectUserWotAmount } from '../store/userInfoSlice';
 export default function Layout({ children }: { children: JSX.Element }) {
-
   const userTokenBalance = useAppSelector(selectUserWotAmount);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
@@ -50,13 +52,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const copyToClipboard = (e: any) => {
     e.preventDefault();
     /* Get the text field */
-    const accountUser = account ? account : "";
+    const accountUser = account ? account : '';
     navigator.clipboard.writeText(accountUser);
 
     /* Alert the copied text */
 
     toast.success('Text copied');
-  }
+  };
 
   return (
     <>
@@ -122,7 +124,10 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       onClick={() => setSidebarOpen(false)}
                     >
                       <span className='sr-only'>Close sidebar</span>
-                      <XIcon className='h-6 w-6 text-white' aria-hidden='true' />
+                      <XIcon
+                        className='h-6 w-6 text-white'
+                        aria-hidden='true'
+                      />
                     </button>
                   </div>
                 </Transition.Child>
@@ -180,7 +185,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         <DocumentDuplicateIcon
                           className='mr-3 flex-shrink-0 h-6 w-6 text-white'
                           aria-hidden='true'
-                          onClick={(e) => copyToClipboard(e)} />
+                          onClick={(e) => copyToClipboard(e)}
+                        />
                       </Menu.Button>
                     </div>
                     <Transition
@@ -201,7 +207,10 @@ export default function Layout({ children }: { children: JSX.Element }) {
                                 'flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer'
                               )}
                             >
-                              <LogoutIcon className='mr-2 h-5' aria-hidden='true' />
+                              <LogoutIcon
+                                className='mr-2 h-5'
+                                aria-hidden='true'
+                              />
                               Disconnect
                             </span>
                           )}
@@ -211,7 +220,10 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   </Menu>
                 </div>
               </div>
-              <span className="flex flex-row text-white"><img alt="logo wot" src={wotLogo} className="mr-2" width="20" />{userTokenBalance}</span>
+              <span className='flex flex-row text-white'>
+                <img alt='logo wot' src={wotLogo} className='mr-2' width='20' />
+                {userTokenBalance}
+              </span>
             </div>
 
             <div className='mt-5 flex-1 flex flex-col'>
@@ -236,15 +248,10 @@ export default function Layout({ children }: { children: JSX.Element }) {
                 ))}
               </nav>
             </div>
-            <div className="py-10 flex justify-center">
-              <DarkModeToggle />
-            </div>
           </div>
         </div>
         <div className='md:pl-64 flex flex-col flex-1'>
-          <div className='sticky top-0 z-10 flex-shrink-0 flex h-16'>
-
-          </div>
+          <div className='sticky top-0 z-10 flex-shrink-0 flex h-16'></div>
 
           <main>
             <div className='py-6'>
