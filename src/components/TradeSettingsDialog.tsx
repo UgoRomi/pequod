@@ -62,11 +62,11 @@ export default function TradeSettingsDialog({
             leaveFrom='opacity-100 scale-100'
             leaveTo='opacity-0 scale-95'
           >
-            <div className='inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-2xl'>
+            <div className='inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-pequod-dark shadow-xl rounded-2xl'>
               <div className='hidden sm:block absolute top-0 right-0 pt-4 pr-4'>
                 <button
                   type='button'
-                  className='bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                  className='bg-pequod-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pequod-purple'
                   onClick={closeDialog}
                 >
                   <span className='sr-only'>Close</span>

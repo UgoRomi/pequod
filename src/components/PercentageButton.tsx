@@ -40,7 +40,7 @@ export default function PercentageButton({
         {' '}
       </button>
       <span
-        className={`w-full flex justify-center text-xs dark:text-pequod-pink dark:${darkModeClass}`}
+        className={`w-full flex justify-center text-xs text-pequod-pink ${darkModeClass}`}
       >
         {percentage}%
       </span>

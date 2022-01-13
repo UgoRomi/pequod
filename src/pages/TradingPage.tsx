@@ -344,8 +344,8 @@ export default function TradingPage() {
 
   return (
     <>
-      <div>
-        <span className='text-white text-xl ml-4'>Trading</span>
+      <div className='flex flex-col gap-10'>
+        <h1 className='text-pequod-white text-3xl font-bold ml-4'>Trading</h1>
         <Carousel
           itemClass='mx-4 mt-4'
           responsive={responsive}
@@ -430,7 +430,7 @@ export default function TradingPage() {
           ))}
         </Carousel>
 
-        <div className='grid grid-cols-buy gap-y-8 xl:bg-white xl:dark:bg-pequod-dark xl:p-5 xl:rounded-md'>
+        <div className='grid grid-cols-buy gap-y-8 xl:bg-pequod-dark xl:p-5 xl:rounded-md'>
           <div className='col-span-2 xl:col-span-1 gap-2 xl:gap-0 grid grid-cols-buy'>
             <div className='flex-1 flex flex-col'>
               <span className='text-white text-xl mb-4'>Search token</span>
@@ -481,9 +481,9 @@ export default function TradingPage() {
                 type='button'
                 className={classNames(
                   currentlySelectedTab === 'buy'
-                    ? 'border border-pequod-white text-white font-bold'
-                    : 'text-white',
-                  'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-200 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
+                    ? 'border-pequod-white font-bold'
+                    : '',
+                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('buy');
@@ -498,9 +498,9 @@ export default function TradingPage() {
                 type='button'
                 className={classNames(
                   currentlySelectedTab === 'sell'
-                    ? 'border border-pequod-white text-white font-bold'
-                    : 'text-white',
-                  'w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md dark:hover:text-purple-100 hover:bg-white-500 dark:hover:bg-white-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500'
+                    ? 'border border-pequod-white font-bold'
+                    : '',
+                  'text-pequod-white border border-transparent w-28 justify-center inline-flex items-center px-4 py-2 text-sm leading-4 font-medium rounded-md hover:border-pequod-white'
                 )}
                 onClick={() => {
                   setCurrentlySelectedTab('sell');
@@ -512,131 +512,132 @@ export default function TradingPage() {
               </button>
             </div>
           </div>
-          <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-gray-700 dark:text-gray-200'>
+          <div
+            className={classNames(
+              !priceHistory?.length ? 'hidden lg:block' : '',
+              'col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-pequod-white'
+            )}
+          >
             {!!priceHistory?.length && (
               <div style={{ height: '90%', width: '100%', minHeight: '190px' }}>
                 <PairChart data={priceHistory} />
               </div>
             )}
           </div>
-          <div className='flex h-100 justify-center items-start col-span-2 xl:col-span-1'>
-            <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
-              {/* 1st row */}
-
-              {/* 2nd row */}
-              <div className='col-span-2 w-full mx-auto'>
-                <div className='flex justify-between'>
-                  <label
-                    htmlFor='amountFrom'
-                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                  >
-                    Total{' '}
-                    {currentlySelectedTab === 'buy'
-                      ? '(BNB)'
-                      : selectedTokenInfo?.symbol
-                      ? `(${selectedTokenInfo?.symbol})`
-                      : ''}
-                  </label>
-                </div>
-                <div className='mt-1'>
-                  <input
-                    type='text'
-                    name='amountFrom'
-                    id='amountFrom'
-                    inputMode='decimal'
-                    autoComplete='off'
-                    autoCorrect='off'
-                    pattern='^[0-9]*[.,]?[0-9]*$'
-                    placeholder='0.0'
-                    minLength={1}
-                    maxLength={79}
-                    spellCheck='false'
-                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
-                    disabled={!selectedTokenInfo.address}
-                    value={formatAmount(amountFrom)}
-                    onChange={(e) => updateFrom(e.target.value)}
-                  />
-                </div>
-                <PercentagesGroup
-                  darkModeClass='text-gray-700'
-                  buttonClickCallback={percentageButtonClicked}
-                  active={percentageButtonActive}
-                  setActive={setPercentageButtonActive}
+          <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 px-5 xl:px-28'>
+            {/* 1st row */}
+            <div className='w-full mx-auto'>
+              <div className='flex justify-between'>
+                <label
+                  htmlFor='amountFrom'
+                  className='block text-sm font-medium text-pequod-white'
+                >
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? '(BNB)'
+                    : selectedTokenInfo?.symbol
+                    ? `(${selectedTokenInfo?.symbol})`
+                    : ''}
+                </label>
+              </div>
+              <div className='mt-1'>
+                <input
+                  type='text'
+                  name='amountFrom'
+                  id='amountFrom'
+                  inputMode='decimal'
+                  autoComplete='off'
+                  autoCorrect='off'
+                  pattern='^[0-9]*[.,]?[0-9]*$'
+                  placeholder='0.0'
+                  minLength={1}
+                  maxLength={79}
+                  spellCheck='false'
+                  className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
                   disabled={!selectedTokenInfo.address}
+                  value={formatAmount(amountFrom)}
+                  onChange={(e) => updateFrom(e.target.value)}
                 />
               </div>
-              {/* 3rd row */}
-              <div className='col-span-2 w-full mx-auto'>
-                <div className='flex justify-between'>
-                  <label
-                    htmlFor='amountTo'
-                    className='block text-sm font-medium text-gray-700 dark:text-gray-200'
-                  >
-                    Total{' '}
-                    {currentlySelectedTab === 'buy'
-                      ? selectedTokenInfo?.symbol
-                        ? `(${selectedTokenInfo?.symbol})`
-                        : ''
-                      : '(BNB)'}
-                  </label>
-                </div>
-                <div className='mt-1'>
-                  <input
-                    type='text'
-                    name='amountTo'
-                    id='amountTo'
-                    inputMode='decimal'
-                    autoComplete='off'
-                    autoCorrect='off'
-                    pattern='^[0-9]*[.,]?[0-9]*$'
-                    placeholder='0.0'
-                    minLength={1}
-                    maxLength={79}
-                    spellCheck='false'
-                    className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
-                    disabled={!selectedTokenInfo.address}
-                    value={formatAmount(amountTo)}
-                    onChange={(e) => updateTo(e.target.value)}
-                  />
-                </div>
+              <PercentagesGroup
+                darkModeClass='text-gray-700'
+                buttonClickCallback={percentageButtonClicked}
+                active={percentageButtonActive}
+                setActive={setPercentageButtonActive}
+                disabled={!selectedTokenInfo.address}
+              />
+            </div>
+            {/* 2nd row */}
+            <div className='w-full mx-auto'>
+              <div className='flex justify-between'>
+                <label
+                  htmlFor='amountTo'
+                  className='block text-sm font-medium text-pequod-white'
+                >
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? selectedTokenInfo?.symbol
+                      ? `(${selectedTokenInfo?.symbol})`
+                      : ''
+                    : '(BNB)'}
+                </label>
               </div>
-              {/* 4th row */}
-              <div className='col-span-2 mt-5 flex justify-center'>
-                {currentlySelectedTab === 'buy' ||
-                selectedTokenInfo.allowance > 0 ? (
-                  <button
-                    onClick={() => {
-                      if (currentlySelectedTab === 'buy') {
-                        buyCallback();
-                      } else {
-                        sellCallback();
-                      }
-                    }}
-                    className='border b-2 w-full text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
-                    disabled={
-                      !selectedTokenInfo ||
-                      !selectedTokenInfo.address ||
-                      !amountFrom ||
-                      !amountTo
-                    }
-                  >
-                    Place Order
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      approve(
-                        selectedTokenInfo.address,
-                        process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-                      )
-                    }
-                    className='bg-purple-400 text-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
-                    disabled={approve === undefined}
-                  >
-                    Approve {selectedTokenInfo.symbol} swap
-                  </button>
-                )}
+              <div className='mt-1'>
+                <input
+                  type='text'
+                  name='amountTo'
+                  id='amountTo'
+                  inputMode='decimal'
+                  autoComplete='off'
+                  autoCorrect='off'
+                  pattern='^[0-9]*[.,]?[0-9]*$'
+                  placeholder='0.0'
+                  minLength={1}
+                  maxLength={79}
+                  spellCheck='false'
+                  className='focus:outline-none focus:ring focus:ring-pequod-purple block w-full sm:text-sm bg-transparent border border-pequod-white rounded-md px-2 py-1.5 disabled:opacity-80 disabled:cursor-not-allowed text-pequod-white'
+                  disabled={!selectedTokenInfo.address}
+                  value={formatAmount(amountTo)}
+                  onChange={(e) => updateTo(e.target.value)}
+                />
               </div>
+            </div>
+            {/* 3rd row */}
+            <div className='mt-5 flex justify-center w-full'>
+              {currentlySelectedTab === 'buy' ||
+              selectedTokenInfo.allowance > 0 ? (
+                <button
+                  onClick={() => {
+                    if (currentlySelectedTab === 'buy') {
+                      buyCallback();
+                    } else {
+                      sellCallback();
+                    }
+                  }}
+                  className='border b-2 w-full text-pequod-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                  disabled={
+                    !selectedTokenInfo ||
+                    !selectedTokenInfo.address ||
+                    !amountFrom ||
+                    !amountTo
+                  }
+                >
+                  Place Order
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    approve(
+                      selectedTokenInfo.address,
+                      process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+                    )
+                  }
+                  className='bg-pequod-purple w-full text-pequod-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                  disabled={approve === undefined}
+                >
+                  Approve {selectedTokenInfo.symbol} swap
+                </button>
+              )}
             </div>
           </div>
         </div>

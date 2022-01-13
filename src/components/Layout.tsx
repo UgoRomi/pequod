@@ -6,6 +6,7 @@ import {
   XIcon,
   ChartPieIcon,
   DocumentDuplicateIcon,
+  MenuAlt2Icon,
 } from '@heroicons/react/outline';
 import { useWeb3React } from '@web3-react/core';
 import useAuth from '../hooks/useAuth';
@@ -107,7 +108,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               leaveFrom='translate-x-0'
               leaveTo='-translate-x-full'
             >
-              <div className='relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-500'>
+              <div className='relative flex-1 flex flex-col gap-6 max-w-xs w-full pt-5 pb-4 bg-pequod-gray'>
                 <Transition.Child
                   as={Fragment}
                   enter='ease-in-out duration-300'
@@ -134,6 +135,49 @@ export default function Layout({ children }: { children: JSX.Element }) {
                 <div className='flex-shrink-0 flex items-center px-4'>
                   <img className='h-8 w-auto' src={logo} alt='Pequod Logo' />
                 </div>
+                <Menu as='div' className='flex w-full justify-center'>
+                  <div>
+                    <Menu.Button className='max-w-xs flex items-center border b-2 text-sm rounded-full bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pequod-purple'>
+                      <span className='sr-only'>Open user menu</span>
+                      <span className='inline-flex items-center px-5 py-1 text-base font-medium rounded-full shadow-sm text-pequod-white bg-transparent hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pequod-purple'>
+                        {account?.slice(0, 6) + '...' + account?.slice(37)}
+                      </span>
+                      <DocumentDuplicateIcon
+                        className='mr-3 flex-shrink-0 h-6 w-6 text-white'
+                        aria-hidden='true'
+                        onClick={(e) => copyToClipboard(e)}
+                      />
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter='transition ease-out duration-100'
+                    enterFrom='transform opacity-0 scale-95'
+                    enterTo='transform opacity-100 scale-100'
+                    leave='transition ease-in duration-75'
+                    leaveFrom='transform opacity-100 scale-100'
+                    leaveTo='transform opacity-0 scale-95'
+                  >
+                    <Menu.Items className='origin-top-right absolute mt-10 w-48 rounded-md shadow-lg py-1 bg-pequod-dark ring-1 ring-pequod-dark ring-opacity-5 focus:outline-none'>
+                      <Menu.Item onClick={logout}>
+                        {({ active }) => (
+                          <span
+                            className={classNames(
+                              active ? 'bg-pequod-dark' : '',
+                              'flex items-center px-4 py-2 text-sm text-pequod-white cursor-pointer'
+                            )}
+                          >
+                            <LogoutIcon
+                              className='mr-2 h-5'
+                              aria-hidden='true'
+                            />
+                            Disconnect
+                          </span>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
                 <div className='mt-5 flex-1 h-0 overflow-y-auto'>
                   <nav className='px-2 space-y-1'>
                     {navigation.map((item) => (
@@ -142,9 +186,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         to={item.href}
                         className={classNames(
                           item.current
-                            ? 'bg-purple-400 text-white dark:bg-purple-500 dark:text-gray-200'
-                            : 'text-purple-100 hover:bg-purple-500',
-                          'group flex items-center px-2 py-2 text-base font-medium rounded-md'
+                            ? 'bg-pequod-purple'
+                            : 'hover:bg-pequod-pink',
+                          'group flex items-center px-2 py-2 text-base font-medium rounded-md text-pequod-white'
                         )}
                       >
                         <item.icon
@@ -177,9 +221,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   {/* Profile dropdown */}
                   <Menu as='div' className='relative'>
                     <div>
-                      <Menu.Button className='max-w-xs flex items-center border b-2  text-sm rounded-full bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                      <Menu.Button className='max-w-xs flex items-center border b-2  text-sm rounded-full bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pequod-purple'>
                         <span className='sr-only'>Open user menu</span>
-                        <span className='inline-flex items-center px-5 py-1 border border-transparent text-base font-medium rounded-full shadow-sm text-whitebg-transparent hover:bg-purple-500 dark:text-gray-200 dark:bg-transparent dark:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'>
+                        <span className='inline-flex items-center px-5 py-1 text-base font-medium rounded-full shadow-sm text-pequod-white bg-transparent hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pequod-purple'>
                           {account?.slice(0, 6) + '...' + account?.slice(37)}
                         </span>
                         <DocumentDuplicateIcon
@@ -198,13 +242,13 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       leaveFrom='transform opacity-100 scale-100'
                       leaveTo='transform opacity-0 scale-95'
                     >
-                      <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                      <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-pequod-dark ring-1 ring-pequod-dark ring-opacity-5 focus:outline-none'>
                         <Menu.Item onClick={logout}>
                           {({ active }) => (
                             <span
                               className={classNames(
-                                active ? 'bg-gray-100 dark:bg-gray-900' : '',
-                                'flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer'
+                                active ? 'bg-pequod-dark' : '',
+                                'flex items-center px-4 py-2 text-sm text-pequod-white cursor-pointer'
                               )}
                             >
                               <LogoutIcon
@@ -234,9 +278,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? 'bg-pequod-white-300 text-white border-l-4 border-pequod-pink'
-                        : 'text-purple-100 hover:bg-pequod-purple pl-3',
-                      'group flex items-center px-2 py-3 text-sm font-medium justify-center'
+                        ? 'bg-pequod-white-300 border-l-4 border-pequod-pink'
+                        : 'hover:bg-pequod-purple pl-3',
+                      'group flex items-center px-2 py-3 text-sm font-medium justify-center text-pequod-white'
                     )}
                   >
                     <item.icon
@@ -251,8 +295,51 @@ export default function Layout({ children }: { children: JSX.Element }) {
           </div>
         </div>
         <div className='md:pl-64 flex flex-col flex-1'>
-          <div className='sticky top-0 z-10 flex-shrink-0 flex h-16'></div>
-
+          <div className='sticky top-0 z-10 flex-shrink-0 flex h-16 md:hidden '>
+            <button
+              type='button'
+              className='px-4 text-pequod-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pequod-purple md:hidden'
+              onClick={() => setSidebarOpen(true)}
+            >
+              <span className='sr-only'>Open sidebar</span>
+              <MenuAlt2Icon className='h-6 w-6' aria-hidden='true' />
+            </button>
+            <div className='flex-1 px-4 flex justify-between'>
+              <div className='ml-4 flex items-center md:ml-6'>
+                {/* Profile dropdown */}
+                <Menu as='div' className='ml-3 relative'>
+                  <Transition
+                    as={Fragment}
+                    enter='transition ease-out duration-100'
+                    enterFrom='transform opacity-0 scale-95'
+                    enterTo='transform opacity-100 scale-100'
+                    leave='transition ease-in duration-75'
+                    leaveFrom='transform opacity-100 scale-100'
+                    leaveTo='transform opacity-0 scale-95'
+                  >
+                    <Menu.Items className='origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-pequod-dark ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                      <Menu.Item onClick={logout}>
+                        {({ active }) => (
+                          <span
+                            className={classNames(
+                              active ? 'bg-pequod-gray' : '',
+                              'flex items-center px-4 py-2 text-sm text-pequod-white cursor-pointer'
+                            )}
+                          >
+                            <LogoutIcon
+                              className='mr-2 h-5'
+                              aria-hidden='true'
+                            />
+                            Disconnect
+                          </span>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+              </div>
+            </div>
+          </div>
           <main>
             <div className='py-6'>
               <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>

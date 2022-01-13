@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.react-multiple-carousel__arrow {
+  z-index: 10 !important;
+}
