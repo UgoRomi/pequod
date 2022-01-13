@@ -85,8 +85,6 @@ export default function TradingPage() {
   const [amountFrom, setAmountFrom] = useState<string>('0');
   const [amountTo, setAmountTo] = useState<string>('0');
   const [slippage, setSlippage] = useState<number>(15);
-  const [hoverValue, setHoverValue] = useState<number | undefined>();
-  const [hoverDate, setHoverDate] = useState<string | undefined>();
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
   const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
@@ -100,8 +98,8 @@ export default function TradingPage() {
     allowance: 0,
     allowanceFetched: false,
   });
-  const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
-    PairDataTimeWindowEnum.DAY
+  const [timeWindow] = useState<PairDataTimeWindowEnum>(
+    PairDataTimeWindowEnum.WEEK
   );
   const dispatch = useAppDispatch();
   const pequodApiCall = useApiCall();
@@ -123,14 +121,6 @@ export default function TradingPage() {
     amountTo.toString(),
     slippage
   );
-
-  const currentDate = new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
   const updateFrom = (value: string) => {
     const valueNumeric = parseFloat(value);
@@ -159,12 +149,6 @@ export default function TradingPage() {
     if (amount.toString().indexOf('e') === -1) return amount;
 
     return parseFloat(amount).toFixed(15);
-  };
-
-  const formatPrice = (price: number): string => {
-    const minimum = 0.000001;
-    if (price < minimum) return `<${minimum.toString()}`;
-    return price.toString();
   };
 
   const getTokenInfo = useCallback(
@@ -497,89 +481,15 @@ export default function TradingPage() {
               </div>
             </div>
             <div className='col-span-2 xl:col-span-1 xl:border-r xl:pr-3 text-gray-700 dark:text-gray-200'>
-              {selectedTokenInfo.symbol && (
-                <>
-                  <p className='flex flex-col xl:flex-row xl:justify-between'>
-                    <span className='text-xl font-medium'>
-                      {selectedTokenInfo.symbol}/BNB{' '}
-                      {formatPrice(hoverValue || selectedTokenInfo.priceBNB)}
-                    </span>
-                    <span className='my-4 md:my-0'>
-                      <span className='relative z-0 inline-flex shadow-sm rounded-md'>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            setTimeWindow(PairDataTimeWindowEnum.DAY)
-                          }
-                          className={classNames(
-                            timeWindow === PairDataTimeWindowEnum.DAY
-                              ? 'border-purple-400 bg-purple-200 z-10'
-                              : 'border-gray-300 bg-white',
-                            'relative inline-flex items-center px-4 py-2 rounded-l-md border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
-                          )}
-                        >
-                          1D
-                        </button>
-                        <button
-                          onClick={() =>
-                            setTimeWindow(PairDataTimeWindowEnum.WEEK)
-                          }
-                          type='button'
-                          className={classNames(
-                            timeWindow === PairDataTimeWindowEnum.WEEK
-                              ? 'border-purple-400 bg-purple-200 z-10'
-                              : 'border-gray-300 bg-white',
-                            '-ml-px relative inline-flex items-center px-4 py-2 border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
-                          )}
-                        >
-                          1W
-                        </button>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            setTimeWindow(PairDataTimeWindowEnum.MONTH)
-                          }
-                          className={classNames(
-                            timeWindow === PairDataTimeWindowEnum.MONTH
-                              ? 'border-purple-400 bg-purple-200 z-10'
-                              : 'border-gray-300 bg-white',
-                            '-ml-px relative inline-flex items-center px-4 py-2 border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
-                          )}
-                        >
-                          1M
-                        </button>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            setTimeWindow(PairDataTimeWindowEnum.YEAR)
-                          }
-                          className={classNames(
-                            timeWindow === PairDataTimeWindowEnum.YEAR
-                              ? 'border-purple-400 bg-purple-200 z-10'
-                              : 'border-gray-300 bg-white',
-                            '-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border text-sm font-medium text-gray-700 hover:opacity-80 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500'
-                          )}
-                        >
-                          1Y
-                        </button>
-                      </span>
-                    </span>
-                  </p>
-                  <p>{hoverDate || currentDate}</p>
-                </>
-              )}
-              {priceHistory && (
-                <div style={{ height: '90%', width: '100%' }}>
-                  <PairChart
-                    data={priceHistory}
-                    setHoverValue={setHoverValue}
-                    setHoverDate={setHoverDate}
-                    isChangePositive={true}
-                  />
+              {!!priceHistory?.length && (
+                <div
+                  style={{ height: '90%', width: '100%', minHeight: '190px' }}
+                >
+                  <PairChart data={priceHistory} />
                 </div>
               )}
             </div>
-            <div className='flex h-100 justify-center items-start col-span-1'>
+            <div className='flex h-100 justify-center items-start col-span-2 xl:col-span-1'>
               <div className='grid grid-cols-2 gap-4 px-5 xl:px-28'>
                 {/* 1st row */}
                 <div className='flex justify-center'>

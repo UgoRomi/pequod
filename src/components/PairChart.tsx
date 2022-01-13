@@ -1,4 +1,3 @@
-import React, { useEffect, Dispatch, SetStateAction } from 'react';
 import {
   Area,
   AreaChart,
@@ -9,70 +8,26 @@ import {
 } from 'recharts';
 
 export type SwapLineChartProps = {
-  data: any[];
-  setHoverValue: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
-  setHoverDate: Dispatch<SetStateAction<string | undefined>>; // used for label of valye
-  isChangePositive: boolean;
+  data: any[]; // used for label of valye
 } & React.HTMLAttributes<HTMLDivElement>;
 
-// Calls setHoverValue and setHoverDate when part of chart is hovered
-// Note: this NEEDs to be wrapped inside component and useEffect, if you plug it as is it will create big render problems (try and see console)
-const HoverUpdater = ({
-  payload,
-  setHoverValue,
-  setHoverDate,
-}: {
-  payload: any;
-  setHoverValue: any;
-  setHoverDate: any;
-}) => {
-  useEffect(() => {
-    setHoverValue(payload.value);
-    setHoverDate(
-      payload.time.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    );
-  }, [payload.value, payload.time, setHoverValue, setHoverDate]);
-
-  return null;
-};
-
-const getChartColors = ({
-  isChangePositive,
-}: {
-  isChangePositive: boolean;
-}) => {
-  return isChangePositive
-    ? { gradient1: '#ac91ff', gradient2: '#806cbd', stroke: '#7357c7' }
-    : { gradient1: '#ED4B9E', gradient2: '#ED4B9E', stroke: '#ED4B9E ' };
-};
-
-export default function PairChart({
-  data,
-  setHoverValue,
-  setHoverDate,
-  isChangePositive,
-}: SwapLineChartProps) {
-  const colors = getChartColors({ isChangePositive });
+export default function PairChart({ data }: SwapLineChartProps) {
+  const colors = {
+    gradient1: '#c923dd',
+    gradient2: '#0b0629',
+    stroke: '#c923dd',
+  };
 
   return (
     <ResponsiveContainer>
       <AreaChart
+        className='bg-gradient-to-r from-pequod-gray via-pequod-gray rounded-3xl border border-pequod-white'
         data={data}
         margin={{
           top: 5,
-          right: 0,
+          right: 6,
           left: 0,
           bottom: 5,
-        }}
-        onMouseLeave={() => {
-          if (setHoverDate) setHoverDate(undefined);
-          if (setHoverValue) setHoverValue(undefined);
         }}
       >
         <defs>
@@ -81,30 +36,18 @@ export default function PairChart({
             <stop offset='100%' stopColor={colors.gradient2} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis
-          dataKey='time'
-          axisLine={false}
-          tickLine={false}
-          minTickGap={8}
-          hide
-        />
+        <XAxis dataKey='time' axisLine={false} tickLine={false} hide />
         <YAxis
           dataKey='value'
           axisLine={false}
           tickLine={false}
+          tickFormatter={(value: number) => `${value.toFixed(8)}`}
+          dx={55}
           domain={['auto', 'auto']}
-          hide
         />
         <Tooltip
-          cursor={{ stroke: '#a78bfa' }}
+          cursor={{ stroke: colors.gradient1 }}
           contentStyle={{ display: 'none' }}
-          formatter={(tooltipValue: any, name: any, props: any) => (
-            <HoverUpdater
-              payload={props.payload}
-              setHoverValue={setHoverValue}
-              setHoverDate={setHoverDate}
-            />
-          )}
         />
         <Area
           dataKey='value'
