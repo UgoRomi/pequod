@@ -19,6 +19,7 @@ import { selectUserBnbAmount } from '../store/userInfoSlice';
 import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 import { RootState } from '../store/store';
 import TradingPageChart from '../components/TradingPageChart';
+import { MIN_ETH } from '../utils/consts';
 
 interface TokenSearchResult {
   name: string;
@@ -105,6 +106,7 @@ export default function TradingPage() {
   const approve = useApprove();
   const checkSwapAllowance = useAllowance();
   const userBnbBalance = useAppSelector(selectUserBnbAmount);
+  const maxBnbAmount = userBnbBalance - MIN_ETH;
   const userSelectedTokenBalance: number = useAppSelector(
     (state: RootState) =>
       state.userInfo?.tokens?.find(
@@ -114,7 +116,7 @@ export default function TradingPage() {
       )?.amount || 0
   );
   const fromTokenBalance =
-    currentlySelectedTab === 'buy' ? userBnbBalance : userSelectedTokenBalance;
+    currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
 
   useEffect(() => {
     // Wait for the allowance to be fetched
@@ -131,11 +133,19 @@ export default function TradingPage() {
     slippage
   );
 
-  const updateFrom = (value: string, fullSell = false) => {
+  const updateFrom = (
+    value: string,
+    fullSell = false,
+    percentageButton: number | null = null
+  ) => {
     const valueNumeric = parseFloat(value);
     setAmountFrom(value.toString());
     setIsFullSell(fullSell);
-    setPercentageButtonActive(100 / (fromTokenBalance / valueNumeric));
+    setPercentageButtonActive(
+      percentageButton === null
+        ? 100 / (fromTokenBalance / valueNumeric)
+        : percentageButton
+    );
     if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
@@ -327,22 +337,35 @@ export default function TradingPage() {
     },
   };
 
-  const percentageButtonClicked = (percentage: Percentages) => {
+  const percentageButtonClicked = async (percentage: Percentages) => {
     switch (percentage) {
       case Percentages['25%']:
-        updateFrom(formatAmount((fromTokenBalance * 0.25).toString()));
+        updateFrom(
+          formatAmount((fromTokenBalance * 0.25).toString()),
+          false,
+          25
+        );
         break;
       case Percentages['50%']:
-        updateFrom(formatAmount((fromTokenBalance * 0.5).toString()));
+        updateFrom(
+          formatAmount((fromTokenBalance * 0.5).toString()),
+          false,
+          50
+        );
         break;
       case Percentages['75%']:
-        updateFrom(formatAmount((fromTokenBalance * 0.7500001).toString()));
+        updateFrom(
+          formatAmount((fromTokenBalance * 0.75).toString()),
+          false,
+          75
+        );
         break;
       case Percentages['100%']:
         // We check if the currently selected tab is sell because we want to set "isFullSell" to true only when the user is selling
         updateFrom(
           formatAmount(fromTokenBalance.toString()),
-          currentlySelectedTab === 'sell'
+          currentlySelectedTab === 'sell',
+          100
         );
         break;
     }

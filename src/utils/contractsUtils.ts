@@ -98,9 +98,9 @@ export function useApprove() {
 function useGasPrice() {
   const { library } = useWeb3React();
 
-  const getGasPrice = async () => {
+  const getGasPrice = async (): Promise<number> => {
     const gasPrice = await library.eth.getGasPrice();
-    return gasPrice;
+    return parseInt(gasPrice);
   };
 
   return getGasPrice;
@@ -162,6 +162,7 @@ export function useSwap(
     } = await swapData();
     try {
       const path = [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
+
       const result = await routerContract.methods
         .swapExactETHForTokensSupportingFeeOnTransferTokens(
           toBigNumber(minimumAmountOut, tokenDecimals),
