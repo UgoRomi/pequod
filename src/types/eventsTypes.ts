@@ -11,6 +11,7 @@ export interface StakeEventRequest {
 
 export interface SellEventRequest {
   wallet: string;
+  fullSell: boolean;
   token: {
     address: string;
     amount: string;

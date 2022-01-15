@@ -87,10 +87,12 @@ export function useSellEvent() {
     tokenAmount: string,
     bnbSpent: number,
     txHash: string,
-    gasSpent: number
+    gasSpent: number,
+    fullSell: boolean
   ) => {
     const requestBody: SellEventRequest = {
       wallet: account as string,
+      fullSell,
       token: {
         address: tokenAddress,
         amount: tokenAmount,

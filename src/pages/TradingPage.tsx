@@ -85,6 +85,7 @@ export default function TradingPage() {
   const [slippage, setSlippage] = useState<number>(30);
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
   const [staking, setStaking] = useState<AvailableStaking[]>([]);
+  const [isFullSell, setIsFullSell] = useState<boolean>(false);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
     name: '',
     address: '',
@@ -130,9 +131,10 @@ export default function TradingPage() {
     slippage
   );
 
-  const updateFrom = (value: string) => {
+  const updateFrom = (value: string, fullSell = false) => {
     const valueNumeric = parseFloat(value);
     setAmountFrom(value.toString());
+    setIsFullSell(fullSell);
     setPercentageButtonActive(100 / (fromTokenBalance / valueNumeric));
     if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
@@ -337,7 +339,11 @@ export default function TradingPage() {
         updateFrom(formatAmount((fromTokenBalance * 0.7500001).toString()));
         break;
       case Percentages['100%']:
-        updateFrom(formatAmount(fromTokenBalance.toString()));
+        // We check if the currently selected tab is sell because we want to set "isFullSell" to true only when the user is selling
+        updateFrom(
+          formatAmount(fromTokenBalance.toString()),
+          currentlySelectedTab === 'sell'
+        );
         break;
     }
   };
@@ -610,7 +616,7 @@ export default function TradingPage() {
                     if (currentlySelectedTab === 'buy') {
                       buyCallback();
                     } else {
-                      sellCallback();
+                      sellCallback(isFullSell);
                     }
                   }}
                   className='border b-2 w-full text-pequod-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'

@@ -13,7 +13,7 @@ import useAuth from '../hooks/useAuth';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
-import logo from '../images/logo2.png';
+import { ReactComponent as Logo } from '../images/logo.svg';
 import wotLogo from '../images/wot-logo.svg';
 import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
@@ -132,8 +132,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     </button>
                   </div>
                 </Transition.Child>
-                <div className='flex-shrink-0 flex items-center px-4'>
-                  <img className='h-8 w-auto' src={logo} alt='Pequod Logo' />
+                <div className='flex-shrink-0 flex items-center justify-center px-4'>
+                  <Logo className='h-20 w-auto' />
                 </div>
                 <Menu as='div' className='flex w-full justify-center'>
                   <div>
@@ -212,8 +212,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
         <div className='hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0'>
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className='flex flex-col flex-grow pt-5 bg-pequod-gray border-r border-pequod-white overflow-y-auto'>
-            <div className='flex items-center flex-shrink-0 px-4'>
-              <img className='w-full' src={logo} alt='Pequod logo' />
+            <div className='flex items-center justify-center flex-shrink-0 px-4'>
+              <Logo className='h-28 w-auto' />
             </div>
             <div className='sticky top-0 z-10 flex-shrink-0 flex h-20 flex-col justify-center items-center'>
               <div className='flex-1 flex justify-center items-center'>
@@ -266,7 +266,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               </div>
               <span className='flex flex-row text-white'>
                 <img alt='logo wot' src={wotLogo} className='mr-2' width='20' />
-                {userWotBalance}
+                {Math.floor(userWotBalance)}
               </span>
             </div>
 

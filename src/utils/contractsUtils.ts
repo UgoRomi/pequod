@@ -7,7 +7,7 @@ import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
 import MOBY_STAKING_ABI from '../mobyStakingABI.json';
 import { MaxUint256 } from '@ethersproject/constants';
 import { useBuyEvent, useSellEvent, useStakeEvent } from './events';
-import { useValidateSessionIfInvalid } from './utils';
+import { toBigNumber, useValidateSessionIfInvalid } from './utils';
 
 function useGetPairAddress() {
   const { library, account } = useWeb3React();
@@ -134,7 +134,9 @@ export function useSwap(
     const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
       from: account,
     });
-    const tokenDecimals = await tokenContract.methods.decimals().call();
+    const tokenDecimals = parseInt(
+      await tokenContract.methods.decimals().call()
+    );
 
     const gasPrice = await getGasPrice();
     return {
@@ -162,10 +164,7 @@ export function useSwap(
       const path = [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
       const result = await routerContract.methods
         .swapExactETHForTokensSupportingFeeOnTransferTokens(
-          library.utils
-            .toBN(Math.floor(minimumAmountOut))
-            .mul(library.utils.toBN(Math.pow(10, tokenDecimals)))
-            .toString(),
+          toBigNumber(minimumAmountOut, tokenDecimals),
           path,
           account,
           deadline
@@ -194,7 +193,9 @@ export function useSwap(
     }
   };
 
-  const sell = async (): Promise<{ success: boolean; txHash: string }> => {
+  const sell = async (
+    fullSell: boolean
+  ): Promise<{ success: boolean; txHash: string }> => {
     const {
       minimumAmountOut,
       deadline,
@@ -209,11 +210,8 @@ export function useSwap(
 
       const result = await routerContract.methods
         .swapExactTokensForETHSupportingFeeOnTransferTokens(
-          library.utils
-            .toBN(amountFrom)
-            .mul(library.utils.toBN(Math.pow(10, tokenDecimals)))
-            .toString(),
-          Math.floor(minimumAmountOut * Math.pow(10, 8)),
+          toBigNumber(parseFloat(amountFrom), tokenDecimals),
+          toBigNumber(minimumAmountOut, 18),
           path,
           account,
           deadline
@@ -228,7 +226,8 @@ export function useSwap(
         minimumAmountOut.toString(),
         parseFloat(amountFrom),
         result.transactionHash,
-        gasUsed
+        gasUsed,
+        fullSell
       );
       return { success: true, txHash: result.transactionHash };
     } catch (error) {

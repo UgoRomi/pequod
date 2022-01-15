@@ -9,6 +9,7 @@ import {
 } from '../store/userInfoSlice';
 import { UserInfoResponse } from './apiTypes';
 import { v4 as uuidV4 } from 'uuid';
+import Web3 from 'web3';
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -146,4 +147,38 @@ export function secondsToDhms(seconds: number) {
 
 export function formatTokenAmount(amount: number) {
   return new Intl.NumberFormat('en-US', {}).format(amount);
+}
+
+export function toBigNumber(amount: number, decimals: number): string {
+  switch (decimals) {
+    case 0:
+      return Web3.utils.toWei(amount.toFixed(0), 'noether');
+    case 1:
+      return Web3.utils.toWei(amount.toFixed(1), 'wei');
+    case 3:
+      return Web3.utils.toWei(amount.toFixed(3), 'kwei');
+    case 6:
+      return Web3.utils.toWei(amount.toFixed(6), 'mwei');
+    case 9:
+      return Web3.utils.toWei(amount.toFixed(9), 'gwei');
+    case 12:
+      return Web3.utils.toWei(amount.toFixed(12), 'szabo');
+    case 15:
+      return Web3.utils.toWei(amount.toFixed(15), 'finney');
+    case 18:
+      return Web3.utils.toWei(amount.toFixed(18), 'ether');
+    case 21:
+      return Web3.utils.toWei(amount.toFixed(21), 'grand');
+    case 24:
+      return Web3.utils.toWei(amount.toFixed(24), 'mether');
+    case 27:
+      return Web3.utils.toWei(amount.toFixed(27), 'gether');
+    case 30:
+      return Web3.utils.toWei(amount.toFixed(30), 'tether');
+    default:
+      return Web3.utils
+        .toBN(Math.floor(amount))
+        .mul(Web3.utils.toBN(Math.pow(10, decimals)))
+        .toString();
+  }
 }
