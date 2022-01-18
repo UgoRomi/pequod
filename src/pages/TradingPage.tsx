@@ -113,15 +113,16 @@ export default function TradingPage() {
     currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
 
   useEffect(() => {
-    let tokens = userTokens.slice();
-
-    tokens.sort((a, b) => {
-      return (
-        (b.earningPercentage || -Infinity) - (a.earningPercentage || -Infinity)
-      );
-    });
-
-    setTopEarners(tokens);
+    setTopEarners(
+      userTokens
+        .filter((token) => !!token.earningPercentage)
+        .sort((a, b) => {
+          return (
+            (b.earningPercentage || -Infinity) -
+            (a.earningPercentage || -Infinity)
+          );
+        })
+    );
   }, [userTokens]);
 
   useEffect(() => {
@@ -321,7 +322,7 @@ export default function TradingPage() {
     },
     mobile: {
       breakpoint: { max: 464, min: 0 },
-      items: 1.5,
+      items: 1,
       partialVisibilityGutter: 30,
     },
   };
@@ -379,7 +380,7 @@ export default function TradingPage() {
                 token.earningPercentage && token.earningPercentage > 0
                   ? 'from-green-800'
                   : 'from-red-800',
-                'rounded-md border border-white-400 bg-gradient-to-b text-white shadow-md px-4 py-2 h-full'
+                'rounded-md border border-white-400 bg-gradient-to-b text-white shadow-md p-4 h-full'
               )}
             >
               <div className='grid grid-cols-cards grid-rows-2 gap-4'>
@@ -390,14 +391,22 @@ export default function TradingPage() {
                 />
                 <div>
                   <p>
-                    <span>{token.name}</span>
+                    <span>{token.name} </span>
                     <span className='font-bold'>{token.symbol}</span>
                   </p>
                   <p className='text-sm opacity-75'>{token.symbol}/USDT</p>
                 </div>
-                <div>
-                  <p>{formatMoney(token.totalInDollars)}</p>
-                  <p>{token.earningPercentage}%</p>
+                <div className='flex items-end justify-between'>
+                  <div>
+                    <p>{formatMoney(token.totalInDollars)}</p>
+                    <p>{token.earningPercentage}%</p>
+                  </div>
+                  <button
+                    onClick={() => setTokenSearch(token.address)}
+                    className='bg-pequod-gray border border-pequod-white rounded-md px-3 py-1'
+                  >
+                    Trade now
+                  </button>
                 </div>
               </div>
             </div>
