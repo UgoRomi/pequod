@@ -7,16 +7,12 @@ import {
   selectAvailableFarms,
 } from '../store/farmsSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import {
-  addUserFarms,
-  FarmState,
-  selectUserWotAmount,
-} from '../store/userInfoSlice';
+import { selectUserWotAmount } from '../store/userInfoSlice';
 import { AvailableFarmResponse } from '../utils/apiTypes';
 import { useApiCall, useUserInfo } from '../utils/utils';
 
 export default function StakingPage() {
-  const getUserInfo = useUserInfo();
+  const getAndUpdateUserInfo = useUserInfo();
   const dispatch = useAppDispatch();
   const apiCall = useApiCall();
   const availableFarms = useAppSelector(selectAvailableFarms);
@@ -25,24 +21,8 @@ export default function StakingPage() {
   const userWotBalance = useAppSelector(selectUserWotAmount);
 
   useEffect(() => {
-    getUserInfo().then((res) => {
-      // Save the current user farms to the store
-      const userFarms = res?.pequodFarms?.map((farm): FarmState => {
-        return {
-          id: parseInt(farm.id),
-          tokenAddress: farm.token.address,
-          tokenUSDPrice: parseFloat(farm.token.priceInUsd),
-          amountEarned: farm.totalEarningInToken,
-          farmPercentageAPY: farm.farmPercentageAPY,
-          totalAmount: parseFloat(farm.amount),
-          unStakingTimeInSeconds: parseInt(farm.unStakingTimeInSeconds),
-          tokenSymbol: farm.token.symbol,
-          farmContractAddress: farm.address,
-        };
-      });
-      if (userFarms) dispatch(addUserFarms(userFarms));
-    });
-  }, [dispatch, getUserInfo]);
+    getAndUpdateUserInfo();
+  }, [getAndUpdateUserInfo]);
 
   useEffect(() => {
     apiCall(`/farms/${process.env.REACT_APP_CHAIN_ID}/available`, {}).then(

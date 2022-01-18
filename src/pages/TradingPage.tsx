@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { SearchIcon, PlusIcon } from '@heroicons/react/outline';
-import { classNames, useApiCall } from '../utils/utils';
+import { SearchIcon } from '@heroicons/react/outline';
+import { classNames, formatMoney, useApiCall } from '../utils/utils';
 import { useAppSelector } from '../store/hooks';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
 import Web3 from 'web3';
@@ -13,9 +13,13 @@ import {
   useApprove,
   useSwap,
 } from '../utils/contractsUtils';
-import wotLogo from '../images/wot-logo.svg';
+import unknownTokenLogo from '../images/unknown-token.svg';
 
-import { selectUserBnbAmount } from '../store/userInfoSlice';
+import {
+  selectUserBnbAmount,
+  selectUserTokens,
+  UserToken,
+} from '../store/userInfoSlice';
 import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 import { RootState } from '../store/store';
 import TradingPageChart from '../components/TradingPageChart';
@@ -58,17 +62,6 @@ export interface GraphData {
   time: Date;
   value: number;
 }
-interface AvailableStaking {
-  active: boolean;
-  address: string;
-  apy: number;
-  id: number;
-  minimumToStake: number;
-  periodInSeconds: number;
-  timesToUnstake: number;
-  token: any;
-  stakeInfo: any;
-}
 
 export default function TradingPage() {
   const [tokenSearch, setTokenSearch] = useState<string>('');
@@ -85,7 +78,6 @@ export default function TradingPage() {
   const [amountTo, setAmountTo] = useState<string>('0');
   const [slippage, setSlippage] = useState<number>(30);
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
-  const [staking, setStaking] = useState<AvailableStaking[]>([]);
   const [isFullSell, setIsFullSell] = useState<boolean>(false);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
     name: '',
@@ -106,6 +98,8 @@ export default function TradingPage() {
   const approve = useApprove();
   const checkSwapAllowance = useAllowance();
   const userBnbBalance = useAppSelector(selectUserBnbAmount);
+  const userTokens = useAppSelector(selectUserTokens);
+  const [topEarners, setTopEarners] = useState<UserToken[]>([]);
   const maxBnbAmount = userBnbBalance - MIN_ETH;
   const userSelectedTokenBalance: number = useAppSelector(
     (state: RootState) =>
@@ -117,6 +111,18 @@ export default function TradingPage() {
   );
   const fromTokenBalance =
     currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
+
+  useEffect(() => {
+    let tokens = userTokens.slice();
+
+    tokens.sort((a, b) => {
+      return (
+        (b.earningPercentage || -Infinity) - (a.earningPercentage || -Infinity)
+      );
+    });
+
+    setTopEarners(tokens);
+  }, [userTokens]);
 
   useEffect(() => {
     // Wait for the allowance to be fetched
@@ -203,23 +209,6 @@ export default function TradingPage() {
     },
     [pequodApiCall]
   );
-
-  useEffect(() => {
-    pequodApiCall(`/farms/${process.env.REACT_APP_CHAIN_ID}/available`, {
-      method: 'GET',
-    })
-      .then((res) => {
-        setStaking(res?.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error(
-          'There was an error retrieving available staking options\nPlease try reloading this page'
-        );
-      });
-    // TODO: Resolve dependency cycle
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Get price history from our API
   useEffect(() => {
@@ -383,77 +372,33 @@ export default function TradingPage() {
           draggable
           infinite
         >
-          {staking.map((token, i) => (
+          {topEarners.map((token, i) => (
             <div
               key={i}
-              className='rounded-md border border-white-400 bg-gradient-to-r from-pequod-gray via-pequod-gray to-transparent text-white shadow-md px-4 py-2 h-full'
+              className={classNames(
+                token.earningPercentage && token.earningPercentage > 0
+                  ? 'from-green-800'
+                  : 'from-red-800',
+                'rounded-md border border-white-400 bg-gradient-to-b text-white shadow-md px-4 py-2 h-full'
+              )}
             >
-              <div className='flex items-center gap-4'>
+              <div className='grid grid-cols-cards grid-rows-2 gap-4'>
                 <img
-                  src={token.token.image ? token.token.image : wotLogo}
-                  alt={token.token.name}
-                  className='h-10'
+                  src={token.logoUrl ?? unknownTokenLogo}
+                  alt={token.symbol}
+                  className='h-10 row-span-2'
                 />
                 <div>
-                  <p className='font-bold'>{token.token.symbol}</p>
-                  <span className='text-sm opacity-75'>APY - {token.apy}%</span>
+                  <p>
+                    <span>{token.name}</span>
+                    <span className='font-bold'>{token.symbol}</span>
+                  </p>
+                  <p className='text-sm opacity-75'>{token.symbol}/USDT</p>
                 </div>
-              </div>
-              <div className='flex items-center justify-between mt-4'>
-                {token.stakeInfo && token.stakeInfo.userAmountInStaking ? (
-                  token.stakeInfo.userAmountInStaking
-                ) : false ? (
-                  <>
-                    <div className='text-xs w-2/3 flex justify-evenly'>
-                      <div>
-                        <p className='font-semibold'>Earned</p>
-                        <p>{token.stakeInfo.totalEarned}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(
-                            token.stakeInfo.totalEarned *
-                              token.token.tokenPriceUSD
-                          )}
-                        </p>
-                      </div>
-                      <div className='border-r' aria-hidden></div>
-                      <div>
-                        <p className='font-semibold'>Balance</p>
-                        <p>{token.stakeInfo.totalBalance}</p>
-                        <p>
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          }).format(
-                            token.stakeInfo.totalBalance *
-                              token.token.tokenPriceUSD
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                    <div className='flex w-1/3 justify-center h-full'>
-                      <button className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'>
-                        <PlusIcon className='w-5' />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className='text-sm'>
-                      <p className='font-semibold'>Total staking</p>
-                      <p>
-                        {token.stakeInfo && token.stakeInfo.totalAmountInStaking
-                          ? token.stakeInfo.totalAmountInStaking
-                          : 0}
-                      </p>
-                    </div>
-                    <button className='border bg-pequod-dark text-pequod-white py-2 px-4 rounded-md'>
-                      Stake now
-                    </button>
-                  </>
-                )}
+                <div>
+                  <p>{formatMoney(token.totalInDollars)}</p>
+                  <p>{token.earningPercentage}%</p>
+                </div>
               </div>
             </div>
           ))}

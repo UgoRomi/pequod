@@ -10,6 +10,7 @@ module.exports = {
       },
       gridTemplateColumns: {
         buy: '1fr auto',
+				cards: 'auto 1fr'
       },
       backgroundColor: {
         'pequod-dark': "#0b0629",
@@ -25,7 +26,7 @@ module.exports = {
       },
       textColor: {
         'pequod-pink': "#c923dd",
-      },  
+      },
       colors: {
         'pequod-dark': "#0b0629",
         'pequod-pink': "#c923dd",

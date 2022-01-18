@@ -4,12 +4,17 @@ import { toast } from 'react-toastify';
 import { selectPequodApiInstance } from '../store/axiosInstancesSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
+  addUserFarms,
+  FarmState,
   selectUserSignedMessage,
   setSignedMessage,
+  setUserTokens,
+  UserToken,
 } from '../store/userInfoSlice';
 import { UserInfoResponse } from './apiTypes';
 import { v4 as uuidV4 } from 'uuid';
 import Web3 from 'web3';
+import { setBnbUsdPrice } from '../store/pricesSlice';
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -75,6 +80,8 @@ export function useValidateSessionIfInvalid() {
 export function useUserInfo() {
   const { account, active } = useWeb3React();
   const pequodApiInstance = useAppSelector(selectPequodApiInstance);
+  const dispatch = useAppDispatch();
+
   const getUserInfo = async () => {
     // Check if the user is logged in
     if (!active) return;
@@ -82,6 +89,38 @@ export function useUserInfo() {
       await pequodApiInstance.get(
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
       );
+    const userFarms = userData?.pequodFarms?.map((farm): FarmState => {
+      return {
+        id: parseInt(farm.id),
+        tokenAddress: farm.token.address,
+        tokenUSDPrice: parseFloat(farm.token.priceInUsd),
+        amountEarned: farm.totalEarningInToken,
+        farmPercentageAPY: farm.farmPercentageAPY,
+        totalAmount: parseFloat(farm.amount),
+        unStakingTimeInSeconds: parseInt(farm.unStakingTimeInSeconds),
+        tokenSymbol: farm.token.symbol,
+        farmContractAddress: farm.address,
+      };
+    });
+    if (userFarms) dispatch(addUserFarms(userFarms));
+
+    const userTokens: UserToken[] =
+      userData?.personalWallet?.tokens.map((token) => ({
+        address: token.address,
+        symbol: token.symbol,
+        name: token.name,
+        amount: token.amount,
+        totalInDollars: parseFloat(token.currentTotalPrice),
+        earningPercentage: token.earningPercentageInUsdt,
+      })) || [];
+    dispatch(setUserTokens(userTokens));
+
+    const bnbUsdPrice =
+      userData?.personalWallet?.tokens?.find(
+        (token) => token.address === process.env.REACT_APP_BNB_ADDRESS
+      )?.currentPrice || 0;
+    dispatch(setBnbUsdPrice(bnbUsdPrice));
+
     return userData;
   };
 
@@ -147,6 +186,13 @@ export function secondsToDhms(seconds: number) {
 
 export function formatTokenAmount(amount: number) {
   return new Intl.NumberFormat('en-US', {}).format(amount);
+}
+
+export function formatMoney(amount: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
 }
 
 export function toBigNumber(amount: number, decimals: number): string {

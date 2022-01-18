@@ -16,7 +16,11 @@ export interface FarmState {
 export interface UserToken {
   address: string;
   symbol: string;
+  name: string;
   amount: number;
+  totalInDollars: number;
+  earningPercentage?: number;
+  logoUrl?: string;
 }
 interface UserInfoState {
   signedMessage: string;

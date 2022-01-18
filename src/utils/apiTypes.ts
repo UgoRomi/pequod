@@ -13,6 +13,10 @@ export interface UserInfoResponse {
       currentPriceInCrypto: number;
       currentTotalPrice: string;
       currentTotalPriceInCrypto: string;
+      earningInCrypto?: number;
+      earningInUsdt?: number;
+      earningPercentageInCrypto?: number;
+      earningPercentageInUsdt?: number;
     }[];
   };
   pequodFarms: {
