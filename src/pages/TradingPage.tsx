@@ -24,6 +24,7 @@ import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
 import { RootState } from '../store/store';
 import TradingPageChart from '../components/TradingPageChart';
 import { MIN_ETH } from '../utils/consts';
+import Spinner from '../components/Spinner';
 
 interface TokenSearchResult {
   name: string;
@@ -79,6 +80,8 @@ export default function TradingPage() {
   const [slippage, setSlippage] = useState<number>(30);
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
   const [isFullSell, setIsFullSell] = useState<boolean>(false);
+  const [orderInProgress, setOrderInProgress] = useState<boolean>(false);
+  const [approvalInProgress, setApprovalInProgress] = useState<boolean>(false);
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
     name: '',
     address: '',
@@ -506,7 +509,7 @@ export default function TradingPage() {
             className='hidden xl:block col-span-2 xl:col-span-1'
           />
 
-          <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 xl:px-28'>
+          <div className='flex flex-col h-100 justify-center items-start col-span-2 xl:col-span-1 gap-4 xl:px-16'>
             {/* 1st row */}
             <div className='w-full mx-auto'>
               <div className='flex justify-between'>
@@ -590,13 +593,18 @@ export default function TradingPage() {
               selectedTokenInfo.allowance > 0 ? (
                 <button
                   onClick={() => {
+                    setOrderInProgress(true);
                     if (currentlySelectedTab === 'buy') {
-                      buyCallback();
+                      buyCallback().finally(() => {
+                        setOrderInProgress(false);
+                      });
                     } else {
-                      sellCallback(isFullSell);
+                      sellCallback(isFullSell).finally(() => {
+                        setOrderInProgress(false);
+                      });
                     }
                   }}
-                  className='border b-2 w-full text-pequod-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                  className='border b-2 w-full text-pequod-white py-2 px-4 rounded-md flex justify-center items-center disabled:opacity-50 disabled:cursor-default'
                   disabled={
                     !selectedTokenInfo ||
                     !selectedTokenInfo.address ||
@@ -604,7 +612,14 @@ export default function TradingPage() {
                     !amountTo
                   }
                 >
-                  Place Order
+                  {orderInProgress ? (
+                    <>
+                      <Spinner className='text-pequod-white h-5' />
+                      <span>Order in progress...</span>
+                    </>
+                  ) : (
+                    'Place Order'
+                  )}
                 </button>
               ) : (
                 <button
@@ -612,12 +627,21 @@ export default function TradingPage() {
                     approve(
                       selectedTokenInfo.address,
                       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-                    )
+                    ).finally(() => {
+                      setApprovalInProgress(false);
+                    })
                   }
-                  className='bg-pequod-purple w-full text-pequod-white py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-default'
+                  className='bg-pequod-purple w-full text-pequod-white py-2 px-4 rounded-md flex justify-center items-center disabled:opacity-50 disabled:cursor-default'
                   disabled={approve === undefined}
                 >
-                  Approve {selectedTokenInfo.symbol} swap
+                  {approvalInProgress ? (
+                    <>
+                      <Spinner className='text-pequod-white h-5' />
+                      <span>Approval in progress...</span>
+                    </>
+                  ) : (
+                    `Approve ${selectedTokenInfo.symbol} swap`
+                  )}
                 </button>
               )}
             </div>

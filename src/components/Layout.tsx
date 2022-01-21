@@ -15,13 +15,13 @@ import { Link } from 'react-router-dom';
 import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
 import { ReactComponent as Logo } from '../images/logo.svg';
 import wotLogo from '../images/wot-logo.svg';
+import logoPng from '../images/logo.png';
 import { useAppSelector } from '../store/hooks';
 import { selectUserSignedMessage } from '../store/userInfoSlice';
 import Spinner from './Spinner';
-
 import { toast } from 'react-toastify';
-
 import { selectUserWotAmount } from '../store/userInfoSlice';
+
 export default function Layout({ children }: { children: JSX.Element }) {
   const userWotBalance = useAppSelector(selectUserWotAmount);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,7 +67,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
         {!userSignedMessage && (
           <div className='z-50 bg-gray-800 bg-opacity-80 fixed top-0 left-0 w-full h-full flex justify-center items-center'>
             <button
-              className='flex bg-pequod-purple text-pequod-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
+              className='flex bg-pequod-purple text-pequod-white py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
               disabled={signInProgress}
               onClick={signMessage}
             >
@@ -133,7 +133,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   </div>
                 </Transition.Child>
                 <div className='flex-shrink-0 flex items-center justify-center px-4'>
-                  <Logo className='h-20 w-auto' />
+                  <img src={logoPng} className='h-20' alt='Pequod Logo' />
                 </div>
                 <Menu as='div' className='flex w-full justify-center'>
                   <div>
