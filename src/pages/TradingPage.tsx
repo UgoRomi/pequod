@@ -272,10 +272,17 @@ export default function TradingPage() {
       selectedTokenInfo.address,
       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
     ).then((allowance: number) => {
-      if (allowance === selectedTokenInfo.allowance) return;
+      if (allowance === selectedTokenInfo.allowance) {
+        setSelectedTokenInfo((selectedTokenInfo) => ({
+          ...selectedTokenInfo,
+          allowanceFetched: true,
+        }));
+        return;
+      }
       setSelectedTokenInfo((selectedTokenInfo) => ({
         ...selectedTokenInfo,
         allowance,
+        allowanceFetched: true,
       }));
     });
   }, [
@@ -427,7 +434,7 @@ export default function TradingPage() {
         </Carousel>
 
         <div className='grid grid-cols-buy gap-y-8 xl:bg-pequod-dark xl:p-5 xl:rounded-md'>
-          <div className='col-span-2 xl:col-span-1 gap-y-2 xl:gap-0 grid grid-cols-buy'>
+          <div className='col-span-2 xl:col-span-1 gap-y-2 xl:gap-0 grid'>
             <div className='flex-1 flex flex-col'>
               <span className='text-pequod-white text-xl mb-4'>
                 Search token
@@ -477,7 +484,7 @@ export default function TradingPage() {
             priceHistory={priceHistory}
             className='block xl:hidden col-span-2 xl:col-span-1'
           />
-          <div className='col-span-2 flex xl:col-span-1 items-end xl:px-28'>
+          <div className='col-span-2 flex xl:col-span-1 items-end xl:px-16'>
             <div className='w-full flex justify-center'>
               <button
                 type='button'
@@ -633,16 +640,19 @@ export default function TradingPage() {
                 </button>
               ) : (
                 <button
-                  onClick={() =>
+                  onClick={() => {
+                    setApprovalInProgress(true);
                     approve(
                       selectedTokenInfo.address,
                       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
                     ).finally(() => {
                       setApprovalInProgress(false);
-                    })
-                  }
+                    });
+                  }}
                   className='bg-pequod-purple w-full text-pequod-white py-2 px-4 rounded-md flex justify-center items-center disabled:opacity-50 disabled:cursor-default'
-                  disabled={approve === undefined}
+                  disabled={
+                    approve === undefined || !selectedTokenInfo.allowanceFetched
+                  }
                 >
                   {approvalInProgress ? (
                     <>

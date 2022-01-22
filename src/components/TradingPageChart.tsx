@@ -17,9 +17,13 @@ export default function TradingPageChart({
         className
       )}
     >
-      {!!priceHistory?.length && (
+      {!!priceHistory?.length ? (
         <div style={{ height: '90%', width: '100%', minHeight: '190px' }}>
           <PairChart data={priceHistory} />
+        </div>
+      ) : (
+        <div className='justify-center items-center text-3xl w-full h-full hidden xl:flex text-pequod-white opacity-70'>
+          No data
         </div>
       )}
     </div>
