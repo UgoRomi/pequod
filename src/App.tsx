@@ -8,14 +8,32 @@ import StakingPage from './pages/StakingPage';
 import { useEffect } from 'react';
 import { useUserInfo } from './utils/utils';
 import TradingPage from './pages/TradingPage';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { selectPequodApiInstance } from './store/axiosInstancesSlice';
+import { TokensListResponse } from './utils/apiTypes';
+import { setTokens } from './store/miscSlice';
+import _ from 'lodash';
 
 function App() {
   useEagerConnect();
   const getAndUpdateUserInfo = useUserInfo();
+  const pequodApiInstance = useAppSelector(selectPequodApiInstance);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     getAndUpdateUserInfo();
   }, [getAndUpdateUserInfo]);
+
+  useEffect(() => {
+    const getTokens = async () => {
+      const { data: tokensList }: { data: TokensListResponse[] } =
+        await pequodApiInstance.get('/tokens/list');
+      dispatch(setTokens(_.uniqBy(tokensList, 'address')));
+    };
+    getTokens();
+    // TODO: FIX
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Routes>

@@ -5,6 +5,7 @@ import userInfoReducer from './userInfoSlice';
 import transactionsReducer from './transactionsSlice';
 import pricesReducer from './pricesSlice';
 import farmsReducer from './farmsSlice';
+import miscReducer from './miscSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     pendingTransactions: transactionsReducer,
     prices: pricesReducer,
     farms: farmsReducer,
+    misc: miscReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

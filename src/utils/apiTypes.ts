@@ -63,3 +63,9 @@ export interface AvailableFarmResponse {
     symbol: string;
   };
 }
+
+export interface TokensListResponse {
+  address: string;
+  name: string;
+  symbol: string;
+}

@@ -25,12 +25,9 @@ import { RootState } from '../store/store';
 import TradingPageChart from '../components/TradingPageChart';
 import { MIN_ETH } from '../utils/consts';
 import Spinner from '../components/Spinner';
-
-interface TokenSearchResult {
-  name: string;
-  address: string;
-  symbol: string;
-}
+import _ from 'lodash';
+import { selectTokensList } from '../store/miscSlice';
+import { TokensListResponse } from '../utils/apiTypes';
 
 interface TokenDetails {
   name: string;
@@ -64,10 +61,29 @@ export interface GraphData {
   value: number;
 }
 
+const responsive = {
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 4,
+    partialVisibilityGutter: 30,
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2,
+    partialVisibilityGutter: 30,
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1,
+    partialVisibilityGutter: 30,
+  },
+};
+
 export default function TradingPage() {
+  const tokensList = useAppSelector(selectTokensList);
   const [tokenSearch, setTokenSearch] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchResults, setSearchResults] = useState<TokenSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
@@ -269,27 +285,39 @@ export default function TradingPage() {
   ]);
 
   useEffect(() => {
-    if (
-      !Web3.utils.isAddress(tokenSearch) ||
-      tokenSearch.toUpperCase() ===
-        (process.env.REACT_APP_BNB_ADDRESS as string).toUpperCase()
-    )
-      return;
-    updateFrom('0');
-    setAmountTo('0');
+    const search = async () => {
+      if (!tokenSearch) return;
+      // If the searched term is an address just search it
+      if (Web3.utils.isAddress(tokenSearch)) {
+        getTokenInfo(tokenSearch);
+        const { BNBReserve, tokenReserve } = await getTokenPrice(tokenSearch);
+        setSelectedTokenInfo((selectedTokenInfo) => ({
+          ...selectedTokenInfo,
+          BNBReserve,
+          tokenReserve,
+        }));
+        return;
+      }
 
-    const searchTokens = setTimeout(async () => {
-      getTokenInfo(tokenSearch);
-      const { BNBReserve, tokenReserve } = await getTokenPrice(tokenSearch);
+      // Otherwise search for the token, matching by symbol first
+      setTimeout(() => {
+        let tokens = tokensList.filter((token) =>
+          token.symbol.toUpperCase().includes(tokenSearch.toUpperCase())
+        );
+        tokens = [
+          ...tokens,
+          ...tokensList.filter(
+            (token) =>
+              token.name.toUpperCase().includes(tokenSearch.toUpperCase()) ||
+              token.address.toUpperCase().includes(tokenSearch.toUpperCase())
+          ),
+        ];
+        tokens = _.uniq(tokens);
+        setSearchResults(tokens);
+      }, 500);
+    };
 
-      setSelectedTokenInfo((selectedTokenInfo) => ({
-        ...selectedTokenInfo,
-        BNBReserve,
-        tokenReserve,
-      }));
-    }, 200);
-
-    return () => clearTimeout(searchTokens);
+    search();
     //TODO: fix this
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenSearch]);
@@ -311,24 +339,6 @@ export default function TradingPage() {
     selectedTokenInfo.BNBReserve,
     selectedTokenInfo.tokenReserve,
   ]);
-
-  const responsive = {
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 4,
-      partialVisibilityGutter: 30,
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2,
-      partialVisibilityGutter: 30,
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1,
-      partialVisibilityGutter: 30,
-    },
-  };
 
   const percentageButtonClicked = async (percentage: Percentages) => {
     switch (percentage) {
@@ -442,14 +452,14 @@ export default function TradingPage() {
                     onBlur={() => setSearchFocused(false)}
                   />
                   {searchResults?.length > 0 && searchFocused && (
-                    <div className='z-10 mt-1 p-3 w-full shadow-md rounded-md absolute bg-pequod-white'>
+                    <div className='z-10 mt-1 p-3 w-full max-h-64 overflow-y-scroll gap-y-3 flex flex-col shadow-md rounded-md absolute bg-pequod-white'>
                       {searchResults.map((token) => (
                         <div
                           className='cursor-pointer'
-                          onClick={() => getTokenInfo(token.address)}
+                          onPointerDown={() => setTokenSearch(token.address)}
                           key={token.address}
                         >
-                          <span className='p-1 text-md text-gray-800 font-semibold'>
+                          <span className='p-1 text-md text-gray-800 font-semibold '>
                             {token.name} - ${token.symbol}
                           </span>
                           <span className='block text-sm text-gray-600 overflow-hidden'>
