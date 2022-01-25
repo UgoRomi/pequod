@@ -79,6 +79,18 @@ const responsive = {
   },
 };
 
+const emptyTokenDetails: TokenDetails = {
+  name: '',
+  address: '',
+  symbol: '',
+  BNBReserve: 0,
+  decimals: 0,
+  priceBNB: 0,
+  tokenReserve: 0,
+  allowance: 0,
+  allowanceFetched: false,
+};
+
 export default function TradingPage() {
   const tokensList = useAppSelector(selectTokensList);
   const [tokenSearch, setTokenSearch] = useState<string>('');
@@ -98,17 +110,8 @@ export default function TradingPage() {
   const [isFullSell, setIsFullSell] = useState<boolean>(false);
   const [orderInProgress, setOrderInProgress] = useState<boolean>(false);
   const [approvalInProgress, setApprovalInProgress] = useState<boolean>(false);
-  const [selectedTokenInfo, setSelectedTokenInfo] = useState<TokenDetails>({
-    name: '',
-    address: '',
-    symbol: '',
-    BNBReserve: 0,
-    decimals: 0,
-    priceBNB: 0,
-    tokenReserve: 0,
-    allowance: 0,
-    allowanceFetched: false,
-  });
+  const [selectedTokenInfo, setSelectedTokenInfo] =
+    useState<TokenDetails>(emptyTokenDetails);
   const [timeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.WEEK
   );
@@ -268,17 +271,14 @@ export default function TradingPage() {
 
   // Get the allowance for the selected token towards the pancake router
   useEffect(() => {
+    if (!selectedTokenInfo.address || selectedTokenInfo.allowanceFetched)
+      return;
     checkSwapAllowance(
       selectedTokenInfo.address,
       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
     ).then((allowance: number) => {
-      if (allowance === selectedTokenInfo.allowance) {
-        setSelectedTokenInfo((selectedTokenInfo) => ({
-          ...selectedTokenInfo,
-          allowanceFetched: true,
-        }));
-        return;
-      }
+      console.log('a');
+
       setSelectedTokenInfo((selectedTokenInfo) => ({
         ...selectedTokenInfo,
         allowance,
@@ -289,11 +289,16 @@ export default function TradingPage() {
     checkSwapAllowance,
     selectedTokenInfo.allowance,
     selectedTokenInfo.address,
+    selectedTokenInfo.allowanceFetched,
   ]);
 
   useEffect(() => {
     const search = async () => {
-      if (!tokenSearch) return;
+      if (!tokenSearch) {
+        setSelectedTokenInfo(emptyTokenDetails);
+        return;
+      }
+
       // If the searched term is an address just search it
       if (Web3.utils.isAddress(tokenSearch)) {
         getTokenInfo(tokenSearch);
