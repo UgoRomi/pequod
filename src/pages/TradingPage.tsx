@@ -277,8 +277,6 @@ export default function TradingPage() {
       selectedTokenInfo.address,
       process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
     ).then((allowance: number) => {
-      console.log('a');
-
       setSelectedTokenInfo((selectedTokenInfo) => ({
         ...selectedTokenInfo,
         allowance,
