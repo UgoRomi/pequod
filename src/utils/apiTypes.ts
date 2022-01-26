@@ -11,7 +11,7 @@ export interface UserInfoResponse {
       amount: number;
       currentPrice: number;
       currentPriceInCrypto: number;
-      currentTotalPrice: string;
+      currentTotalPriceInUsdt: string;
       currentTotalPriceInCrypto: string;
       earningInCrypto?: number;
       earningInUsdt?: number;

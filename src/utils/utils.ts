@@ -110,7 +110,7 @@ export function useUserInfo() {
         symbol: token.symbol,
         name: token.name,
         amount: token.amount,
-        totalInDollars: parseFloat(token.currentTotalPrice),
+        totalInDollars: parseFloat(token.currentTotalPriceInUsdt),
         earningPercentage: token.earningPercentageInUsdt,
       })) || [];
     dispatch(setUserTokens(userTokens));
