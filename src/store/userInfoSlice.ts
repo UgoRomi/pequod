@@ -72,7 +72,9 @@ export const selectUserBnbAmount = (state: RootState) =>
   )?.amount || 0;
 export const selectUserWotAmount = (state: RootState) =>
   state.userInfo.tokens.find(
-    (token) => token.address === process.env.REACT_APP_WOT_ADDRESS
+    (token) =>
+      token.address.toUpperCase() ===
+      process.env.REACT_APP_WOT_ADDRESS?.toUpperCase()
   )?.amount || 0;
 export const selectUserTokens = (state: RootState) => state.userInfo.tokens;
 export const selectUserSignedMessage = (state: RootState) =>

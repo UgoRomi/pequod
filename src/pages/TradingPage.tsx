@@ -316,10 +316,8 @@ export default function TradingPage() {
         );
         tokens = [
           ...tokens,
-          ...tokensList.filter(
-            (token) =>
-              token.name.toUpperCase().includes(tokenSearch.toUpperCase()) ||
-              token.address.toUpperCase().includes(tokenSearch.toUpperCase())
+          ...tokensList.filter((token) =>
+            token.name.toUpperCase().includes(tokenSearch.toUpperCase())
           ),
         ];
         tokens = _.uniq(tokens);
