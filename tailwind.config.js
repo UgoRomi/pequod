@@ -9,7 +9,7 @@ module.exports = {
         sans: ["Righteous", ...defaultTheme.fontFamily.sans],
       },
       gridTemplateColumns: {
-        buy: "1fr minmax(350px, auto)",
+        buy: "2fr minmax(350px, 1.2fr)",
         cards: "auto 1fr",
       },
       backgroundColor: {
