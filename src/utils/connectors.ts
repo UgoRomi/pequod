@@ -1,5 +1,5 @@
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 
 const injected = new InjectedConnector({
   supportedChainIds: [parseInt(process.env.REACT_APP_CHAIN_ID as string)],
@@ -13,8 +13,8 @@ const walletconnect = new WalletConnectConnector({
 });
 
 export enum ConnectorNames {
-  Injected = 'injected',
-  WalletConnect = 'walletconnect',
+  Injected = "injected",
+  WalletConnect = "walletconnect",
 }
 
 export interface Config {
@@ -25,12 +25,12 @@ export interface Config {
 
 export const connectors: Config[] = [
   {
-    title: 'Metamask',
+    title: "Metamask",
     connectorId: ConnectorNames.Injected,
     priority: 1,
   },
   {
-    title: 'WalletConnect',
+    title: "WalletConnect",
     connectorId: ConnectorNames.WalletConnect,
     priority: 2,
   },
@@ -41,4 +41,4 @@ export const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.WalletConnect]: walletconnect,
 };
 
-export const connectorLocalStorageKey = 'connectorId';
+export const connectorLocalStorageKey = "connectorId";

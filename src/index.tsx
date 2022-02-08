@@ -1,16 +1,16 @@
-import './index.css';
-import 'react-toastify/dist/ReactToastify.css';
-import 'react-multi-carousel/lib/styles.css';
-import ReactDOM from 'react-dom';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
-import { Web3ReactProvider } from '@web3-react/core';
-import Web3 from 'web3';
-import { provider } from 'web3-core';
-import { ToastContainer } from 'react-toastify';
-import { Provider } from 'react-redux';
-import { store } from './store/store';
+import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+import "react-multi-carousel/lib/styles.css";
+import ReactDOM from "react-dom";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
+import { Web3ReactProvider } from "@web3-react/core";
+import Web3 from "web3";
+import { provider } from "web3-core";
+import { ToastContainer } from "react-toastify";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 function getLibrary(provider: provider) {
   return new Web3(provider);
@@ -25,7 +25,7 @@ ReactDOM.render(
       <ToastContainer />
     </Provider>
   </Web3ReactProvider>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

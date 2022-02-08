@@ -1,13 +1,13 @@
-import { useWeb3React } from '@web3-react/core';
-import { toast } from 'react-toastify';
-import BEP20_ABI from '../BEP20.json';
-import PANCAKE_FACTORY_ABI from '../pancakeFactoryABI.json';
-import PANCAKE_PAIR_ABI from '../pancakePairABI.json';
-import PANCAKE_ROUTER_ABI from '../pancakeRouterABI.json';
-import MOBY_STAKING_ABI from '../mobyStakingABI.json';
-import { MaxUint256 } from '@ethersproject/constants';
-import { useBuyEvent, useSellEvent, useStakeEvent } from './events';
-import { toBigNumber, useValidateSessionIfInvalid } from './utils';
+import { useWeb3React } from "@web3-react/core";
+import { toast } from "react-toastify";
+import BEP20_ABI from "../BEP20.json";
+import PANCAKE_FACTORY_ABI from "../pancakeFactoryABI.json";
+import PANCAKE_PAIR_ABI from "../pancakePairABI.json";
+import PANCAKE_ROUTER_ABI from "../pancakeRouterABI.json";
+import MOBY_STAKING_ABI from "../mobyStakingABI.json";
+import { MaxUint256 } from "@ethersproject/constants";
+import { useBuyEvent, useSellEvent, useStakeEvent } from "./events";
+import { toBigNumber, useValidateSessionIfInvalid } from "./utils";
 
 function useGetPairAddress() {
   const { library, account } = useWeb3React();
@@ -190,7 +190,7 @@ export function useSwap(
     } catch (error) {
       toast.error(`There was an error in the transaction\nPlease retry`);
       console.error(error);
-      return { success: false, txHash: '' };
+      return { success: false, txHash: "" };
     }
   };
 
@@ -234,7 +234,7 @@ export function useSwap(
     } catch (error) {
       toast.error(`There was an error in the transaction\nPlease retry`);
       console.error(error);
-      return { success: false, txHash: '' };
+      return { success: false, txHash: "" };
     }
   };
   return { buyCallback: buy, sellCallback: sell };
@@ -252,7 +252,7 @@ export function useWotStake() {
     stakeId: number
   ): Promise<{ success: boolean; txHash: string }> => {
     const valid = await validateSessionIfInvalid();
-    if (!valid) return { success: false, txHash: '' };
+    if (!valid) return { success: false, txHash: "" };
     const routerContract = new library.eth.Contract(
       MOBY_STAKING_ABI,
       stakingContractAddress,
@@ -281,7 +281,7 @@ export function useWotStake() {
         `There was an error staking your ${process.env.REACT_APP_WOT_SYMBOL}\nPlease retry`
       );
       console.error(error);
-      return { success: false, txHash: '' };
+      return { success: false, txHash: "" };
     }
     // No need to use
   };

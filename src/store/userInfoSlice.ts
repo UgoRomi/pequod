@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "./store";
 
 export interface FarmState {
   id: number;
@@ -29,13 +29,13 @@ interface UserInfoState {
 }
 
 const initialState: UserInfoState = {
-  signedMessage: '',
+  signedMessage: "",
   farms: [],
   tokens: [],
 };
 
 export const userInfoSlice = createSlice({
-  name: 'userInfo',
+  name: "userInfo",
   initialState,
   reducers: {
     setUserTokens: (state, action: PayloadAction<UserToken[]>) => {

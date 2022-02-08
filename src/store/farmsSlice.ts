@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "./store";
 
 export interface AvailableFarmState {
   id: number;
@@ -19,7 +19,7 @@ const initialState: FarmsState = {
 };
 
 export const farmsSlice = createSlice({
-  name: 'farms',
+  name: "farms",
   initialState,
   reducers: {
     addAvailableFarms: (state, action: PayloadAction<AvailableFarmState[]>) => {

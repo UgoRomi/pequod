@@ -1,6 +1,6 @@
-import { GraphData } from '../pages/TradingPage';
-import { classNames } from '../utils/utils';
-import PairChart from './PairChart';
+import { GraphData } from "../pages/TradingPage";
+import { classNames } from "../utils/utils";
+import PairChart from "./PairChart";
 
 export default function TradingPageChart({
   priceHistory,
@@ -12,17 +12,17 @@ export default function TradingPageChart({
   return (
     <div
       className={classNames(
-        !priceHistory?.length ? 'hidden lg:block' : '',
-        'xl:border-r xl:pr-3 text-pequod-white',
+        !priceHistory?.length ? "hidden lg:block" : "",
+        "text-pequod-white xl:border-r xl:pr-3",
         className
       )}
     >
       {!!priceHistory?.length ? (
-        <div style={{ height: '90%', width: '100%', minHeight: '190px' }}>
+        <div style={{ height: "90%", width: "100%", minHeight: "190px" }}>
           <PairChart data={priceHistory} />
         </div>
       ) : (
-        <div className='justify-center items-center text-3xl w-full h-full hidden xl:flex text-pequod-white opacity-70'>
+        <div className="hidden h-full w-full items-center justify-center text-3xl text-pequod-white opacity-70 xl:flex">
           No data
         </div>
       )}

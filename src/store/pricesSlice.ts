@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "./store";
 
 interface PricesState {
   bnbUsdPrice: number;
@@ -10,7 +10,7 @@ const initialState: PricesState = {
 };
 
 export const pricesSlice = createSlice({
-  name: 'prices',
+  name: "prices",
   initialState,
   reducers: {
     setBnbUsdPrice: (state, action: PayloadAction<number>) => {

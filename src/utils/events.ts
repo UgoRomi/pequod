@@ -1,12 +1,12 @@
-import { useWeb3React } from '@web3-react/core';
-import { useAppSelector } from '../store/hooks';
-import { selectBnbUsdPrice } from '../store/pricesSlice';
+import { useWeb3React } from "@web3-react/core";
+import { useAppSelector } from "../store/hooks";
+import { selectBnbUsdPrice } from "../store/pricesSlice";
 import {
   BuyEventRequest,
   SellEventRequest,
   StakeEventRequest,
-} from '../types/eventsTypes';
-import { useEventCall } from './utils';
+} from "../types/eventsTypes";
+import { useEventCall } from "./utils";
 
 export function useStakeEvent() {
   const eventCall = useEventCall();
@@ -36,7 +36,7 @@ export function useStakeEvent() {
       },
     };
     eventCall(`/events/stake`, {
-      method: 'POST',
+      method: "POST",
       data: requestBody,
     });
   };
@@ -70,7 +70,7 @@ export function useBuyEvent() {
       },
     };
     eventCall(`/events/purchase`, {
-      method: 'POST',
+      method: "POST",
       data: requestBody,
     });
   };
@@ -106,7 +106,7 @@ export function useSellEvent() {
       },
     };
     eventCall(`/events/sell`, {
-      method: 'POST',
+      method: "POST",
       data: requestBody,
     });
   };

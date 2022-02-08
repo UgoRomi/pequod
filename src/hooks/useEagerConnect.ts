@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { connectorLocalStorageKey, ConnectorNames } from '../utils/connectors';
-import useAuth from './useAuth';
+import { useEffect } from "react";
+import { connectorLocalStorageKey, ConnectorNames } from "../utils/connectors";
+import useAuth from "./useAuth";
 
 const useEagerConnect = () => {
   const { login } = useAuth();

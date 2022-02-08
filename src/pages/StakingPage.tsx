@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import Spinner from '../components/Spinner';
-import StakingCard from '../components/StakingCard';
+import { useEffect, useState } from "react";
+import Spinner from "../components/Spinner";
+import StakingCard from "../components/StakingCard";
 import {
   addAvailableFarms,
   AvailableFarmState,
   selectAvailableFarms,
-} from '../store/farmsSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { selectUserWotAmount } from '../store/userInfoSlice';
-import { AvailableFarmResponse } from '../utils/apiTypes';
-import { useApiCall, useUserInfo } from '../utils/utils';
+} from "../store/farmsSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { selectUserWotAmount } from "../store/userInfoSlice";
+import { AvailableFarmResponse } from "../utils/apiTypes";
+import { useApiCall, useUserInfo } from "../utils/utils";
 
 export default function StakingPage() {
   const getAndUpdateUserInfo = useUserInfo();
@@ -53,14 +53,14 @@ export default function StakingPage() {
   }, [dispatch]);
   if (loadingFarms && !availableFarms.length) {
     return (
-      <div className='flex justify-center w-full h-full'>
-        <Spinner className='h-10 text-gray-800' />
+      <div className="flex h-full w-full justify-center">
+        <Spinner className="h-10 text-gray-800" />
       </div>
     );
   }
 
   return (
-    <div className='grid w-full grid-cols-1 gap-3'>
+    <div className="grid w-full grid-cols-1 gap-3">
       {availableFarms.map((farm) => {
         return (
           <StakingCard

@@ -1,11 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit';
-import tradeDialogReducer from './tradeDialogSlice';
-import axiosInstancesReducer from './axiosInstancesSlice';
-import userInfoReducer from './userInfoSlice';
-import transactionsReducer from './transactionsSlice';
-import pricesReducer from './pricesSlice';
-import farmsReducer from './farmsSlice';
-import miscReducer from './miscSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import tradeDialogReducer from "./tradeDialogSlice";
+import axiosInstancesReducer from "./axiosInstancesSlice";
+import userInfoReducer from "./userInfoSlice";
+import transactionsReducer from "./transactionsSlice";
+import pricesReducer from "./pricesSlice";
+import farmsReducer from "./farmsSlice";
+import miscReducer from "./miscSlice";
 
 export const store = configureStore({
   reducer: {

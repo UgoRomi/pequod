@@ -1,18 +1,18 @@
-import { Route, Routes } from 'react-router-dom';
-import Layout from './components/Layout';
-import RequireAuth from './components/RequireAuth';
-import RequireNoAuth from './components/RequireNoAuth';
-import useEagerConnect from './hooks/useEagerConnect';
-import LoginPage from './pages/LoginPage';
-import StakingPage from './pages/StakingPage';
-import { useEffect } from 'react';
-import { useUserInfo } from './utils/utils';
-import TradingPage from './pages/TradingPage';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { selectPequodApiInstance } from './store/axiosInstancesSlice';
-import { TokensListResponse } from './utils/apiTypes';
-import { setTokens } from './store/miscSlice';
-import _ from 'lodash';
+import { Route, Routes } from "react-router-dom";
+import Layout from "./components/Layout";
+import RequireAuth from "./components/RequireAuth";
+import RequireNoAuth from "./components/RequireNoAuth";
+import useEagerConnect from "./hooks/useEagerConnect";
+import LoginPage from "./pages/LoginPage";
+import StakingPage from "./pages/StakingPage";
+import { useEffect } from "react";
+import { useUserInfo } from "./utils/utils";
+import TradingPage from "./pages/TradingPage";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { selectPequodApiInstance } from "./store/axiosInstancesSlice";
+import { TokensListResponse } from "./utils/apiTypes";
+import { setTokens } from "./store/miscSlice";
+import _ from "lodash";
 
 function App() {
   useEagerConnect();
@@ -31,8 +31,8 @@ function App() {
   useEffect(() => {
     const getTokens = async () => {
       const { data: tokensList }: { data: TokensListResponse[] } =
-        await pequodApiInstance.get('/tokens/list');
-      dispatch(setTokens(_.uniqBy(tokensList, 'address')));
+        await pequodApiInstance.get("/tokens/list");
+      dispatch(setTokens(_.uniqBy(tokensList, "address")));
     };
     getTokens();
     // TODO: FIX
@@ -42,7 +42,7 @@ function App() {
   return (
     <Routes>
       <Route
-        path='/'
+        path="/"
         element={
           <RequireAuth>
             <Layout>
@@ -52,7 +52,7 @@ function App() {
         }
       />
       <Route
-        path='/staking'
+        path="/staking"
         element={
           <RequireAuth>
             <Layout>
@@ -62,7 +62,7 @@ function App() {
         }
       />
       <Route
-        path='/login'
+        path="/login"
         element={
           <RequireNoAuth>
             <LoginPage />

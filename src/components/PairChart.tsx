@@ -5,7 +5,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
+} from "recharts";
 
 export type SwapLineChartProps = {
   data: any[]; // used for label of valye
@@ -13,15 +13,15 @@ export type SwapLineChartProps = {
 
 export default function PairChart({ data }: SwapLineChartProps) {
   const colors = {
-    gradient1: '#c923dd',
-    gradient2: '#0b0629',
-    stroke: '#c923dd',
+    gradient1: "#c923dd",
+    gradient2: "#0b0629",
+    stroke: "#c923dd",
   };
 
   return (
     <ResponsiveContainer>
       <AreaChart
-        className='bg-gradient-to-r from-pequod-gray via-pequod-gray rounded-3xl border border-pequod-white'
+        className="rounded-3xl border border-pequod-white bg-gradient-to-r from-pequod-gray via-pequod-gray"
         data={data}
         margin={{
           top: 5,
@@ -31,29 +31,29 @@ export default function PairChart({ data }: SwapLineChartProps) {
         }}
       >
         <defs>
-          <linearGradient id='gradient' x1='0' y1='0' x2='0' y2='1'>
-            <stop offset='5%' stopColor={colors.gradient1} stopOpacity={0.34} />
-            <stop offset='100%' stopColor={colors.gradient2} stopOpacity={0} />
+          <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={colors.gradient1} stopOpacity={0.34} />
+            <stop offset="100%" stopColor={colors.gradient2} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis dataKey='time' axisLine={false} tickLine={false} hide />
+        <XAxis dataKey="time" axisLine={false} tickLine={false} hide />
         <YAxis
-          dataKey='value'
+          dataKey="value"
           axisLine={false}
           tickLine={false}
           tickFormatter={(value: number) => `${value.toFixed(8)}`}
           dx={55}
-          domain={['auto', 'auto']}
+          domain={["auto", "auto"]}
         />
         <Tooltip
           cursor={{ stroke: colors.gradient1 }}
-          contentStyle={{ display: 'none' }}
+          contentStyle={{ display: "none" }}
         />
         <Area
-          dataKey='value'
-          type='linear'
+          dataKey="value"
+          type="linear"
           stroke={colors.stroke}
-          fill='url(#gradient)'
+          fill="url(#gradient)"
           strokeWidth={2}
         />
       </AreaChart>

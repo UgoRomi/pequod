@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EventType } from '../utils/consts';
-import { RootState } from './store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { EventType } from "../utils/consts";
+import { RootState } from "./store";
 
 interface PendingTransactionsState {
   transactions: { txHash: string; type: EventType; addedTimestamp: number }[];
@@ -11,7 +11,7 @@ const initialState: PendingTransactionsState = {
 };
 
 export const pendingTransactionsSlice = createSlice({
-  name: 'pendingTransactions',
+  name: "pendingTransactions",
   initialState,
   reducers: {
     addTransaction: (

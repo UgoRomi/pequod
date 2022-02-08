@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TokensListResponse } from '../utils/apiTypes';
-import { RootState } from './store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { TokensListResponse } from "../utils/apiTypes";
+import { RootState } from "./store";
 
 interface MiscState {
   tokens: TokensListResponse[];
@@ -11,7 +11,7 @@ const initialState: MiscState = {
 };
 
 export const miscSlice = createSlice({
-  name: 'misc',
+  name: "misc",
   initialState,
   reducers: {
     setTokens: (state, action: PayloadAction<TokensListResponse[]>) => {

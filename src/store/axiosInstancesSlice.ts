@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from './store';
-import axios, { AxiosInstance } from 'axios';
+import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "./store";
+import axios, { AxiosInstance } from "axios";
 
 interface AxiosInstancesState {
   pequodAPI: AxiosInstance;
@@ -13,7 +13,7 @@ const initialState: AxiosInstancesState = {
 };
 
 export const axiosInterfacesSlice = createSlice({
-  name: 'axiosInterfaces',
+  name: "axiosInterfaces",
   initialState,
   reducers: {
     initializePequodInstance: (state) => {

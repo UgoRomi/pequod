@@ -1,8 +1,8 @@
-import { useWeb3React } from '@web3-react/core';
-import { AxiosRequestConfig } from 'axios';
-import { toast } from 'react-toastify';
-import { selectPequodApiInstance } from '../store/axiosInstancesSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useWeb3React } from "@web3-react/core";
+import { AxiosRequestConfig } from "axios";
+import { toast } from "react-toastify";
+import { selectPequodApiInstance } from "../store/axiosInstancesSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   addUserFarms,
   FarmState,
@@ -10,14 +10,14 @@ import {
   setSignedMessage,
   setUserTokens,
   UserToken,
-} from '../store/userInfoSlice';
-import { UserInfoResponse } from './apiTypes';
-import { v4 as uuidV4 } from 'uuid';
-import Web3 from 'web3';
-import { setBnbUsdPrice } from '../store/pricesSlice';
+} from "../store/userInfoSlice";
+import { UserInfoResponse } from "./apiTypes";
+import { v4 as uuidV4 } from "uuid";
+import Web3 from "web3";
+import { setBnbUsdPrice } from "../store/pricesSlice";
 
 export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export function getLocale() {
@@ -134,10 +134,10 @@ export function useSignMessage() {
     const signedMessage = await library.eth.personal.sign(
       messageToSign,
       account,
-      ''
+      ""
     );
     if (!signedMessage) {
-      toast.error('Please sign the message before proceeding');
+      toast.error("Please sign the message before proceeding");
       return;
     }
     return signedMessage;
@@ -185,42 +185,42 @@ export function secondsToDhms(seconds: number) {
 }
 
 export function formatTokenAmount(amount: number) {
-  return new Intl.NumberFormat('en-US', {}).format(amount);
+  return new Intl.NumberFormat("en-US", {}).format(amount);
 }
 
 export function formatMoney(amount: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(amount);
 }
 
 export function toBigNumber(amount: number, decimals: number): string {
   switch (decimals) {
     case 0:
-      return Web3.utils.toWei(amount.toFixed(0), 'noether');
+      return Web3.utils.toWei(amount.toFixed(0), "noether");
     case 1:
-      return Web3.utils.toWei(amount.toFixed(1), 'wei');
+      return Web3.utils.toWei(amount.toFixed(1), "wei");
     case 3:
-      return Web3.utils.toWei(amount.toFixed(3), 'kwei');
+      return Web3.utils.toWei(amount.toFixed(3), "kwei");
     case 6:
-      return Web3.utils.toWei(amount.toFixed(6), 'mwei');
+      return Web3.utils.toWei(amount.toFixed(6), "mwei");
     case 9:
-      return Web3.utils.toWei(amount.toFixed(9), 'gwei');
+      return Web3.utils.toWei(amount.toFixed(9), "gwei");
     case 12:
-      return Web3.utils.toWei(amount.toFixed(12), 'szabo');
+      return Web3.utils.toWei(amount.toFixed(12), "szabo");
     case 15:
-      return Web3.utils.toWei(amount.toFixed(15), 'finney');
+      return Web3.utils.toWei(amount.toFixed(15), "finney");
     case 18:
-      return Web3.utils.toWei(amount.toFixed(18), 'ether');
+      return Web3.utils.toWei(amount.toFixed(18), "ether");
     case 21:
-      return Web3.utils.toWei(amount.toFixed(21), 'grand');
+      return Web3.utils.toWei(amount.toFixed(21), "grand");
     case 24:
-      return Web3.utils.toWei(amount.toFixed(24), 'mether');
+      return Web3.utils.toWei(amount.toFixed(24), "mether");
     case 27:
-      return Web3.utils.toWei(amount.toFixed(27), 'gether');
+      return Web3.utils.toWei(amount.toFixed(27), "gether");
     case 30:
-      return Web3.utils.toWei(amount.toFixed(30), 'tether');
+      return Web3.utils.toWei(amount.toFixed(30), "tether");
     default:
       return Web3.utils
         .toBN(Math.floor(amount))

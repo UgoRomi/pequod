@@ -1,5 +1,5 @@
-import { classNames } from '../utils/utils';
-import { Percentages } from './PercentagesGroup';
+import { classNames } from "../utils/utils";
+import { Percentages } from "./PercentagesGroup";
 
 export default function PercentageButton({
   active,
@@ -26,21 +26,21 @@ export default function PercentageButton({
     <div
       onClick={buttonClick}
       className={classNames(
-        disabled ? 'cursor-default opacity-70' : 'cursor-pointer',
-        'flex flex-col justify-center '
+        disabled ? "cursor-default opacity-70" : "cursor-pointer",
+        "flex flex-col justify-center "
       )}
     >
       <button
         className={classNames(
-          active ? 'bg-pequod-purple' : 'bg-pequod-white',
-          'h-2 rounded-lg w-full disabled:cursor-default'
+          active ? "bg-pequod-purple" : "bg-pequod-white",
+          "h-2 w-full rounded-lg disabled:cursor-default"
         )}
         disabled={disabled}
       >
-        {' '}
+        {" "}
       </button>
       <span
-        className={`w-full flex justify-center text-xs text-pequod-pink ${darkModeClass}`}
+        className={`flex w-full justify-center text-xs text-pequod-pink ${darkModeClass}`}
       >
         {percentage}%
       </span>

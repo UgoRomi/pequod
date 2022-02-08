@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "./store";
 
 interface TradeDialogState {
   isOpen: boolean;
@@ -10,7 +10,7 @@ const initialState: TradeDialogState = {
 };
 
 export const tradeDialogSlice = createSlice({
-  name: 'tradeDialog',
+  name: "tradeDialog",
   initialState,
   reducers: {
     openTradeSettingsDialog: (state) => {

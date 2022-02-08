@@ -1,16 +1,16 @@
-import { ChevronUpIcon, ExclamationCircleIcon } from '@heroicons/react/outline';
-import { LockClosedIcon } from '@heroicons/react/solid';
-import { useEffect, useState } from 'react';
-import { AvailableFarmState } from '../store/farmsSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { RootState } from '../store/store';
-import { updateUserFarm } from '../store/userInfoSlice';
-import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
-import { formatTokenAmount, secondsToDhms } from '../utils/utils';
-import PercentagesGroup, { Percentages } from './PercentagesGroup';
-import { subMilliseconds } from 'date-fns';
-import Spinner from './Spinner';
-import { ReactComponent as TokenLogo } from '../images/wot-logo.svg';
+import { ChevronUpIcon, ExclamationCircleIcon } from "@heroicons/react/outline";
+import { LockClosedIcon } from "@heroicons/react/solid";
+import { useEffect, useState } from "react";
+import { AvailableFarmState } from "../store/farmsSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { RootState } from "../store/store";
+import { updateUserFarm } from "../store/userInfoSlice";
+import { useAllowance, useApprove, useWotStake } from "../utils/contractsUtils";
+import { formatTokenAmount, secondsToDhms } from "../utils/utils";
+import PercentagesGroup, { Percentages } from "./PercentagesGroup";
+import { subMilliseconds } from "date-fns";
+import Spinner from "./Spinner";
+import { ReactComponent as TokenLogo } from "../images/wot-logo.svg";
 
 export default function StakingCard({
   stakeId,
@@ -20,7 +20,7 @@ export default function StakingCard({
   userTokenBalance: number;
 }) {
   const [stakingFormIsOpen, setStakingFormIsOpen] = useState(false);
-  const [stakeAmount, setStakeAmount] = useState('0');
+  const [stakeAmount, setStakeAmount] = useState("0");
   const [allowed, setAllowed] = useState(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
@@ -86,16 +86,16 @@ export default function StakingCard({
 
   const percentageButtonClicked = (percentage: Percentages) => {
     switch (percentage) {
-      case Percentages['25%']:
+      case Percentages["25%"]:
         setStakeAmount((userTokenBalance * 0.25).toFixed(4));
         break;
-      case Percentages['50%']:
+      case Percentages["50%"]:
         setStakeAmount((userTokenBalance * 0.5).toFixed(4));
         break;
-      case Percentages['75%']:
+      case Percentages["75%"]:
         setStakeAmount((userTokenBalance * 0.75).toFixed(4));
         break;
-      case Percentages['100%']:
+      case Percentages["100%"]:
         setStakeAmount(userTokenBalance.toFixed(4));
         break;
     }
@@ -115,54 +115,54 @@ export default function StakingCard({
   };
 
   return (
-    <div className='rounded-md border-2 border-purple-400 bg-white shadow-md p-2 h-full w-full relative'>
-      <div className='flex items-center gap-4 lg:gap-7'>
-        <TokenLogo className='h-10 w-10' />
+    <div className="relative h-full w-full rounded-md border-2 border-purple-400 bg-white p-2 shadow-md">
+      <div className="flex items-center gap-4 lg:gap-7">
+        <TokenLogo className="h-10 w-10" />
         <div>
-          <p className='font-bold'>{farmGeneralData.tokenSymbol}</p>
-          <p className='text-sm opacity-75'>APY - {farmGeneralData.apy}%</p>
-          <p className='text-sm opacity-75'>Lock-Up Period: 1 year</p>
+          <p className="font-bold">{farmGeneralData.tokenSymbol}</p>
+          <p className="text-sm opacity-75">APY - {farmGeneralData.apy}%</p>
+          <p className="text-sm opacity-75">Lock-Up Period: 1 year</p>
         </div>
         {userFarm ? (
           <>
-            <div className='hidden lg:block self-start'>
-              <p className='font-semibold'>Earned</p>
+            <div className="hidden self-start lg:block">
+              <p className="font-semibold">Earned</p>
               <p>{formatTokenAmount(userFarm.amountEarned)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
                 <p>
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
                   }).format(userFarm.amountEarned * userFarm.tokenUSDPrice)}
                 </p>
               )}
             </div>
-            <div className='hidden lg:block self-start'>
-              <p className='font-semibold'>Total in staking</p>
+            <div className="hidden self-start lg:block">
+              <p className="font-semibold">Total in staking</p>
               <p>{formatTokenAmount(userFarm.totalAmount)}</p>
               {userFarm.tokenUSDPrice !== Infinity && (
                 <p>
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
                   }).format(userFarm.totalAmount * userFarm.tokenUSDPrice)}
                 </p>
               )}
             </div>
-            <div className='hidden lg:block self-start'>
-              <p className='font-semibold'>Unlocks in</p>
+            <div className="hidden self-start lg:block">
+              <p className="font-semibold">Unlocks in</p>
               <p>{formatUnStakingTime(userFarm.unStakingTimeInSeconds)}</p>
             </div>
             <button
               onClick={() => setStakingFormIsOpen(!stakingFormIsOpen)}
-              className='capitalize text-purple-400 font-bold py-2 px-4 rounded-md ml-auto gap-3 justify-center items-center flex'
+              className="ml-auto flex items-center justify-center gap-3 rounded-md py-2 px-4 font-bold capitalize text-purple-400"
             >
-              <LockClosedIcon className='w-5 text-purple-400 font-bold' />
+              <LockClosedIcon className="w-5 font-bold text-purple-400" />
               details
               <ChevronUpIcon
                 className={`${
-                  !stakingFormIsOpen ? 'transform rotate-180' : ''
-                } w-5 h-5 text-purple-400`}
+                  !stakingFormIsOpen ? "rotate-180 transform" : ""
+                } h-5 w-5 text-purple-400`}
               />
             </button>
           </>
@@ -171,28 +171,28 @@ export default function StakingCard({
             {allowed ? (
               <button
                 onClick={() => setStakingFormIsOpen(!stakingFormIsOpen)}
-                className='capitalize text-purple-400 font-bold py-2 px-4 rounded-md ml-auto gap-3 justify-center items-center flex'
+                className="ml-auto flex items-center justify-center gap-3 rounded-md py-2 px-4 font-bold capitalize text-purple-400"
               >
                 Details
                 <ChevronUpIcon
                   className={`${
-                    !stakingFormIsOpen ? 'transform rotate-180' : ''
-                  } w-5 h-5 text-purple-400`}
+                    !stakingFormIsOpen ? "rotate-180 transform" : ""
+                  } h-5 w-5 text-purple-400`}
                 />
               </button>
             ) : (
               <button
                 disabled={isApproving}
-                className='bg-purple-400 text-white font-bold py-2 px-4 rounded-md'
+                className="rounded-md bg-purple-400 py-2 px-4 font-bold text-white"
                 onClick={approveSpending}
               >
                 {isApproving ? (
                   <>
-                    <Spinner className='h-5 text-white' />
+                    <Spinner className="h-5 text-white" />
                     Approving...
                   </>
                 ) : (
-                  'Approve spending'
+                  "Approve spending"
                 )}
               </button>
             )}
@@ -200,81 +200,81 @@ export default function StakingCard({
         )}
       </div>
       {stakingFormIsOpen && (
-        <div className='flex flex-col my-3'>
+        <div className="my-3 flex flex-col">
           {userFarm && (
-            <div className='lg:hidden grid grid-cols-1 gap-4'>
-              <div className='flex gap-x-6 flex-wrap'>
-                <p className='font-semibold w-full'>Earned</p>
+            <div className="grid grid-cols-1 gap-4 lg:hidden">
+              <div className="flex flex-wrap gap-x-6">
+                <p className="w-full font-semibold">Earned</p>
                 <span>{formatTokenAmount(userFarm.amountEarned)}</span>
                 {userFarm.tokenUSDPrice !== Infinity && (
                   <span>
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
                     }).format(userFarm.amountEarned * userFarm.tokenUSDPrice)}
                   </span>
                 )}
               </div>
-              <div className='flex gap-x-6 flex-wrap'>
-                <p className='font-semibold w-full'>Total in staking</p>
+              <div className="flex flex-wrap gap-x-6">
+                <p className="w-full font-semibold">Total in staking</p>
                 <p>{formatTokenAmount(userFarm.totalAmount)}</p>
                 {userFarm.tokenUSDPrice !== Infinity && (
                   <p>
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
                     }).format(userFarm.totalAmount * userFarm.tokenUSDPrice)}
                   </p>
                 )}
               </div>
-              <div className='flex gap-x-6 flex-wrap'>
-                <p className='font-semibold w-full'>Unlocks in</p>
+              <div className="flex flex-wrap gap-x-6">
+                <p className="w-full font-semibold">Unlocks in</p>
                 <p>{formatUnStakingTime(userFarm.unStakingTimeInSeconds)}</p>
               </div>
             </div>
           )}
-          <div className='border-t-2 mt-2 pt-2 flex flex-wrap justify-around items-center gap-y-3'>
+          <div className="mt-2 flex flex-wrap items-center justify-around gap-y-3 border-t-2 pt-2">
             {userFarm && (
-              <span className='w-full text-xl font-bold flex items-center justify-center gap-3 text-purple-500'>
-                <ExclamationCircleIcon className='h-20 lg:h-10' />
+              <span className="flex w-full items-center justify-center gap-3 text-xl font-bold text-purple-500">
+                <ExclamationCircleIcon className="h-20 lg:h-10" />
                 Adding more {userFarm?.tokenSymbol} to the staking pool will
                 reset the lockup period
               </span>
             )}
             <div>
-              <div className='md:w-max'>
+              <div className="md:w-max">
                 <label
-                  htmlFor='stakingAmount'
-                  className='block text-sm font-medium text-gray-700'
+                  htmlFor="stakingAmount"
+                  className="block text-sm font-medium text-gray-700"
                 >
                   Stake {farmGeneralData.tokenSymbol}
                 </label>
                 <input
-                  type='text'
-                  name='stakingAmount'
-                  inputMode='decimal'
-                  autoComplete='off'
-                  autoCorrect='off'
-                  pattern='^[0-9]*[.,]?[0-9]*$'
+                  type="text"
+                  name="stakingAmount"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
                   placeholder={farmGeneralData.minimumToStake.toString()}
                   minLength={1}
                   maxLength={79}
-                  spellCheck='false'
-                  className='shadow-sm w-full focus:outline-none focus:ring focus:ring-purple-400 block sm:text-sm bg-purple-100 border-1 rounded-md px-2 py-1.5 disabled:opacity-70 disabled:cursor-default'
+                  spellCheck="false"
+                  className="focus:outline-none border-1 block w-full rounded-md bg-purple-100 px-2 py-1.5 shadow-sm focus:ring focus:ring-purple-400 disabled:cursor-default disabled:opacity-70 sm:text-sm"
                   value={stakeAmount}
                   onChange={updateStakeAmount}
                 />
                 <PercentagesGroup
-                  darkModeClass='text-gray-700'
+                  darkModeClass="text-gray-700"
                   buttonClickCallback={percentageButtonClicked}
                   active={percentageButtonActive}
                   setActive={setPercentageButtonActive}
                 />
               </div>
               {!userFarm && (
-                <p className='mt-2 text-sm text-gray-500'>
-                  You need to stake at least{' '}
-                  {formatTokenAmount(farmGeneralData.minimumToStake)}{' '}
+                <p className="mt-2 text-sm text-gray-500">
+                  You need to stake at least{" "}
+                  {formatTokenAmount(farmGeneralData.minimumToStake)}{" "}
                   {farmGeneralData.tokenSymbol}.
                 </p>
               )}
@@ -289,15 +289,15 @@ export default function StakingCard({
                   !userFarm?.totalAmount)
               }
               onClick={stake}
-              className='flex bg-purple-400 text-white font-bold py-2 px-4 rounded-md h-10 disabled:opacity-70 disabled:cursor-default'
+              className="flex h-10 rounded-md bg-purple-400 py-2 px-4 font-bold text-white disabled:cursor-default disabled:opacity-70"
             >
               {stakingInProgress ? (
                 <>
-                  <Spinner className='text-white h-5' />
+                  <Spinner className="h-5 text-white" />
                   Staking...
                 </>
               ) : (
-                'Stake Now'
+                "Stake Now"
               )}
             </button>
           </div>

@@ -4,14 +4,14 @@ export const setupNetwork = async () => {
     const chainId = parseInt(process.env.REACT_APP_CHAIN_ID as string);
     try {
       await provider.request({
-        method: 'wallet_addEthereumChain',
+        method: "wallet_addEthereumChain",
         params: [
           {
             chainId: `0x${chainId.toString(16)}`,
             chainName: process.env.REACT_APP_CHAIN_NAME as string,
             nativeCurrency: {
-              name: 'BNB',
-              symbol: 'bnb',
+              name: "BNB",
+              symbol: "bnb",
               decimals: 18,
             },
             rpcUrls: [process.env.REACT_APP_CHAIN_RPC_URL as string],
@@ -23,7 +23,7 @@ export const setupNetwork = async () => {
       });
       return true;
     } catch (error) {
-      console.error('Failed to setup the network in Metamask:', error);
+      console.error("Failed to setup the network in Metamask:", error);
       return false;
     }
   } else {
