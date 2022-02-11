@@ -548,9 +548,11 @@ export default function TradingPage() {
                 >
                   Total{' '}
                   {currentlySelectedTab === 'buy'
-                    ? '(BNB)'
+                    ? `(BNB) Balance: ${userBnbBalance.toFixed(3)}`
                     : selectedTokenInfo?.symbol
-                    ? `(${selectedTokenInfo?.symbol})`
+                    ? `(${
+                        selectedTokenInfo?.symbol
+                      }) Balance: ${userSelectedTokenBalance.toFixed(6)}`
                     : ''}
                 </label>
               </div>
@@ -591,9 +593,11 @@ export default function TradingPage() {
                   Total{' '}
                   {currentlySelectedTab === 'buy'
                     ? selectedTokenInfo?.symbol
-                      ? `(${selectedTokenInfo?.symbol})`
+                      ? `(${
+                          selectedTokenInfo?.symbol
+                        }) Balance: ${userSelectedTokenBalance.toFixed(6)}`
                       : ''
-                    : '(BNB)'}
+                    : `(BNB) Balance: ${userBnbBalance.toFixed(3)}`}
                 </label>
               </div>
               <div className='mt-1'>
