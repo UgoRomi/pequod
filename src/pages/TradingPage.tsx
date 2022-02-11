@@ -392,7 +392,6 @@ export default function TradingPage() {
     setAmountTo('0');
     setTakeProfit(0);
     setStopLoss(0);
-    setTpslAllowance(false);
   };
 
   return (
