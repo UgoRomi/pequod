@@ -1,33 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { MinusIcon, PlusIcon, SearchIcon } from "@heroicons/react/outline";
-import { classNames, formatMoney, useApiCall } from "../utils/utils";
-import { useAppSelector } from "../store/hooks";
-import TradeSettingsDialog from "../components/TradeSettingsDialog";
-import Web3 from "web3";
-import Carousel from "react-multi-carousel";
-import { PairDataTimeWindowEnum } from "../utils/chart";
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { MinusIcon, PlusIcon, SearchIcon } from '@heroicons/react/outline';
+import { classNames, formatMoney, useApiCall } from '../utils/utils';
+import { useAppSelector } from '../store/hooks';
+import TradeSettingsDialog from '../components/TradeSettingsDialog';
+import Web3 from 'web3';
+import Carousel from 'react-multi-carousel';
+import { PairDataTimeWindowEnum } from '../utils/chart';
 import {
   useGetTokenPrice,
   useAllowance,
   useApprove,
   useSwap,
-} from "../utils/contractsUtils";
-import unknownTokenLogo from "../images/unknown-token.svg";
+} from '../utils/contractsUtils';
+import unknownTokenLogo from '../images/unknown-token.svg';
 
 import {
   selectUserBnbAmount,
   selectUserTokens,
   UserToken,
-} from "../store/userInfoSlice";
-import PercentagesGroup, { Percentages } from "../components/PercentagesGroup";
-import { RootState } from "../store/store";
-import TradingPageChart from "../components/TradingPageChart";
-import { MIN_ETH } from "../utils/consts";
-import Spinner from "../components/Spinner";
-import _ from "lodash";
-import { selectTokensList } from "../store/miscSlice";
-import { TokensListResponse } from "../utils/apiTypes";
+} from '../store/userInfoSlice';
+import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
+import { RootState } from '../store/store';
+import TradingPageChart from '../components/TradingPageChart';
+import { MIN_ETH } from '../utils/consts';
+import Spinner from '../components/Spinner';
+import _ from 'lodash';
+import { selectTokensList } from '../store/miscSlice';
+import { TokensListResponse } from '../utils/apiTypes';
 
 interface TokenDetails {
   name: string;
@@ -80,9 +80,9 @@ const responsive = {
 };
 
 const emptyTokenDetails: TokenDetails = {
-  name: "",
-  address: "",
-  symbol: "",
+  name: '',
+  address: '',
+  symbol: '',
   BNBReserve: 0,
   decimals: 0,
   priceBNB: 0,
@@ -93,7 +93,7 @@ const emptyTokenDetails: TokenDetails = {
 
 export default function TradingPage() {
   const tokensList = useAppSelector(selectTokensList);
-  const [tokenSearch, setTokenSearch] = useState<string>("");
+  const [tokenSearch, setTokenSearch] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
@@ -101,10 +101,10 @@ export default function TradingPage() {
     useState<number>(0);
 
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
-    "buy" | "sell"
-  >("buy");
-  const [amountFrom, setAmountFrom] = useState<string>("0");
-  const [amountTo, setAmountTo] = useState<string>("0");
+    'buy' | 'sell'
+  >('buy');
+  const [amountFrom, setAmountFrom] = useState<string>('0');
+  const [amountTo, setAmountTo] = useState<string>('0');
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [takeProfit, setTakeProfit] = useState<number>(0);
   const [slippage, setSlippage] = useState<number>(30);
@@ -112,6 +112,8 @@ export default function TradingPage() {
   const [isFullSell, setIsFullSell] = useState<boolean>(false);
   const [orderInProgress, setOrderInProgress] = useState<boolean>(false);
   const [approvalInProgress, setApprovalInProgress] = useState<boolean>(false);
+  const [tpslApprovalInProgress, setTpslApprovalInProgress] =
+    useState<boolean>(false);
   const [selectedTokenInfo, setSelectedTokenInfo] =
     useState<TokenDetails>(emptyTokenDetails);
   const [timeWindow] = useState<PairDataTimeWindowEnum>(
@@ -124,6 +126,7 @@ export default function TradingPage() {
   const userBnbBalance = useAppSelector(selectUserBnbAmount);
   const userTokens = useAppSelector(selectUserTokens);
   const [topEarners, setTopEarners] = useState<UserToken[]>([]);
+  const [tpslAllowance, setTpslAllowance] = useState<boolean>(false);
   const maxBnbAmount = userBnbBalance - MIN_ETH;
   const userSelectedTokenBalance: number = useAppSelector(
     (state: RootState) =>
@@ -134,7 +137,7 @@ export default function TradingPage() {
       )?.amount || 0
   );
   const fromTokenBalance =
-    currentlySelectedTab === "buy" ? maxBnbAmount : userSelectedTokenBalance;
+    currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
 
   useEffect(() => {
     setTopEarners(
@@ -170,7 +173,7 @@ export default function TradingPage() {
         : percentageButton
     );
     if (!selectedTokenInfo?.priceBNB) return;
-    if (currentlySelectedTab === "buy") {
+    if (currentlySelectedTab === 'buy') {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     } else {
       setAmountTo((valueNumeric * selectedTokenInfo.priceBNB).toString());
@@ -182,7 +185,7 @@ export default function TradingPage() {
 
     setAmountTo(value.toString());
     if (!selectedTokenInfo?.priceBNB) return;
-    if (currentlySelectedTab === "buy") {
+    if (currentlySelectedTab === 'buy') {
       updateFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
     } else {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
@@ -190,7 +193,7 @@ export default function TradingPage() {
   };
 
   const formatAmount = (amount: string): string => {
-    if (amount.toString().indexOf("e") === -1) return amount;
+    if (amount.toString().indexOf('e') === -1) return amount;
 
     return parseFloat(amount).toFixed(15);
   };
@@ -199,11 +202,11 @@ export default function TradingPage() {
     (tokenAddress: string) => {
       pequodApiCall(
         `tokens/info/${tokenAddress}/${process.env.REACT_APP_CHAIN_ID}`,
-        { method: "GET" }
+        { method: 'GET' }
       )
         .then((res) => {
           if (!res?.data) {
-            toast.error("Error retrieving token info, please retry");
+            toast.error('Error retrieving token info, please retry');
             return;
           }
           const { data: response }: { data: TokenInfoResponse } = res;
@@ -221,7 +224,7 @@ export default function TradingPage() {
         })
         .catch((err) => {
           console.error(err);
-          toast.error("Error retrieving token info, please retry");
+          toast.error('Error retrieving token info, please retry');
         });
     },
     [pequodApiCall]
@@ -232,11 +235,11 @@ export default function TradingPage() {
     if (!selectedTokenInfo.address) return;
     pequodApiCall(
       `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/${process.env.REACT_APP_CHAIN_ID}/bnb`,
-      { method: "GET" }
+      { method: 'GET' }
     )
       .then((res) => {
         if (!res?.data) {
-          toast.error("Error retrieving token price history, please retry");
+          toast.error('Error retrieving token price history, please retry');
           return;
         }
         const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
@@ -256,7 +259,7 @@ export default function TradingPage() {
       .catch((err) => {
         console.error(err);
         toast.error(
-          "Error retrieving token details from our API, please retry"
+          'Error retrieving token details from our API, please retry'
         );
       });
     // TODO: Resolve dependency cycle
@@ -276,6 +279,12 @@ export default function TradingPage() {
         allowance,
         allowanceFetched: true,
       }));
+    });
+    checkSwapAllowance(
+      selectedTokenInfo.address,
+      process.env.REACT_APP_TPSL_ADDRESS as string
+    ).then((allowance: number) => {
+      setTpslAllowance(allowance > 0);
     });
   }, [
     checkSwapAllowance,
@@ -346,32 +355,32 @@ export default function TradingPage() {
 
   const percentageButtonClicked = async (percentage: Percentages) => {
     switch (percentage) {
-      case Percentages["25%"]:
+      case Percentages['25%']:
         updateFrom(
           formatAmount((fromTokenBalance * 0.25).toString()),
           false,
           25
         );
         break;
-      case Percentages["50%"]:
+      case Percentages['50%']:
         updateFrom(
           formatAmount((fromTokenBalance * 0.5).toString()),
           false,
           50
         );
         break;
-      case Percentages["75%"]:
+      case Percentages['75%']:
         updateFrom(
           formatAmount((fromTokenBalance * 0.75).toString()),
           false,
           75
         );
         break;
-      case Percentages["100%"]:
+      case Percentages['100%']:
         // We check if the currently selected tab is sell because we want to set "isFullSell" to true only when the user is selling
         updateFrom(
           formatAmount(fromTokenBalance.toString()),
-          currentlySelectedTab === "sell",
+          currentlySelectedTab === 'sell',
           100
         );
         break;
@@ -379,10 +388,11 @@ export default function TradingPage() {
   };
 
   const resetForm = () => {
-    updateFrom("0");
-    setAmountTo("0");
+    updateFrom('0');
+    setAmountTo('0');
     setTakeProfit(0);
     setStopLoss(0);
+    setTpslAllowance(false);
   };
 
   return (
@@ -402,9 +412,9 @@ export default function TradingPage() {
               key={i}
               className={classNames(
                 token.earningPercentage && token.earningPercentage > 0
-                  ? "from-green-800"
-                  : "from-red-800",
-                "border-white-400 h-full rounded-md border bg-gradient-to-b p-4 text-white shadow-md"
+                  ? 'from-green-800'
+                  : 'from-red-800',
+                'border-white-400 h-full rounded-md border bg-gradient-to-b p-4 text-white shadow-md'
               )}
             >
               <div className='grid-cols-cards grid grid-rows-2 gap-4'>
@@ -493,13 +503,13 @@ export default function TradingPage() {
               <button
                 type='button'
                 className={classNames(
-                  currentlySelectedTab === "buy"
-                    ? "border-pequod-white font-bold"
-                    : "",
-                  "text-pequod-white hover:border-pequod-white inline-flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium leading-4"
+                  currentlySelectedTab === 'buy'
+                    ? 'border-pequod-white font-bold'
+                    : '',
+                  'text-pequod-white hover:border-pequod-white inline-flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium leading-4'
                 )}
                 onClick={() => {
-                  setCurrentlySelectedTab("buy");
+                  setCurrentlySelectedTab('buy');
                   resetForm();
                 }}
               >
@@ -509,13 +519,13 @@ export default function TradingPage() {
               <button
                 type='button'
                 className={classNames(
-                  currentlySelectedTab === "sell"
-                    ? "border-pequod-white border font-bold"
-                    : "",
-                  "text-pequod-white hover:border-pequod-white inline-flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium leading-4"
+                  currentlySelectedTab === 'sell'
+                    ? 'border-pequod-white border font-bold'
+                    : '',
+                  'text-pequod-white hover:border-pequod-white inline-flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium leading-4'
                 )}
                 onClick={() => {
-                  setCurrentlySelectedTab("sell");
+                  setCurrentlySelectedTab('sell');
                   resetForm();
                 }}
               >
@@ -536,12 +546,12 @@ export default function TradingPage() {
                   htmlFor='amountFrom'
                   className='text-pequod-white block text-sm font-medium'
                 >
-                  Total{" "}
-                  {currentlySelectedTab === "buy"
-                    ? "(BNB)"
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? '(BNB)'
                     : selectedTokenInfo?.symbol
                     ? `(${selectedTokenInfo?.symbol})`
-                    : ""}
+                    : ''}
                 </label>
               </div>
               <div className='mt-1'>
@@ -578,12 +588,12 @@ export default function TradingPage() {
                   htmlFor='amountTo'
                   className='text-pequod-white block text-sm font-medium'
                 >
-                  Total{" "}
-                  {currentlySelectedTab === "buy"
+                  Total{' '}
+                  {currentlySelectedTab === 'buy'
                     ? selectedTokenInfo?.symbol
                       ? `(${selectedTokenInfo?.symbol})`
-                      : ""
-                    : "(BNB)"}
+                      : ''
+                    : '(BNB)'}
                 </label>
               </div>
               <div className='mt-1'>
@@ -704,65 +714,100 @@ export default function TradingPage() {
               </div>
             </div>
             {/* 4th row */}
-            <div className='mt-5 flex w-full justify-center'>
-              {currentlySelectedTab === "buy" ||
-              selectedTokenInfo.allowance > 0 ? (
-                <button
-                  onClick={() => {
-                    setOrderInProgress(true);
-                    if (currentlySelectedTab === "buy") {
-                      buyCallback().finally(() => {
-                        setOrderInProgress(false);
-                      });
-                    } else {
-                      sellCallback(isFullSell).finally(() => {
-                        setOrderInProgress(false);
-                      });
+            <div className='mt-5 grid w-full grid-cols-2 gap-x-5'>
+              <div className='flex w-full justify-center'>
+                {currentlySelectedTab === 'buy' ||
+                selectedTokenInfo.allowance > 0 ? (
+                  <button
+                    onClick={() => {
+                      setOrderInProgress(true);
+                      if (currentlySelectedTab === 'buy') {
+                        buyCallback().finally(() => {
+                          setOrderInProgress(false);
+                        });
+                      } else {
+                        sellCallback(isFullSell).finally(() => {
+                          setOrderInProgress(false);
+                        });
+                      }
+                    }}
+                    className='b-2 text-pequod-white flex w-full items-center justify-center rounded-md border py-2 px-4 disabled:cursor-default disabled:opacity-50'
+                    disabled={
+                      !selectedTokenInfo ||
+                      !selectedTokenInfo.address ||
+                      !amountFrom ||
+                      !amountTo
                     }
-                  }}
-                  className='b-2 text-pequod-white flex w-full items-center justify-center rounded-md border py-2 px-4 disabled:cursor-default disabled:opacity-50'
-                  disabled={
-                    !selectedTokenInfo ||
-                    !selectedTokenInfo.address ||
-                    !amountFrom ||
-                    !amountTo
-                  }
-                >
-                  {orderInProgress ? (
-                    <>
-                      <Spinner className='text-pequod-white h-5' />
-                      <span>Order in progress...</span>
-                    </>
-                  ) : (
-                    "Place Order"
-                  )}
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setApprovalInProgress(true);
-                    approve(
-                      selectedTokenInfo.address,
-                      process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-                    ).finally(() => {
-                      setApprovalInProgress(false);
-                    });
-                  }}
-                  className='bg-pequod-purple text-pequod-white flex w-full items-center justify-center rounded-md py-2 px-4 disabled:cursor-default disabled:opacity-50'
-                  disabled={
-                    approve === undefined || !selectedTokenInfo.allowanceFetched
-                  }
-                >
-                  {approvalInProgress ? (
-                    <>
-                      <Spinner className='text-pequod-white h-5' />
-                      <span>Approval in progress...</span>
-                    </>
-                  ) : (
-                    `Approve ${selectedTokenInfo.symbol} swap`
-                  )}
-                </button>
-              )}
+                  >
+                    {orderInProgress ? (
+                      <>
+                        <Spinner className='text-pequod-white h-5' />
+                        <span>Order in progress...</span>
+                      </>
+                    ) : (
+                      'Place Order'
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setApprovalInProgress(true);
+                      approve(
+                        selectedTokenInfo.address,
+                        process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+                      ).finally(() => {
+                        setApprovalInProgress(false);
+                      });
+                    }}
+                    className='bg-pequod-purple text-pequod-white flex w-full items-center justify-center rounded-md py-2 px-4 disabled:cursor-default disabled:opacity-50'
+                    disabled={
+                      approve === undefined ||
+                      !selectedTokenInfo.allowanceFetched
+                    }
+                  >
+                    {approvalInProgress ? (
+                      <>
+                        <Spinner className='text-pequod-white h-5' />
+                        <span>Approval in progress...</span>
+                      </>
+                    ) : (
+                      `Approve ${selectedTokenInfo.symbol} swap`
+                    )}
+                  </button>
+                )}
+              </div>
+              <div className='flex w-full justify-center'>
+                {tpslAllowance ? (
+                  <button className='b-2 text-pequod-white flex w-full items-center justify-center rounded-md border py-2 px-4 disabled:cursor-default disabled:opacity-50'>
+                    Set TP/SL
+                  </button>
+                ) : (
+                  <button
+                    disabled={!selectedTokenInfo.address}
+                    onClick={() => {
+                      setTpslApprovalInProgress(true);
+                      approve(
+                        selectedTokenInfo.address,
+                        process.env.REACT_APP_TPSL_ADDRESS as string
+                      )
+                        .then(() => setTpslAllowance(true))
+                        .finally(() => {
+                          setTpslApprovalInProgress(false);
+                        });
+                    }}
+                    className='b-2 text-pequod-white flex w-full items-center justify-center rounded-md border py-2 px-4 disabled:cursor-default disabled:opacity-50'
+                  >
+                    {tpslApprovalInProgress ? (
+                      <>
+                        <Spinner className='text-pequod-white h-5' />
+                        <span>Approval in progress...</span>
+                      </>
+                    ) : (
+                      ' Approve TP/SL'
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
