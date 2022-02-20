@@ -5,6 +5,7 @@ import {
   BuyEventRequest,
   SellEventRequest,
   StakeEventRequest,
+  TakeProfitStopLossEventRequest,
 } from "../types/eventsTypes";
 import { useEventCall } from "./utils";
 
@@ -106,6 +107,34 @@ export function useSellEvent() {
       },
     };
     eventCall(`/events/sell`, {
+      method: "POST",
+      data: requestBody,
+    });
+  };
+  return sell;
+}
+
+export function useTakeProfitStopLossEvent() {
+  const eventCall = useEventCall();
+  const { account } = useWeb3React();
+
+  const sell = async (
+    tokenAddress: string,
+    tokenAmount: string,
+    takeProfitPercentageInCrypto: string,
+    stopLossPercentageInCrypto: string
+  ) => {
+    const requestBody: TakeProfitStopLossEventRequest = {
+      wallet: account as string,
+      token: {
+        address: tokenAddress,
+        amount: tokenAmount,
+        takeProfitPercentageInCrypto,
+        stopLossPercentageInCrypto,
+        chainId: process.env.REACT_APP_CHAIN_ID as string,
+      },
+    };
+    eventCall(`events/setTakeProfitStopLoss`, {
       method: "POST",
       data: requestBody,
     });

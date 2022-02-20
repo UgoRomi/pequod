@@ -39,3 +39,14 @@ export interface BuyEventRequest {
     gasSpentInUsdt: string;
   };
 }
+
+export interface TakeProfitStopLossEventRequest {
+  wallet: string;
+  token: {
+    address: string;
+    amount: string;
+    takeProfitPercentageInCrypto: string;
+    stopLossPercentageInCrypto: string;
+    chainId: string;
+  };
+}
