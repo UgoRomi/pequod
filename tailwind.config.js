@@ -33,9 +33,13 @@ module.exports = {
         "pequod-purple": "#891abf",
         "pequod-white": "#f2f2f2",
         "pequod-white-300": "#f2f2f20f",
+        "pequod-white-400": "#f2f2f22e",
         "pequod-white-500": "#f2f2f2af",
         "pequod-gray": "#231e3e",
       },
+      borderRadius: {
+        '40': '40px',
+      }
     },
   },
   variants: {

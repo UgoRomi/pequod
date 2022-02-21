@@ -62,6 +62,10 @@ export interface AvailableFarmResponse {
     address: string;
     symbol: string;
   };
+  available: number;
+  earningPercentage: number;
+  symbol: string;
+  logoUrl: string;
 }
 
 export interface TokensListResponse {

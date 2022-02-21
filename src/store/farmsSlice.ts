@@ -9,6 +9,8 @@ export interface AvailableFarmState {
   tokenSymbol: string;
   tokenAddress: string;
   minimumToStake: number;
+  earningPercentage: number;
+  token: any;
 }
 interface FarmsState {
   available: AvailableFarmState[];
