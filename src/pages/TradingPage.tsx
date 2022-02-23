@@ -144,6 +144,13 @@ export default function TradingPage() {
   const fromTokenBalance =
     currentlySelectedTab === "buy" ? maxBnbAmount : userSelectedTokenBalance;
 
+
+  
+    const [profitInUsd, setProfitInUsd] = useState<number>(0);
+    const [profitInBnb, setProfitInBnb] = useState<number>(0);
+    const [lossInUsd, setLossInUsd] = useState<number>(0);
+    const [lossInBnb, setLossInBnb] = useState<number>(0);
+
   useEffect(() => {
     setTopEarners(
       userTokens
@@ -184,6 +191,15 @@ export default function TradingPage() {
       setAmountTo((valueNumeric * selectedTokenInfo.priceBNB).toString());
     }
   };
+
+  const updateProfit = (tp: number) =>{
+    setProfitInUsd((parseInt(amountFrom) * tp) / 100);
+    setProfitInBnb((parseInt(amountFrom) * tp) / 100);
+  }
+  const updateLoss = (tp: number) =>{
+    setLossInUsd((parseInt(amountFrom) * tp) / 100);
+    setLossInBnb((parseInt(amountFrom) * tp) / 100);
+  }
 
   const updateTo = (value: string) => {
     const valueNumeric = parseFloat(value);
@@ -497,8 +513,9 @@ export default function TradingPage() {
                   )}
                   
                   <button
-                    className="b-1 focus:ring-pequod-purple block h-full w-1/5 rounded-md border bg-transparent h-50 py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring sm:text-sm"
+                    className="b-1 focus:ring-pequod-purple block h-full w-1/5 rounded-md border bg-transparent h-50 py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring sm:text-sm disabled:cursor-default"
                     disabled={true}
+                    onClick={()=>{}}
                   >{
                     selectedTokenInfo?.symbol
                     ? `${
@@ -590,7 +607,7 @@ export default function TradingPage() {
                   className="border-pequod-white text-pequod-white focus:ring-pequod-purple h-40 block w-full rounded-10 border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountFrom)}
-                  onChange={(e) => updateFrom(e.target.value)}
+                  onChange={(e) => {updateFrom(e.target.value); updateProfit(takeProfit); updateLoss(takeProfit); }}
                 />
               </div>
               <PercentagesGroup
@@ -634,7 +651,7 @@ export default function TradingPage() {
                   className="border-pequod-white text-pequod-white focus:ring-pequod-purple h-40 block w-full rounded-10 border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountTo)}
-                  onChange={(e) => updateTo(e.target.value)}
+                  onChange={(e) => {updateTo(e.target.value);}}
                 />
               </div>
             </div>
@@ -643,6 +660,7 @@ export default function TradingPage() {
                 selectedTokenInfo.allowance > 0 ? (
                   <button
                     onClick={() => {
+                      if(!selectedTokenInfo || !selectedTokenInfo.address || !amountFrom || !amountTo) return;
                       setOrderInProgress(true);
                       if (currentlySelectedTab === "buy") {
                         buyCallback().finally(() => {
@@ -660,7 +678,7 @@ export default function TradingPage() {
                       !selectedTokenInfo ||
                       !selectedTokenInfo.address ||
                       !amountFrom ||
-                      !amountTo
+                      !amountTo || showAutoSwap
                     }
                   >
                     {orderInProgress ? (
@@ -705,11 +723,12 @@ export default function TradingPage() {
               <label htmlFor="autoSwap" className="block text-sm font-medium text-white opacity-75" >AUTO SWAP</label>
               <div className="flex flex-row items-center">
               <Switch
+                disabled={currentlySelectedTab === "sell" ? true : false }
                 checked={showAutoSwap}
                 onChange={setShowAutoSwap}
                 className={classNames(
                   showAutoSwap ? 'bg-pequod-purple' : 'bg-gray-900',
-                  'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-offset-2'
+                  'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-offset-2 disabled:opacity-75 disabled:cursor-default'
                 )}
               >
                 <span className="sr-only">Auto Swap</span>
@@ -736,8 +755,9 @@ export default function TradingPage() {
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <button
                     type="button"
-                    onClick={() =>
-                      setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1)
+                    onClick={() =>{
+                      setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1); updateProfit(takeProfit <= 0 ? 0 : takeProfit - 1);
+                    }
                     }
                     disabled={!selectedTokenInfo.address}
                     className="border-pequod-white text-pequod-white h-40 focus:border-pequod-purple focus:ring-pequod-purple relative inline-flex items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
@@ -755,14 +775,14 @@ export default function TradingPage() {
                       min="0"
                       value={takeProfit}
                       disabled={!selectedTokenInfo.address}
-                      onChange={(e) => setTakeProfit(Number(e.target.value))}
+                      onChange={(e) => {setTakeProfit(Number(e.target.value));}}
                       className="focus:border-pequod-purple text-center focus:ring-pequod-purple border-pequod-white text-pequod-white block w-full border-t border-b bg-transparent disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                       placeholder="0"
                     />
                   </div>
                   <button
                     type="button"
-                    onClick={() => setTakeProfit(takeProfit + 1)}
+                    onClick={() => { setTakeProfit(takeProfit + 1); updateProfit(takeProfit + 1);}}
                     disabled={!selectedTokenInfo.address}
                     className="focus:border-pequod-purple focus:ring-pequod-purple border-pequod-white text-pequod-white relative -ml-px inline-flex items-center space-x-2 rounded-r-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
                   >
@@ -772,6 +792,10 @@ export default function TradingPage() {
                     />
                   </button>
                 </div>
+                {takeProfit > 0 ? (
+                  <label className="block text-sm font-medium text-white mt-2">Profit: {profitInUsd} $ / {profitInBnb} BNB</label>
+                ) : (<></>)
+                } 
               </div>
               <div>
                 <label
@@ -783,8 +807,10 @@ export default function TradingPage() {
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <button
                     type="button"
-                    onClick={() =>
-                      setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1)
+                    onClick={() =>{
+                      setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1);
+                      updateLoss(stopLoss <= 0 ? 0 : stopLoss - 1);
+                    }
                     }
                     disabled={!selectedTokenInfo.address}
                     className="border-pequod-white text-pequod-white focus:border-pequod-purple h-40 focus:ring-pequod-purple relative inline-flex items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
@@ -809,7 +835,8 @@ export default function TradingPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setStopLoss(stopLoss + 1)}
+                    onClick={() => {setStopLoss(stopLoss + 1); updateLoss(stopLoss + 1);
+                    }}
                     disabled={!selectedTokenInfo.address}
                     className="border-pequod-white text-pequod-white focus:border-pequod-purple focus:ring-pequod-purple relative -ml-px inline-flex items-center space-x-2 rounded-r-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
                   >
@@ -819,6 +846,10 @@ export default function TradingPage() {
                     />
                   </button>
                 </div>
+                {stopLoss > 0 ? (
+                  <label className="block text-sm font-light text-white mt-2">Loss: {lossInUsd} $ / {lossInBnb} BNB</label>
+                ) : (<></>)
+                }
               </div>
             </div>
             {/* 4th row */}

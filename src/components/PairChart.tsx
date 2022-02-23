@@ -42,8 +42,8 @@ export default function PairChart({ data }: SwapLineChartProps) {
           axisLine={false}
           tickLine={false}
           tick={{fontSize: 10}}
-          tickFormatter={(value: number) => `${value.toFixed(8)}`}
-          dx={10}
+          tickFormatter={(value: number) => `${value.toFixed(10)}`}
+          dx={30}
           dy={20}
           domain={["auto", "auto"]}
         />
