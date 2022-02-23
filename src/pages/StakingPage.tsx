@@ -7,7 +7,7 @@ import {
   selectAvailableFarms,
 } from "../store/farmsSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectUserWotAmount } from "../store/userInfoSlice";
+import { selectUserFarms, selectUserWotAmount } from "../store/userInfoSlice";
 import { AvailableFarmResponse } from "../utils/apiTypes";
 import { useApiCall, useUserInfo } from "../utils/utils";
 
@@ -26,6 +26,7 @@ export default function StakingPage() {
   const [showStakeModal, setShowStakeModal] = useState<boolean>(false);
   const [stakeIdSelected, setStakeId] = useState<number>(0);
   const userWotBalance = useAppSelector(selectUserWotAmount);
+  const userStakings = useAppSelector(selectUserFarms);
 
   const responsive = {
     desktop: {
@@ -46,7 +47,9 @@ export default function StakingPage() {
   };
   useEffect(() => {
     getAndUpdateUserInfo();
-  }, [getAndUpdateUserInfo]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     apiCall(`/farms/${process.env.REACT_APP_CHAIN_ID}/available`, {}).then(
@@ -66,7 +69,7 @@ export default function StakingPage() {
               tokenAddress: farm.token.address,
               minimumToStake: farm.minimumToStake,
               earningPercentage: 0,
-              token: farm.token
+              token: farm.token,
             };
           }
         );
@@ -80,7 +83,7 @@ export default function StakingPage() {
   if (loadingFarms && !availableFarms.length) {
     return (
       <div className="flex h-full w-full justify-center">
-        <Spinner className="h-10 text-gray-800" />
+        <Spinner className="text-pequod-white h-10" />
       </div>
     );
   }
@@ -90,62 +93,69 @@ export default function StakingPage() {
       <div className="flex flex-col gap-10">
         <h1 className="text-pequod-white ml-4 text-2xl font-normal">Staking</h1>
         <Carousel
-            itemClass="mx-4"
-            responsive={responsive}
-            slidesToSlide={1}
-            swipeable
-            draggable
-            infinite
-          >
-            {availableFarms.map((farm, i) => (
-              <div
-                key={i}
-                className="from-pequod-white-400 to-transparent border-white-400 h-full rounded-40 border bg-gradient-to-b p-8 text-white shadow-md"
-              >
-                <div className="grid-cols-cards grid grid-rows-2 gap-2">
-                  <img
-                    src={unknownTokenLogo}
-                    alt={farm.tokenSymbol}
-                    className="row-span-2 h-10"
-                  />
+          itemClass="mx-4"
+          responsive={responsive}
+          slidesToSlide={1}
+          swipeable
+          draggable
+          infinite
+        >
+          {availableFarms.map((farm, i) => (
+            <div
+              key={i}
+              className="from-pequod-white-400 border-white-400 rounded-40 h-full border bg-gradient-to-b to-transparent p-8 text-white shadow-md"
+            >
+              <div className="grid-cols-cards grid grid-rows-2 gap-2">
+                <img
+                  src={unknownTokenLogo}
+                  alt={farm.tokenSymbol}
+                  className="row-span-2 h-10"
+                />
+                <div>
+                  <p>
+                    <span className="opacity-75">{farm.token.name} </span>
+                    <span className="font-bold">{farm.tokenSymbol}</span>
+                  </p>
+                  <p className="text-sm opacity-75">{farm.tokenSymbol}/USDT</p>
+                </div>
+                <div className="flex items-end justify-between">
                   <div>
-                    <p>
-                      <span className="opacity-75">{farm.token.name} </span>
-                      <span className="font-bold">{farm.tokenSymbol}</span>
-                    </p>
-                    <p className="text-sm opacity-75">{farm.tokenSymbol}/USDT</p>
+                    <p>APY</p>
+                    <p className="text-sm">{farm.apy}%</p>
                   </div>
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p>APY</p>
-                      <p className="text-sm">{farm.apy}%</p>
-                    </div>
-                    <button
-                      onClick={() => {setStakeId(farm.id); setShowStakeModal(!showStakeModal)}}
-                      className="border-pequod-white bg-pequod-gray rounded-md border px-3 py-1"
-                    >
-                      Stake now
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      setStakeId(farm.id);
+                      setShowStakeModal(!showStakeModal);
+                    }}
+                    className="border-pequod-white bg-pequod-gray rounded-md border px-3 py-1"
+                  >
+                    Stake now
+                  </button>
                 </div>
               </div>
-            ))}
-          </Carousel>
-        
-        <h1 className="text-pequod-white ml-4 text-2xl font-normal">Staked tokens</h1>
-        <StakingTable></StakingTable>
-        
-        {
-          showStakeModal ?
-          (
-            <>
-            <StakingModal stakeId={stakeIdSelected}
-            userTokenBalance={userWotBalance}></StakingModal>
-            </>
-          ) : 
-          (<></>)
-        }
+            </div>
+          ))}
+        </Carousel>
 
+        <h1 className="text-pequod-white ml-4 text-2xl font-normal">
+          Staked tokens
+        </h1>
+        <StakingTable
+          farms={userStakings}
+          toggleModal={setShowStakeModal}
+        ></StakingTable>
+
+        {showStakeModal ? (
+          <>
+            <StakingModal
+              stakeId={stakeIdSelected}
+              userTokenBalance={userWotBalance}
+            ></StakingModal>
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

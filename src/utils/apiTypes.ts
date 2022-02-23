@@ -39,11 +39,11 @@ export interface UserInfoResponse {
       }
     ];
     risk: string;
-    initialAmountInToken: string;
-    initialAmountInUsdt: string;
-    earnedAMountAmount: string;
+    initialAmountInToken: number;
+    initialAmountInUsdt: number;
+    earnedAMountAmount: number;
     totalEarningInToken: number;
-    totalEarningInUsdt: null;
+    totalEarningInUsdt: number;
     unStackingAmount: number;
     secondsInStaking: number;
     unStakingTimeInSeconds: string;
