@@ -14,16 +14,14 @@ import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { classNames, useValidateSessionIfInvalid } from "../utils/utils";
 import { ReactComponent as Logo } from "../images/logo.svg";
-import wotLogo from "../images/wot-logo.svg";
 import logoPng from "../images/logo.png";
 import { useAppSelector } from "../store/hooks";
 import { selectUserSignedMessage } from "../store/userInfoSlice";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
-import { selectUserWotAmount } from "../store/userInfoSlice";
+import '../override_toastify.css'
 
 export default function Layout({ children }: { children: JSX.Element }) {
-  const userWotBalance = useAppSelector(selectUserWotAmount);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
   const { logout } = useAuth();
@@ -264,10 +262,6 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   </Menu>
                 </div>
               </div>
-              <span className="flex flex-row text-white">
-                <img alt="logo wot" src={wotLogo} className="mr-2" width="20" />
-                {Math.floor(userWotBalance)}
-              </span>
             </div>
 
             <div className="mt-5 flex flex-1 flex-col">

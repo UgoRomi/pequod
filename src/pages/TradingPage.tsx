@@ -14,6 +14,7 @@ import {
   useSwap,
 } from "../utils/contractsUtils";
 import unknownTokenLogo from "../images/unknown-token.svg";
+import wotLogo from '../images/wot-logo.svg';
 
 import {
   selectUserBnbAmount,
@@ -440,7 +441,7 @@ export default function TradingPage() {
             >
               <div className="grid-cols-cards grid grid-rows-2 gap-4">
                 <img
-                  src={token.logoUrl ?? unknownTokenLogo}
+                  src={token.logoUrl ? token.logoUrl : token.symbol === process.env.REACT_APP_WOT_SYMBOL ? wotLogo : unknownTokenLogo}
                   alt={token.symbol}
                   className="row-span-2 h-10"
                 />
@@ -494,7 +495,7 @@ export default function TradingPage() {
                     onBlur={() => setSearchFocused(false)}
                   />
                   {searchResults?.length > 0 && searchFocused && (
-                    <div className="bg-pequod-white absolute z-10 mt-1 flex max-h-64 w-full flex-col gap-y-3 overflow-y-scroll rounded-md p-3 shadow-md">
+                    <div className="bg-pequod-white absolute z-10 mt-12 flex max-h-64 w-full flex-col gap-y-3 overflow-y-scroll rounded-md p-3 shadow-md">
                       {searchResults.map((token) => (
                         <div
                           className="cursor-pointer"
@@ -521,7 +522,7 @@ export default function TradingPage() {
                     ? `${
                         selectedTokenInfo?.symbol
                       }`
-                    : "Search a token"}</button>
+                    : "-"}</button>
                 </div>
               </form>
             </div>

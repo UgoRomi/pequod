@@ -11,7 +11,7 @@ import { selectUserWotAmount } from "../store/userInfoSlice";
 import { AvailableFarmResponse } from "../utils/apiTypes";
 import { useApiCall, useUserInfo } from "../utils/utils";
 
-import unknownTokenLogo from "../images/unknown-token.svg";
+import logoWot from "../images/wot-logo.svg";
 import StakingTable from "../components/StakingTable";
 import StakingModal from "../components/StakingModal";
 export function classNames(...classes: string[]) {
@@ -104,7 +104,7 @@ export default function StakingPage() {
               >
                 <div className="grid-cols-cards grid grid-rows-2 gap-2">
                   <img
-                    src={unknownTokenLogo}
+                    src={logoWot}
                     alt={farm.tokenSymbol}
                     className="row-span-2 h-10"
                   />

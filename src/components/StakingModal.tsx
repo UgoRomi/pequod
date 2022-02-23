@@ -83,13 +83,14 @@ export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: nu
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
             &#8203;
           </span>
+          
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -99,29 +100,36 @@ export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: nu
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+            <div className="inline-block align-bottom text-left bg-pequod-gray rounded-40 md:pb-10 md:p-8 md:pt-10 border border-pequod-white-300 overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
               <div>
+                
               <label
                     htmlFor="stakingAmount"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-md text-center font-medium text-white mb-4"
                     >
                     Stake {farmGeneralData.tokenSymbol}
                     </label>
+                    <div className="mt-1 relative rounded-md shadow-sm">
                     <input
-                    type="text"
-                    name="stakingAmount"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    pattern="^[0-9]*[.,]?[0-9]*$"
-                    placeholder={farmGeneralData.minimumToStake.toString()}
-                    minLength={1}
-                    maxLength={79}
-                    spellCheck="false"
-                    className="focus:outline-none border-1 block w-full rounded-md bg-purple-100 px-2 py-1.5 shadow-sm focus:ring focus:ring-purple-400 disabled:cursor-default disabled:opacity-70 sm:text-sm"
-                    value={stakeAmount}
-                    onChange={updateStakeAmount}
+                      type="text"
+                      name="stakingAmount"
+                      inputMode="decimal"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      pattern="^[0-9]*[.,]?[0-9]*$"
+                      placeholder={farmGeneralData.minimumToStake.toString()}
+                      minLength={1}
+                      maxLength={79}
+                      spellCheck="false"
+                      className="border-pequod-white text-pequod-white focus:ring-pequod-purple h-40 block w-full rounded-10 border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+                      value={stakeAmount}
+                      onChange={updateStakeAmount}
                     />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-white opacity-40">
+                      {farmGeneralData.tokenSymbol}
+                    </div>
+                  </div>
+                   
                     <PercentagesGroup
                     darkModeClass="text-gray-700"
                     buttonClickCallback={percentageButtonClicked}
@@ -129,7 +137,7 @@ export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: nu
                     setActive={setPercentageButtonActive}
                     />
                     {!userFarm && (
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-xs text-gray-500">
                     You need to stake at least{" "}
                     {formatTokenAmount(farmGeneralData.minimumToStake)}{" "}
                     {farmGeneralData.tokenSymbol}.
@@ -146,7 +154,7 @@ export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: nu
                   !userFarm?.totalAmount)
               }
               onClick={stake}
-              className="flex h-10 rounded-md bg-purple-400 py-2 px-4 font-bold text-white disabled:cursor-default disabled:opacity-20"
+              className="w-full text-center h-40 rounded-md bg-pequod-dark border border-white py-2 px-4 font-bold text-white disabled:cursor-default disabled:opacity-20"
             >
               {stakingInProgress ? (
                 <>

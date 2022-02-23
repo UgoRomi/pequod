@@ -22,6 +22,7 @@ module.exports = {
       },
       borderColor: {
         "pequod-white": "#f2f2f2",
+        "pequod-white-300": "#f2f2f20f",
         "pequod-pink": "#c923dd",
       },
       textColor: {
