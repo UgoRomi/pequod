@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { MinusIcon, PlusIcon, SearchIcon,SwitchHorizontalIcon } from "@heroicons/react/outline";
+import {
+  MinusIcon,
+  PlusIcon,
+  SearchIcon,
+  SwitchHorizontalIcon,
+} from "@heroicons/react/outline";
 import { classNames, formatMoney, useApiCall } from "../utils/utils";
 import { useAppSelector } from "../store/hooks";
 import TradeSettingsDialog from "../components/TradeSettingsDialog";
@@ -99,7 +104,7 @@ export default function TradingPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
-  const [showAutoSwap, setShowAutoSwap] = useState(false)
+  const [showAutoSwap, setShowAutoSwap] = useState(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
 
@@ -144,12 +149,10 @@ export default function TradingPage() {
   const fromTokenBalance =
     currentlySelectedTab === "buy" ? maxBnbAmount : userSelectedTokenBalance;
 
-
-  
-    const [profitInUsd, setProfitInUsd] = useState<number>(0);
-    const [profitInBnb, setProfitInBnb] = useState<number>(0);
-    const [lossInUsd, setLossInUsd] = useState<number>(0);
-    const [lossInBnb, setLossInBnb] = useState<number>(0);
+  const [profitInUsd, setProfitInUsd] = useState<number>(0);
+  const [profitInBnb, setProfitInBnb] = useState<number>(0);
+  const [lossInUsd, setLossInUsd] = useState<number>(0);
+  const [lossInBnb, setLossInBnb] = useState<number>(0);
 
   useEffect(() => {
     setTopEarners(
@@ -192,14 +195,14 @@ export default function TradingPage() {
     }
   };
 
-  const updateProfit = (tp: number) =>{
+  const updateProfit = (tp: number) => {
     setProfitInUsd((parseInt(amountFrom) * tp) / 100);
     setProfitInBnb((parseInt(amountFrom) * tp) / 100);
-  }
-  const updateLoss = (tp: number) =>{
+  };
+  const updateLoss = (tp: number) => {
     setLossInUsd((parseInt(amountFrom) * tp) / 100);
     setLossInBnb((parseInt(amountFrom) * tp) / 100);
-  }
+  };
 
   const updateTo = (value: string) => {
     const valueNumeric = parseFloat(value);
@@ -217,6 +220,37 @@ export default function TradingPage() {
     if (amount.toString().indexOf("e") === -1) return amount;
 
     return parseFloat(amount).toFixed(15);
+  };
+
+  const swap = async () => {
+    if (
+      !selectedTokenInfo ||
+      !selectedTokenInfo.address ||
+      !amountFrom ||
+      !amountTo
+    )
+      return;
+    if (currentlySelectedTab === "buy") {
+      await buyCallback();
+    } else {
+      await sellCallback(isFullSell);
+    }
+  };
+
+  const autoSwap = async () => {
+    await swap();
+    await setTakeProfitStopLoss(
+      selectedTokenInfo.address,
+      userTokens
+        .find(
+          (token) =>
+            token.address.toUpperCase() ===
+            selectedTokenInfo.address.toUpperCase()
+        )
+        ?.amount.toString() || "0",
+      takeProfit.toString(),
+      stopLoss.toString()
+    );
   };
 
   const getTokenInfo = useCallback(
@@ -419,54 +453,54 @@ export default function TradingPage() {
     <>
       <div className="flex flex-col gap-10">
         <div>
-        <h1 className="text-pequod-white ml-4 text-3xl font-bold">Trading</h1>
-        <Carousel
-          itemClass="mx-4 mt-4"
-          responsive={responsive}
-          slidesToSlide={1}
-          swipeable
-          draggable
-          infinite
-        >
-          {topEarners.map((token, i) => (
-            <div
-              key={i}
-              className={classNames(
-                token.earningPercentage && token.earningPercentage > 0
-                  ? "from-green-800"
-                  : "from-red-800",
-                "border-white-400 h-full rounded-40  border bg-gradient-to-b p-8 text-white shadow-md"
-              )}
-            >
-              <div className="grid-cols-cards grid grid-rows-2 gap-4">
-                <img
-                  src={token.logoUrl ?? unknownTokenLogo}
-                  alt={token.symbol}
-                  className="row-span-2 h-10"
-                />
-                <div>
-                  <p>
-                    <span>{token.name} </span>
-                    <span className="font-bold">{token.symbol}</span>
-                  </p>
-                  <p className="text-sm opacity-75">{token.symbol}/USDT</p>
-                </div>
-                <div className="flex items-end justify-between">
+          <h1 className="text-pequod-white ml-4 text-3xl font-bold">Trading</h1>
+          <Carousel
+            itemClass="mx-4 mt-4"
+            responsive={responsive}
+            slidesToSlide={1}
+            swipeable
+            draggable
+            infinite
+          >
+            {topEarners.map((token, i) => (
+              <div
+                key={i}
+                className={classNames(
+                  token.earningPercentage && token.earningPercentage > 0
+                    ? "from-green-800"
+                    : "from-red-800",
+                  "border-white-400 rounded-40 h-full  border bg-gradient-to-b p-8 text-white shadow-md"
+                )}
+              >
+                <div className="grid-cols-cards grid grid-rows-2 gap-4">
+                  <img
+                    src={token.logoUrl ?? unknownTokenLogo}
+                    alt={token.symbol}
+                    className="row-span-2 h-10"
+                  />
                   <div>
-                    <p>{formatMoney(token.totalInDollars)}</p>
-                    <p>{token.earningPercentage}%</p>
+                    <p>
+                      <span>{token.name} </span>
+                      <span className="font-bold">{token.symbol}</span>
+                    </p>
+                    <p className="text-sm opacity-75">{token.symbol}/USDT</p>
                   </div>
-                  <button
-                    onClick={() => setTokenSearch(token.address)}
-                    className="border-pequod-white bg-pequod-gray rounded-md border px-4 py-1 h-40"
-                  >
-                    Trade now
-                  </button>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p>{formatMoney(token.totalInDollars)}</p>
+                      <p>{token.earningPercentage}%</p>
+                    </div>
+                    <button
+                      onClick={() => setTokenSearch(token.address)}
+                      className="border-pequod-white bg-pequod-gray h-40 rounded-md border px-4 py-1"
+                    >
+                      Trade now
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </Carousel>  
+            ))}
+          </Carousel>
         </div>
         <div className="grid-cols-buy xl:bg-pequod-dark grid gap-y-8 xl:rounded-md xl:p-5">
           <div className="col-span-2 grid gap-y-2 xl:col-span-1 xl:gap-0">
@@ -474,17 +508,17 @@ export default function TradingPage() {
               <span className="text-pequod-white mb-4 text-xl">
                 Search token
               </span>
-              <form className="justify-left flex w-full md:ml-0 flex-row">
+              <form className="justify-left flex w-full flex-row md:ml-0">
                 <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
-                <div className="text-pequod-white relative w-full xl:pr-12 h-50 flex flex-row">
+                <div className="text-pequod-white h-50 relative flex w-full flex-row xl:pr-12">
                   <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center">
                     <SearchIcon className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <input
                     id="search-field"
-                    className="b-1 focus:ring-pequod-purple block h-full w-4/5 mr-4 rounded-md border bg-transparent h-50 py-2 pl-10 pr-3 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring sm:text-sm"
+                    className="b-1 focus:ring-pequod-purple h-50 mr-4 block w-4/5 rounded-md border bg-transparent py-2 pl-10 pr-3 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring sm:text-sm"
                     placeholder="0xe861...."
                     type="search"
                     name="search"
@@ -511,17 +545,16 @@ export default function TradingPage() {
                       ))}
                     </div>
                   )}
-                  
+
                   <button
-                    className="b-1 focus:ring-pequod-purple block h-full w-1/5 rounded-md border bg-transparent h-50 py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring sm:text-sm disabled:cursor-default"
+                    className="b-1 focus:ring-pequod-purple h-50 block w-1/5 rounded-md border bg-transparent py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:outline-none focus:ring disabled:cursor-default sm:text-sm"
                     disabled={true}
-                    onClick={()=>{}}
-                  >{
-                    selectedTokenInfo?.symbol
-                    ? `${
-                        selectedTokenInfo?.symbol
-                      }`
-                    : "Search a token"}</button>
+                    onClick={() => {}}
+                  >
+                    {selectedTokenInfo?.symbol
+                      ? `${selectedTokenInfo?.symbol}`
+                      : "Search a token"}
+                  </button>
                 </div>
               </form>
             </div>
@@ -530,25 +563,29 @@ export default function TradingPage() {
             priceHistory={priceHistory}
             className="col-span-2 block xl:col-span-1 xl:hidden"
           />
-          <div className="col-span-2 h-50 flex items-end xl:col-span-1 xl:px-12 self-end">
-            <div className="flex w-full justify-center items-center">
-            <button
+          <div className="h-50 col-span-2 flex items-end self-end xl:col-span-1 xl:px-12">
+            <div className="flex w-full items-center justify-center">
+              <button
                 type="button"
-                className="border-pequod-pink text-pequod-white inline-flex w-full items-center justify-center border border-transparent rounded-15 px-2 py-2 h-50 text-sm font-medium leading-4"
+                className="border-pequod-pink text-pequod-white rounded-15 h-50 inline-flex w-full items-center justify-center border border-transparent px-2 py-2 text-sm font-medium leading-4"
               >
-                <img src={unknownTokenLogo} width={20} alt="temp" />&nbsp;<span className="text-ellipsis overflow-hidden max-w-full">{currentlySelectedTab === "buy"
+                <img src={unknownTokenLogo} width={20} alt="temp" />
+                &nbsp;
+                <span className="max-w-full overflow-hidden text-ellipsis">
+                  {currentlySelectedTab === "buy"
                     ? `BNB`
                     : selectedTokenInfo?.symbol
-                    ? `${
-                        selectedTokenInfo?.symbol
-                      }`
-                    : "-"}</span>
+                    ? `${selectedTokenInfo?.symbol}`
+                    : "-"}
+                </span>
               </button>
               <button
                 type="button"
-                className="text-pequod-pink border-pequod-white inline-flex items-center justify-center border border-transparent rounded-10 w-55 min-w-55 h-35 mx-4 text-sm font-medium leading-4"
+                className="text-pequod-pink border-pequod-white rounded-10 w-55 min-w-55 h-35 mx-4 inline-flex items-center justify-center border border-transparent text-sm font-medium leading-4"
                 onClick={() => {
-                  setCurrentlySelectedTab(currentlySelectedTab === "buy" ? "sell" : "buy");
+                  setCurrentlySelectedTab(
+                    currentlySelectedTab === "buy" ? "sell" : "buy"
+                  );
                   resetForm();
                 }}
               >
@@ -556,15 +593,17 @@ export default function TradingPage() {
               </button>
               <button
                 type="button"
-                className="border-pequod-white text-pequod-white inline-flex w-full items-center justify-center flex-row rounded-15 border border-transparent h-50 px-2 py-2 text-sm font-medium leading-4"
+                className="border-pequod-white text-pequod-white rounded-15 h-50 inline-flex w-full flex-row items-center justify-center border border-transparent px-2 py-2 text-sm font-medium leading-4"
               >
-                <img src={unknownTokenLogo} width={20} alt="temp2"/>&nbsp;<span className="text-ellipsis overflow-hidden max-w-full">{currentlySelectedTab === "sell"
+                <img src={unknownTokenLogo} width={20} alt="temp2" />
+                &nbsp;
+                <span className="max-w-full overflow-hidden text-ellipsis">
+                  {currentlySelectedTab === "sell"
                     ? `BNB`
                     : selectedTokenInfo?.symbol
-                    ? `${
-                        selectedTokenInfo?.symbol
-                      }`
-                    : "-"}</span>
+                    ? `${selectedTokenInfo?.symbol}`
+                    : "-"}
+                </span>
               </button>
             </div>
           </div>
@@ -604,10 +643,14 @@ export default function TradingPage() {
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"
-                  className="border-pequod-white text-pequod-white focus:ring-pequod-purple h-40 block w-full rounded-10 border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+                  className="border-pequod-white text-pequod-white focus:ring-pequod-purple rounded-10 block h-40 w-full border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountFrom)}
-                  onChange={(e) => {updateFrom(e.target.value); updateProfit(takeProfit); updateLoss(takeProfit); }}
+                  onChange={(e) => {
+                    updateFrom(e.target.value);
+                    updateProfit(takeProfit);
+                    updateLoss(takeProfit);
+                  }}
                 />
               </div>
               <PercentagesGroup
@@ -648,103 +691,114 @@ export default function TradingPage() {
                   minLength={1}
                   maxLength={79}
                   spellCheck="false"
-                  className="border-pequod-white text-pequod-white focus:ring-pequod-purple h-40 block w-full rounded-10 border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+                  className="border-pequod-white text-pequod-white focus:ring-pequod-purple rounded-10 block h-40 w-full border bg-transparent px-2 py-1.5 focus:outline-none focus:ring disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountTo)}
-                  onChange={(e) => {updateTo(e.target.value);}}
+                  onChange={(e) => {
+                    updateTo(e.target.value);
+                  }}
                 />
               </div>
             </div>
             <div className="flex w-full justify-center">
-                {currentlySelectedTab === "buy" ||
-                selectedTokenInfo.allowance > 0 ? (
-                  <button
-                    onClick={() => {
-                      if(!selectedTokenInfo || !selectedTokenInfo.address || !amountFrom || !amountTo) return;
-                      setOrderInProgress(true);
-                      if (currentlySelectedTab === "buy") {
-                        buyCallback().finally(() => {
-                          setOrderInProgress(false);
-                        });
-                      } else {
-                        sellCallback(isFullSell).finally(() => {
-                          setOrderInProgress(false);
-                        });
-                      }
-                    }}
-                    className={
-                      classNames( showAutoSwap ? "border-pequod-white opacity-50 cursor-default" : "opacity-100","b-2 text-pequod-white flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 disabled:cursor-default disabled:opacity-50")}
-                    disabled={
-                      !selectedTokenInfo ||
-                      !selectedTokenInfo.address ||
-                      !amountFrom ||
-                      !amountTo || showAutoSwap
-                    }
-                  >
-                    {orderInProgress ? (
-                      <>
-                        <Spinner className="text-pequod-white h-5" />
-                        <span>Order in progress...</span>
-                      </>
-                    ) : (
-                      "SWAP"
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setApprovalInProgress(true);
-                      approve(
-                        selectedTokenInfo.address,
-                        process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
-                      ).finally(() => {
-                        setApprovalInProgress(false);
-                      });
-                    }}
-                    className="bg-pequod-purple text-pequod-white flex w-full items-center justify-center rounded-10 py-2 px-4 disabled:cursor-default disabled:opacity-50"
-                    disabled={
-                      approve === undefined ||
-                      !selectedTokenInfo.allowanceFetched
-                    }
-                  >
-                    {approvalInProgress ? (
-                      <>
-                        <Spinner className="text-pequod-white h-5" />
-                        <span>Approval in progress...</span>
-                      </>
-                    ) : (
-                      `APPROVE ${selectedTokenInfo.symbol} SWAP`
-                    )}
-                  </button>
-                )}
-              </div>
-            {/* 3rd row */}
-            <div className="flex flex-row w-full justify-between border-t pt-3">
-              <label htmlFor="autoSwap" className="block text-sm font-medium text-white opacity-75" >AUTO SWAP</label>
-              <div className="flex flex-row items-center">
-              <Switch
-                disabled={currentlySelectedTab === "sell" ? true : false }
-                checked={showAutoSwap}
-                onChange={setShowAutoSwap}
-                className={classNames(
-                  showAutoSwap ? 'bg-pequod-purple' : 'bg-gray-900',
-                  'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-offset-2 disabled:opacity-75 disabled:cursor-default'
-                )}
-              >
-                <span className="sr-only">Auto Swap</span>
-                <span
-                  aria-hidden="true"
+              {currentlySelectedTab === "buy" ||
+              selectedTokenInfo.allowance > 0 ? (
+                <button
+                  onClick={() => {
+                    setOrderInProgress(true);
+                    swap().then(() => setOrderInProgress(false));
+                  }}
                   className={classNames(
-                    showAutoSwap ? 'translate-x-5' : 'translate-x-0',
-                    'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200'
+                    showAutoSwap
+                      ? "border-pequod-white cursor-default opacity-50"
+                      : "opacity-100",
+                    "b-2 text-pequod-white rounded-10 border-pequod-pink flex w-full items-center justify-center border-2 py-2 px-4 disabled:cursor-default disabled:opacity-50"
                   )}
-                />
-              </Switch>
-              <label htmlFor="autoSwap" className="block text-sm font-regular text-pequod-pink opacity-75 ml-4" >PEQUOD SWAP</label>
+                  disabled={
+                    !selectedTokenInfo ||
+                    !selectedTokenInfo.address ||
+                    !amountFrom ||
+                    !amountTo ||
+                    showAutoSwap
+                  }
+                >
+                  {orderInProgress ? (
+                    <>
+                      <Spinner className="text-pequod-white h-5" />
+                      <span>Swapping...</span>
+                    </>
+                  ) : (
+                    "SWAP"
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setApprovalInProgress(true);
+                    approve(
+                      selectedTokenInfo.address,
+                      process.env.REACT_APP_PANCAKE_ROUTER_ADDRESS as string
+                    ).finally(() => {
+                      setApprovalInProgress(false);
+                    });
+                  }}
+                  className="bg-pequod-purple text-pequod-white rounded-10 flex w-full items-center justify-center py-2 px-4 disabled:cursor-default disabled:opacity-50"
+                  disabled={
+                    approve === undefined || !selectedTokenInfo.allowanceFetched
+                  }
+                >
+                  {approvalInProgress ? (
+                    <>
+                      <Spinner className="text-pequod-white h-5" />
+                      <span>Approval in progress...</span>
+                    </>
+                  ) : (
+                    `APPROVE ${selectedTokenInfo.symbol} SWAP`
+                  )}
+                </button>
+              )}
+            </div>
+            {/* 3rd row */}
+            <div className="flex w-full flex-row justify-between border-t pt-3">
+              <label
+                htmlFor="autoSwap"
+                className="block text-sm font-medium text-white opacity-75"
+              >
+                AUTO SWAP
+              </label>
+              <div className="flex flex-row items-center">
+                <Switch
+                  disabled={currentlySelectedTab === "sell" ? true : false}
+                  checked={showAutoSwap}
+                  onChange={setShowAutoSwap}
+                  className={classNames(
+                    showAutoSwap ? "bg-pequod-purple" : "bg-gray-900",
+                    "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-offset-2 disabled:cursor-default disabled:opacity-75"
+                  )}
+                >
+                  <span className="sr-only">Auto Swap</span>
+                  <span
+                    aria-hidden="true"
+                    className={classNames(
+                      showAutoSwap ? "translate-x-5" : "translate-x-0",
+                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                    )}
+                  />
+                </Switch>
+                <label
+                  htmlFor="autoSwap"
+                  className="font-regular text-pequod-pink ml-4 block text-sm opacity-75"
+                >
+                  PEQUOD SWAP
+                </label>
               </div>
             </div>
-            <div className={
-              classNames( showAutoSwap ? "" : "hidden", "flex gap-x-10") }>
+            <div
+              className={classNames(
+                showAutoSwap ? "" : "hidden",
+                "flex gap-x-10"
+              )}
+            >
               <div>
                 <label
                   htmlFor="takeProfit"
@@ -755,12 +809,12 @@ export default function TradingPage() {
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <button
                     type="button"
-                    onClick={() =>{
-                      setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1); updateProfit(takeProfit <= 0 ? 0 : takeProfit - 1);
-                    }
-                    }
+                    onClick={() => {
+                      setTakeProfit(takeProfit <= 0 ? 0 : takeProfit - 1);
+                      updateProfit(takeProfit <= 0 ? 0 : takeProfit - 1);
+                    }}
                     disabled={!selectedTokenInfo.address}
-                    className="border-pequod-white text-pequod-white h-40 focus:border-pequod-purple focus:ring-pequod-purple relative inline-flex items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
+                    className="border-pequod-white text-pequod-white focus:border-pequod-purple focus:ring-pequod-purple relative inline-flex h-40 items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
                   >
                     <MinusIcon
                       className="text-pequod-white h-4 w-4"
@@ -775,14 +829,19 @@ export default function TradingPage() {
                       min="0"
                       value={takeProfit}
                       disabled={!selectedTokenInfo.address}
-                      onChange={(e) => {setTakeProfit(Number(e.target.value));}}
-                      className="focus:border-pequod-purple text-center focus:ring-pequod-purple border-pequod-white text-pequod-white block w-full border-t border-b bg-transparent disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+                      onChange={(e) => {
+                        setTakeProfit(Number(e.target.value));
+                      }}
+                      className="focus:border-pequod-purple focus:ring-pequod-purple border-pequod-white text-pequod-white block w-full border-t border-b bg-transparent text-center disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                       placeholder="0"
                     />
                   </div>
                   <button
                     type="button"
-                    onClick={() => { setTakeProfit(takeProfit + 1); updateProfit(takeProfit + 1);}}
+                    onClick={() => {
+                      setTakeProfit(takeProfit + 1);
+                      updateProfit(takeProfit + 1);
+                    }}
                     disabled={!selectedTokenInfo.address}
                     className="focus:border-pequod-purple focus:ring-pequod-purple border-pequod-white text-pequod-white relative -ml-px inline-flex items-center space-x-2 rounded-r-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
                   >
@@ -793,9 +852,12 @@ export default function TradingPage() {
                   </button>
                 </div>
                 {takeProfit > 0 ? (
-                  <label className="block text-sm font-medium text-white mt-2">Profit: {profitInUsd} $ / {profitInBnb} BNB</label>
-                ) : (<></>)
-                } 
+                  <label className="mt-2 block text-sm font-medium text-white">
+                    Profit: {profitInUsd} $ / {profitInBnb} BNB
+                  </label>
+                ) : (
+                  <></>
+                )}
               </div>
               <div>
                 <label
@@ -807,13 +869,12 @@ export default function TradingPage() {
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <button
                     type="button"
-                    onClick={() =>{
+                    onClick={() => {
                       setStopLoss(stopLoss <= 0 ? 0 : stopLoss - 1);
                       updateLoss(stopLoss <= 0 ? 0 : stopLoss - 1);
-                    }
-                    }
+                    }}
                     disabled={!selectedTokenInfo.address}
-                    className="border-pequod-white text-pequod-white focus:border-pequod-purple h-40 focus:ring-pequod-purple relative inline-flex items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
+                    className="border-pequod-white text-pequod-white focus:border-pequod-purple focus:ring-pequod-purple relative inline-flex h-40 items-center space-x-2 rounded-l-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
                   >
                     <MinusIcon
                       className="text-pequod-white h-4 w-4"
@@ -829,13 +890,15 @@ export default function TradingPage() {
                       value={stopLoss}
                       onChange={(e) => setStopLoss(Number(e.target.value))}
                       disabled={!selectedTokenInfo.address}
-                      className="focus:border-pequod-purple text-center focus:ring-pequod-purple border-pequod-white text-pequod-white block w-full border-t border-b bg-transparent disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+                      className="focus:border-pequod-purple focus:ring-pequod-purple border-pequod-white text-pequod-white block w-full border-t border-b bg-transparent text-center disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
                       placeholder="0"
                     />
                   </div>
                   <button
                     type="button"
-                    onClick={() => {setStopLoss(stopLoss + 1); updateLoss(stopLoss + 1);
+                    onClick={() => {
+                      setStopLoss(stopLoss + 1);
+                      updateLoss(stopLoss + 1);
                     }}
                     disabled={!selectedTokenInfo.address}
                     className="border-pequod-white text-pequod-white focus:border-pequod-purple focus:ring-pequod-purple relative -ml-px inline-flex items-center space-x-2 rounded-r-md border bg-transparent p-2 text-sm font-medium focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-80"
@@ -847,38 +910,34 @@ export default function TradingPage() {
                   </button>
                 </div>
                 {stopLoss > 0 ? (
-                  <label className="block text-sm font-light text-white mt-2">Loss: {lossInUsd} $ / {lossInBnb} BNB</label>
-                ) : (<></>)
-                }
+                  <label className="mt-2 block text-sm font-light text-white">
+                    Loss: {lossInUsd} $ / {lossInBnb} BNB
+                  </label>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
             {/* 4th row */}
-            <div className={
-              classNames( showAutoSwap ? "" : "hidden", "mt-5 grid w-full gap-x-5")}>
+            <div
+              className={classNames(
+                showAutoSwap ? "" : "hidden",
+                "mt-5 grid w-full gap-x-5"
+              )}
+            >
               <div className="flex w-full justify-center">
                 {tpslAllowance ? (
                   <button
                     onClick={() => {
                       setSettingTpsl(true);
-                      setTakeProfitStopLoss(
-                        selectedTokenInfo.address,
-                        userTokens
-                          .find(
-                            (token) =>
-                              token.address.toUpperCase() ===
-                              selectedTokenInfo.address.toUpperCase()
-                          )
-                          ?.amount.toString() || "0",
-                        takeProfit.toString(),
-                        stopLoss.toString()
-                      ).finally(() => setSettingTpsl(false));
+                      autoSwap().then(() => setSettingTpsl(false));
                     }}
-                    className="border-2 border-pequod-pink b-2 text-pequod-white flex w-full  items-center justify-center rounded-md  py-2 px-4 disabled:cursor-default disabled:opacity-50"
+                    className="border-pequod-pink b-2 text-pequod-white flex w-full items-center  justify-center rounded-md border-2  py-2 px-4 disabled:cursor-default disabled:opacity-50"
                   >
                     {settingTpsl ? (
                       <>
                         <Spinner className="text-pequod-white h-5" />
-                        <span>Setting TP/SL...</span>
+                        <span>Swapping...</span>
                       </>
                     ) : (
                       `PEQUOD SWAP`
@@ -898,12 +957,12 @@ export default function TradingPage() {
                           setTpslApprovalInProgress(false);
                         });
                     }}
-                    className="border-2 border-pequod-pink b-2 text-pequod-white flex w-full items-center justify-center rounded-md  py-2 px-4 disabled:cursor-default disabled:opacity-50"
+                    className="border-pequod-pink b-2 text-pequod-white flex w-full items-center justify-center rounded-md border-2  py-2 px-4 disabled:cursor-default disabled:opacity-50"
                   >
                     {tpslApprovalInProgress ? (
                       <>
                         <Spinner className="text-pequod-white h-5" />
-                        <span>Approval in progress...</span>
+                        <span>Approving...</span>
                       </>
                     ) : (
                       " Approve TP/SL"
