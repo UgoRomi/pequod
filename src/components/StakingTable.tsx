@@ -80,7 +80,7 @@ const stakings = [
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <img className="h-10 w-10 rounded-full" src={stake.image} alt="" />
+                            <img className="h-10 w-10 rounded-full" src={stake.image} alt="f" />
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-white">{stake.name}</div>
@@ -102,10 +102,10 @@ const stakings = [
                         )
                       }>{stake.earnings}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                        <a href="#" className="text-white border py-2 px-4 rounded-md mr-4">
+                        <a href="/" className="text-white border py-2 px-4 rounded-md mr-4">
                           Add funds
                         </a>
-                        <a href="#" className="text-white border py-2 px-4 rounded-md">
+                        <a href="/" className="text-white border py-2 px-4 rounded-md">
                           Unstake
                         </a>
                       </td>

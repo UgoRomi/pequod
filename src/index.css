@@ -5,3 +5,7 @@
 .react-multiple-carousel__arrow {
   z-index: 10 !important;
 }
+
+.text-ellipsis{
+  text-overflow: ellipsis;
+}

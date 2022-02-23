@@ -39,6 +39,22 @@ module.exports = {
       },
       borderRadius: {
         '40': '40px',
+        '15': '15px',
+        '10': '10px',
+      },
+      width: {
+        '55': '55px',
+      },
+      height: {
+        '50': '50px',
+        '40': '40px',
+        '35': '35px',
+      },
+      maxHeight: {
+        '400': '400px',
+      },
+      minWidth: {
+        '55': '55px',
       }
     },
   },

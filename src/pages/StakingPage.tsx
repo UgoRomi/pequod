@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Carousel from "react-multi-carousel";
 import Spinner from "../components/Spinner";
-import StakingCard from "../components/StakingCard";
 import {
   addAvailableFarms,
   AvailableFarmState,
@@ -10,7 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectUserWotAmount } from "../store/userInfoSlice";
 import { AvailableFarmResponse } from "../utils/apiTypes";
-import { useApiCall, useUserInfo, formatMoney } from "../utils/utils";
+import { useApiCall, useUserInfo } from "../utils/utils";
 
 import unknownTokenLogo from "../images/unknown-token.svg";
 import StakingTable from "../components/StakingTable";

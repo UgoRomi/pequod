@@ -13,7 +13,7 @@ export default function TradingPageChart({
     <div
       className={classNames(
         !priceHistory?.length ? "hidden lg:block" : "",
-        "text-pequod-white xl:border-r xl:pr-3",
+        "text-pequod-white xl:border-r xl:pr-12",
         className
       )}
     >

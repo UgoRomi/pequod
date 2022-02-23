@@ -1,28 +1,25 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationIcon } from '@heroicons/react/outline'
 import PercentagesGroup, { Percentages } from "./PercentagesGroup";
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppSelector } from '../store/hooks';
 import { AvailableFarmState } from '../store/farmsSlice';
-import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
+import { useAllowance, useWotStake } from '../utils/contractsUtils';
 import { RootState } from '../store/store';
-import { formatTokenAmount, secondsToDhms } from "../utils/utils";
+import { formatTokenAmount } from "../utils/utils";
 import Spinner from './Spinner';
 export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: number; userTokenBalance: number; }) {
   const [open, setOpen] = useState(true)
 
   const [stakeAmount, setStakeAmount] = useState("0");
-  const [allowed, setAllowed] = useState(false);
+  const [, setAllowed] = useState(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
     
   const [stakingInProgress, setStakingInProgress] = useState(false);
   const cancelButtonRef = useRef(null)
   const getAllowance = useAllowance();
-  const approve = useApprove();
   const stakeWot = useWotStake();
-  const dispatch = useAppDispatch();
   const farmGeneralData = useAppSelector((state: RootState) =>
   state.farms.available.find((farm) => farm.id === stakeId)) as AvailableFarmState;
   

@@ -21,7 +21,7 @@ export default function PairChart({ data }: SwapLineChartProps) {
   return (
     <ResponsiveContainer>
       <AreaChart
-        className="rounded-3xl border border-pequod-white bg-gradient-to-r from-pequod-gray via-pequod-gray"
+        className="rounded-40 border border-pequod-white bg-gradient-to-r from-pequod-gray via-pequod-gray"
         data={data}
         margin={{
           top: 5,
@@ -41,8 +41,10 @@ export default function PairChart({ data }: SwapLineChartProps) {
           dataKey="value"
           axisLine={false}
           tickLine={false}
+          tick={{fontSize: 10}}
           tickFormatter={(value: number) => `${value.toFixed(8)}`}
-          dx={55}
+          dx={10}
+          dy={20}
           domain={["auto", "auto"]}
         />
         <Tooltip
