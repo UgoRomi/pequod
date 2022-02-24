@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import PercentagesGroup, { Percentages } from './PercentagesGroup';
 import { useAppSelector } from '../store/hooks';
 import { AvailableFarmState } from '../store/farmsSlice';
-import { useAllowance, useWotStake } from '../utils/contractsUtils';
+import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
 import { RootState } from '../store/store';
 import { formatTokenAmount } from '../utils/utils';
 import Spinner from './Spinner';
@@ -21,7 +21,7 @@ export default function StakingModal({
   const [allowed, setAllowed] = useState(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
-
+  const [approvalInProgress, setApprovalInProgress] = useState<boolean>(false);
   const [stakingInProgress, setStakingInProgress] = useState(false);
   const cancelButtonRef = useRef(null);
   const getAllowance = useAllowance();
@@ -29,6 +29,7 @@ export default function StakingModal({
   const farmGeneralData = useAppSelector((state: RootState) =>
     state.farms.available.find((farm) => farm.id === stakeId)
   ) as AvailableFarmState;
+  const approve = useApprove();
 
   const userFarm = useAppSelector((state: RootState) =>
     state.userInfo.farms.find((farm) => farm.id === stakeId)
@@ -41,6 +42,14 @@ export default function StakingModal({
       setAllowed(res > 0);
     });
   });
+
+  const onApprove = () => {
+    if (!userFarm?.tokenAddress || !userFarm.farmContractAddress) return;
+    setApprovalInProgress(true);
+    approve(userFarm.tokenAddress, userFarm.farmContractAddress).finally(() => {
+      setApprovalInProgress(false);
+    });
+  };
 
   const updateStakeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStakeAmount(event.target.value);
@@ -160,26 +169,44 @@ export default function StakingModal({
                 )}
               </div>
               <div className="mt-5 sm:mt-6">
-                <button
-                  disabled={
-                    !stakeAmount ||
-                    parseFloat(stakeAmount) === 0 ||
-                    stakingInProgress ||
-                    (parseFloat(stakeAmount) < farmGeneralData.minimumToStake &&
-                      !userFarm?.totalAmount)
-                  }
-                  onClick={stake}
-                  className="flex h-40 w-full justify-center rounded-md border border-white bg-pequod-dark py-2 px-4 text-center font-bold text-white disabled:cursor-default disabled:opacity-20"
-                >
-                  {stakingInProgress ? (
-                    <>
-                      <Spinner className="h-5 text-white" />
-                      Staking...
-                    </>
-                  ) : (
-                    'Stake Now'
-                  )}
-                </button>
+                {allowed ? (
+                  <button
+                    disabled={
+                      !stakeAmount ||
+                      parseFloat(stakeAmount) === 0 ||
+                      stakingInProgress ||
+                      (parseFloat(stakeAmount) <
+                        farmGeneralData.minimumToStake &&
+                        !userFarm?.totalAmount)
+                    }
+                    onClick={stake}
+                    className="flex h-40 w-full justify-center rounded-md border border-white bg-pequod-dark py-2 px-4 text-center font-bold text-white disabled:cursor-default disabled:opacity-20"
+                  >
+                    {stakingInProgress ? (
+                      <>
+                        <Spinner className="h-5 text-white" />
+                        Staking...
+                      </>
+                    ) : (
+                      'Stake Now'
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    disabled={approvalInProgress}
+                    onClick={onApprove}
+                    className="flex h-40 w-full justify-center rounded-md border border-white bg-pequod-dark py-2 px-4 text-center font-bold text-white disabled:cursor-default disabled:opacity-20"
+                  >
+                    {approvalInProgress ? (
+                      <>
+                        <Spinner className="h-5 text-white" />
+                        Appriving...
+                      </>
+                    ) : (
+                      'Approve'
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </Transition.Child>
