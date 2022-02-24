@@ -154,7 +154,7 @@ export default function StakingModal({ stakeId, userTokenBalance }: {stakeId: nu
                   !userFarm?.totalAmount)
               }
               onClick={stake}
-              className="w-full text-center h-40 rounded-md bg-pequod-dark border border-white py-2 px-4 font-bold text-white disabled:cursor-default disabled:opacity-20"
+              className="w-full text-center h-40 rounded-md bg-pequod-dark border flex justify-center border-white py-2 px-4 font-bold text-white disabled:cursor-default disabled:opacity-20"
             >
               {stakingInProgress ? (
                 <>

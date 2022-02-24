@@ -529,17 +529,17 @@ export default function TradingPage() {
                     onBlur={() => setSearchFocused(false)}
                   />
                   {searchResults?.length > 0 && searchFocused && (
-                    <div className="bg-pequod-white absolute z-10 mt-12 flex max-h-64 w-full flex-col gap-y-3 overflow-y-scroll rounded-md p-3 shadow-md">
+                    <div className="bg-pequod-gray absolute z-10 mt-14 flex max-h-64 w-4/5 flex-col gap-y-3 overflow-y-scroll rounded-md p-3 shadow-md">
                       {searchResults.map((token) => (
                         <div
                           className="cursor-pointer"
                           onPointerDown={() => setTokenSearch(token.address)}
                           key={token.address}
                         >
-                          <span className="text-md p-1 font-semibold text-gray-800 ">
+                          <span className="text-md p-1 font-semibold text-white ">
                             {token.name} - ${token.symbol}
                           </span>
-                          <span className="block overflow-hidden text-sm text-gray-600">
+                          <span className="block overflow-hidden text-sm text-white opacity-75">
                             {token.address}
                           </span>
                         </div>
