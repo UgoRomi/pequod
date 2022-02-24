@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import Carousel from "react-multi-carousel";
-import Spinner from "../components/Spinner";
+import { useEffect, useState } from 'react';
+import Carousel from 'react-multi-carousel';
+import Spinner from '../components/Spinner';
 import {
   addAvailableFarms,
   AvailableFarmState,
   selectAvailableFarms,
-} from "../store/farmsSlice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectUserFarms, selectUserWotAmount } from "../store/userInfoSlice";
-import { AvailableFarmResponse } from "../utils/apiTypes";
-import { useApiCall, useUserInfo } from "../utils/utils";
+} from '../store/farmsSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { selectUserFarms, selectUserWotAmount } from '../store/userInfoSlice';
+import { AvailableFarmResponse } from '../utils/apiTypes';
+import { useApiCall, useUserInfo } from '../utils/utils';
 
-import logoWot from "../images/wot-logo.svg";
-import StakingTable from "../components/StakingTable";
-import StakingModal from "../components/StakingModal";
+import logoWot from '../images/wot-logo.svg';
+import StakingTable from '../components/StakingTable';
+import StakingModal from '../components/StakingModal';
 export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 export default function StakingPage() {
   const getAndUpdateUserInfo = useUserInfo();
@@ -58,8 +58,9 @@ export default function StakingPage() {
           return;
         }
         const { data: response }: { data: AvailableFarmResponse[] } = res;
-        const availableFarms: AvailableFarmState[] = response.map(
-          (farm): AvailableFarmState => {
+        const availableFarms: AvailableFarmState[] = response
+          .filter((farm) => farm.active)
+          .map((farm): AvailableFarmState => {
             return {
               id: farm.id,
               farmContractAddress: farm.address,
@@ -71,8 +72,7 @@ export default function StakingPage() {
               earningPercentage: 0,
               token: farm.token,
             };
-          }
-        );
+          });
         dispatch(addAvailableFarms(availableFarms));
         setLoadingFarms(false);
       }
@@ -83,15 +83,22 @@ export default function StakingPage() {
   if (loadingFarms && !availableFarms.length) {
     return (
       <div className="flex h-full w-full justify-center">
-        <Spinner className="text-pequod-white h-10" />
+        <Spinner className="h-10 text-pequod-white" />
       </div>
     );
   }
 
   return (
     <>
-      <div className="flex flex-col gap-10">
-        <h1 className="text-pequod-white ml-4 text-2xl font-normal">Staking</h1>
+      <main className="flex flex-col gap-10">
+        <h1 className="ml-4 text-2xl font-normal text-pequod-white">Staking</h1>
+        {availableFarms.length === 0 && userStakings.length === 0 && (
+          <div className="flex h-full w-full items-center justify-center overflow-hidden py-60">
+            <h2 className="ml-4 text-4xl font-normal text-pequod-white">
+              No staking options available
+            </h2>
+          </div>
+        )}
         <Carousel
           itemClass="mx-4"
           responsive={responsive}
@@ -103,9 +110,9 @@ export default function StakingPage() {
           {availableFarms.map((farm, i) => (
             <div
               key={i}
-              className="from-pequod-white-400 border-white-400 rounded-40 h-full border bg-gradient-to-b to-transparent p-8 text-white shadow-md"
+              className="border-white-400 h-full rounded-40 border bg-gradient-to-b from-pequod-white-400 to-transparent p-8 text-white shadow-md"
             >
-              <div className="grid-cols-cards grid grid-rows-2 gap-2">
+              <div className="grid grid-cols-cards grid-rows-2 gap-2">
                 <img
                   src={logoWot}
                   alt={farm.tokenSymbol}
@@ -128,7 +135,7 @@ export default function StakingPage() {
                       setStakeId(farm.id);
                       setShowStakeModal(!showStakeModal);
                     }}
-                    className="border-pequod-white bg-pequod-gray rounded-md border px-3 py-1"
+                    className="rounded-md border border-pequod-white bg-pequod-gray px-3 py-1"
                   >
                     Stake now
                   </button>
@@ -138,25 +145,27 @@ export default function StakingPage() {
           ))}
         </Carousel>
 
-        <h1 className="text-pequod-white ml-4 text-2xl font-normal">
-          Staked tokens
-        </h1>
-        <StakingTable
-          farms={userStakings}
-          toggleModal={setShowStakeModal}
-        ></StakingTable>
-
-        {showStakeModal ? (
+        {userStakings.length > 0 && (
           <>
-            <StakingModal
-              stakeId={stakeIdSelected}
-              userTokenBalance={userWotBalance}
-            ></StakingModal>
+            <h1 className="ml-4 text-2xl font-normal text-pequod-white">
+              Staked tokens
+            </h1>
+            <StakingTable
+              farms={userStakings}
+              setStakeId={setStakeId}
+              toggleModal={setShowStakeModal}
+            ></StakingTable>
+            {showStakeModal && (
+              <>
+                <StakingModal
+                  stakeId={stakeIdSelected}
+                  userTokenBalance={userWotBalance}
+                ></StakingModal>
+              </>
+            )}
           </>
-        ) : (
-          <></>
         )}
-      </div>
+      </main>
     </>
   );
 }

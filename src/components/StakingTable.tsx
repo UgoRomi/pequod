@@ -1,17 +1,19 @@
-import unknownTokenLogo from "../images/unknown-token.svg";
-import { sub } from "date-fns";
-import { FarmState } from "../store/userInfoSlice";
+import unknownTokenLogo from '../images/unknown-token.svg';
+import { sub } from 'date-fns';
+import { FarmState } from '../store/userInfoSlice';
 
 export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function StakingTable({
   farms,
   toggleModal,
+  setStakeId,
 }: {
   farms: FarmState[];
   toggleModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setStakeId: React.Dispatch<React.SetStateAction<number>>;
 }) {
   return (
     <div className="mx-4 flex flex-col">
@@ -87,16 +89,19 @@ export default function StakingTable({
                     <td
                       className={classNames(
                         farm.totalEarningInUsdt < 0
-                          ? "text-red-500"
-                          : "text-green-500",
-                        "whitespace-nowrap px-6 py-4 text-sm"
+                          ? 'text-red-500'
+                          : 'text-green-500',
+                        'whitespace-nowrap px-6 py-4 text-sm'
                       )}
                     >
                       {farm.totalEarningInUsdt}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                       <button
-                        onClick={() => toggleModal(true)}
+                        onClick={() => {
+                          setStakeId(farm.id);
+                          toggleModal(true);
+                        }}
                         className="mr-4 rounded-md border py-2 px-4 text-white"
                       >
                         Add funds
