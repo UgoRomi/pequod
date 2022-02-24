@@ -1,121 +1,120 @@
-
 import unknownTokenLogo from "../images/unknown-token.svg";
-const stakings = [
-    {
-      id: 1,
-      name: 'BNB',
-      qtyStaked: '21.00',
-      stakedOn: '03/01/2021 10:20:10',
-      earnings: '+ 0.06 / 2.93%',
-      isNegative: false,
-      image: unknownTokenLogo
-    },
-    {
-      id: 2,
-      name: 'MOBY DICK TOKEN',
-      qtyStaked: '21000298000',
-      stakedOn: '03/01/2021 10:20:10',
-      earnings: '+ 1,000 / 4.23%',
-      isNegative: false,
-      image: unknownTokenLogo
-    },
-    {
-      id: 3,
-      name: 'ETH',
-      qtyStaked: '2.00',
-      stakedOn: '03/01/2021 10:20:10',
-      earnings: '- 210 / 1.12%',
-      isNegative: true,
-      image: unknownTokenLogo
-    },
-  ]
-  export function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-  }
-  
-  export default function StakingTable() {
-    return (
-      <div className="flex flex-col mx-4">
-        <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Asset
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Q.ty staked
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Staked on
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Earnings
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className=" divide-y divide-gray-200">
-                  {stakings.map((stake) => (
-                    <tr key={stake.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <img className="h-10 w-10 rounded-full" src={stake.image} alt="f" />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-white">{stake.name}</div>
+import { sub } from "date-fns";
+import { FarmState } from "../store/userInfoSlice";
+
+export function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+export default function StakingTable({
+  farms,
+  toggleModal,
+}: {
+  farms: FarmState[];
+  toggleModal: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="mx-4 flex flex-col">
+      <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="overflow-hidden border-b border-gray-200 shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Asset
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Q.ty staked
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Staked on
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Earnings
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className=" divide-y divide-gray-200">
+                {farms.map((farm) => (
+                  <tr key={farm.id}>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <img
+                            className="h-10 w-10 rounded-full"
+                            src={farm.imageUrl || unknownTokenLogo}
+                            alt="farm token"
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-white">
+                            {farm.tokenSymbol}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{stake.qtyStaked}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{stake.stakedOn}</div>
-                      </td>
-                      <td className={
-                        classNames(
-                          stake.isNegative
-                            ? "text-red-500"
-                            : "text-green-500",
-                            "px-6 py-4 whitespace-nowrap text-sm"
-                        )
-                      }>{stake.earnings}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                        <a href="/" className="text-white border py-2 px-4 rounded-md mr-4">
-                          Add funds
-                        </a>
-                        <a href="/" className="text-white border py-2 px-4 rounded-md">
-                          Unstake
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-white">
+                        {farm.totalAmount}
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-white">
+                        {sub(new Date(), {
+                          seconds: farm.secondsInStaking,
+                        }).toLocaleString()}
+                      </div>
+                    </td>
+                    <td
+                      className={classNames(
+                        farm.totalEarningInUsdt < 0
+                          ? "text-red-500"
+                          : "text-green-500",
+                        "whitespace-nowrap px-6 py-4 text-sm"
+                      )}
+                    >
+                      {farm.totalEarningInUsdt}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+                      <button
+                        onClick={() => toggleModal(true)}
+                        className="mr-4 rounded-md border py-2 px-4 text-white"
+                      >
+                        Add funds
+                      </button>
+                      <button
+                        disabled={farm.unStakingTimeInSeconds > 0}
+                        className="rounded-md border py-2 px-4 text-white disabled:cursor-default disabled:opacity-70"
+                      >
+                        Unstake
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  );
+}

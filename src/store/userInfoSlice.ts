@@ -11,6 +11,10 @@ export interface FarmState {
   farmPercentageAPY: number;
   amountEarned: number;
   unStakingTimeInSeconds: number;
+  secondsInStaking: number;
+  totalEarningInUsdt: number;
+  initialAmountInUsdt: number;
+  imageUrl?: string;
 }
 
 export interface UserToken {
@@ -79,6 +83,7 @@ export const selectUserWotAmount = (state: RootState) =>
 export const selectUserTokens = (state: RootState) => state.userInfo.tokens;
 export const selectUserSignedMessage = (state: RootState) =>
   state.userInfo.signedMessage;
+export const selectUserFarms = (state: RootState) => state.userInfo.farms;
 // #endregion
 
 export default userInfoSlice.reducer;

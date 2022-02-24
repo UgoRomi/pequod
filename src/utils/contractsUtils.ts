@@ -283,7 +283,6 @@ export function useWotStake() {
       console.error(error);
       return { success: false, txHash: "" };
     }
-    // No need to use
   };
   return stake;
 }

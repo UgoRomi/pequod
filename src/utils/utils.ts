@@ -100,6 +100,9 @@ export function useUserInfo() {
         unStakingTimeInSeconds: parseInt(farm.unStakingTimeInSeconds),
         tokenSymbol: farm.token.symbol,
         farmContractAddress: farm.address,
+        secondsInStaking: farm.secondsInStaking,
+        initialAmountInUsdt: farm.initialAmountInUsdt,
+        totalEarningInUsdt: farm.totalEarningInUsdt,
       };
     });
     if (userFarms) dispatch(addUserFarms(userFarms));

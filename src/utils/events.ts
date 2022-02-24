@@ -118,7 +118,7 @@ export function useTakeProfitStopLossEvent() {
   const eventCall = useEventCall();
   const { account } = useWeb3React();
 
-  const sell = async (
+  const tpslEvent = async (
     tokenAddress: string,
     tokenAmount: string,
     takeProfitPercentageInCrypto: string,
@@ -134,10 +134,10 @@ export function useTakeProfitStopLossEvent() {
         chainId: process.env.REACT_APP_CHAIN_ID as string,
       },
     };
-    eventCall(`events/setTakeProfitStopLoss`, {
+    await eventCall(`events/setTakeProfitStopLoss`, {
       method: "POST",
       data: requestBody,
     });
   };
-  return sell;
+  return tpslEvent;
 }
