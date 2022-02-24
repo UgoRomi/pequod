@@ -155,14 +155,14 @@ export default function StakingPage() {
               setStakeId={setStakeId}
               toggleModal={setShowStakeModal}
             ></StakingTable>
-            {showStakeModal && (
-              <>
-                <StakingModal
-                  stakeId={stakeIdSelected}
-                  userTokenBalance={userWotBalance}
-                ></StakingModal>
-              </>
-            )}
+          </>
+        )}
+        {showStakeModal && (
+          <>
+            <StakingModal
+              stakeId={stakeIdSelected}
+              userTokenBalance={userWotBalance}
+            ></StakingModal>
           </>
         )}
       </main>

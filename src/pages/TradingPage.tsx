@@ -125,7 +125,7 @@ export default function TradingPage() {
     useState<boolean>(false);
   const [selectedTokenInfo, setSelectedTokenInfo] =
     useState<TokenDetails>(emptyTokenDetails);
-  const [timeWindow] = useState<PairDataTimeWindowEnum>(
+  const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(
     PairDataTimeWindowEnum.WEEK
   );
   const pequodApiCall = useApiCall();
@@ -566,6 +566,9 @@ export default function TradingPage() {
             </div>
           </div>
           <TradingPageChart
+            selectedTokenSymbol={selectedTokenInfo?.symbol}
+            currentlySelectedTimeWindow={timeWindow}
+            setTimeWindow={setTimeWindow}
             priceHistory={priceHistory}
             className="col-span-2 block xl:col-span-1 xl:hidden"
           />
@@ -614,10 +617,12 @@ export default function TradingPage() {
             </div>
           </div>
           <TradingPageChart
-            priceHistory={priceHistory}
+            selectedTokenSymbol={selectedTokenInfo?.symbol}
+            currentlySelectedTimeWindow={timeWindow}
+            setTimeWindow={setTimeWindow}
             className="col-span-2 hidden xl:col-span-1 xl:block"
+            priceHistory={priceHistory}
           />
-
           <div className="h-100 col-span-2 flex flex-col items-start justify-center gap-4 xl:col-span-1 xl:px-12">
             {/* 1st row */}
             <div className="mx-auto w-full">
