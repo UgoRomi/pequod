@@ -210,8 +210,12 @@ export default function Layout({ children }: { children: JSX.Element }) {
         <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r border-pequod-white bg-pequod-gray pt-5">
-            <div className="flex flex-shrink-0 items-center justify-center px-4">
+            <div className="flex flex-shrink-0 items-center flex-col justify-center px-4">
               <Logo className="h-28 w-auto" />
+              
+              <p className="text-center text-md text-pequod-white mb-2">
+                    BETA V 1.0.0
+                  </p>
             </div>
             <div className="sticky top-0 z-10 flex h-20 flex-shrink-0 flex-col items-center justify-center">
               <div className="flex flex-1 items-center justify-center">

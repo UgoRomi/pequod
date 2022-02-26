@@ -37,6 +37,8 @@ import { TokensListResponse } from '../utils/apiTypes';
 import { useTakeProfitStopLossEvent } from '../utils/events';
 import { Switch } from '@headlessui/react';
 import { selectBnbUsdPrice } from '../store/pricesSlice';
+import NotificationTable from "../components/NotificationTable";
+import { useWeb3React } from "@web3-react/core";
 
 interface TokenDetails {
   name: string;
@@ -64,7 +66,12 @@ interface PairPriceHistoryApiResponse {
   close: number;
   volume: number;
 }
-
+export interface NotificationState {
+  uuid: string;
+  description: string;
+  type: string;
+  createdAt: string;
+}
 export interface GraphData {
   time: Date;
   value: number;
@@ -119,6 +126,7 @@ export default function TradingPage() {
   const [takeProfit, setTakeProfit] = useState<number>(0);
   const [slippage, setSlippage] = useState<number>(30);
   const [priceHistory, setPriceHistory] = useState<GraphData[]>([]);
+  const [userNotifications, setUserNotifications] = useState<[]>([]);
   const [isFullSell, setIsFullSell] = useState<boolean>(false);
   const [orderInProgress, setOrderInProgress] = useState<boolean>(false);
   const [approvalInProgress, setApprovalInProgress] = useState<boolean>(false);
@@ -130,6 +138,7 @@ export default function TradingPage() {
     PairDataTimeWindowEnum.WEEK
   );
   const pequodApiCall = useApiCall();
+  const { account } = useWeb3React();
   const getTokenPrice = useGetTokenPrice();
   const approve = useApprove();
   const checkSwapAllowance = useAllowance();
@@ -419,6 +428,20 @@ export default function TradingPage() {
     selectedTokenInfo.tokenReserve,
   ]);
 
+
+  // Get notifications
+  useEffect(() => {
+    pequodApiCall(`/users/${account}/${process.env.REACT_APP_CHAIN_ID}/notifications/list/ALL`, {}).then(
+      (res) => {
+        if (!res?.data) {
+          return;
+        }
+        setUserNotifications(res.data)
+      }
+    );
+    // TODO: Fix dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
   const percentageButtonClicked = async (percentage: Percentages) => {
     let newAmount;
     switch (percentage) {
@@ -640,19 +663,18 @@ export default function TradingPage() {
               <div className="flex justify-between">
                 <label
                   htmlFor="amountFrom"
-                  className="block text-sm font-medium text-pequod-white"
+                  className="text-pequod-pink block text-xs"
                 >
-                  Total{' '}
-                  {currentlySelectedTab === 'buy'
-                    ? `(BNB) Balance: ${userBnbBalance.toFixed(3)}`
-                    : selectedTokenInfo?.symbol
-                    ? `(${
-                        selectedTokenInfo?.symbol
-                      }) Balance: ${userSelectedTokenBalance.toFixed(6)}`
-                    : ''}
+                  {currentlySelectedTab === "buy"
+                    ? `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(2)} USD)` : 
+                    selectedTokenInfo?.symbol
+                    ? <><span className="text-pequod-white">Amount</span> ({selectedTokenInfo?.symbol})</>
+                    : ""}
+                  
                 </label>
+                <div className="float-right text-xs text-pequod-white font-regular opacity-50">Balance: {userBnbBalance.toFixed(3)}</div>
               </div>
-              <div className="mt-1">
+              <div className="mt-1 relative rounded-md shadow-sm">
                 <input
                   type="text"
                   name="amountFrom"
@@ -674,6 +696,16 @@ export default function TradingPage() {
                     updateLoss(takeProfit);
                   }}
                 />
+
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-white opacity-75">
+                  {currentlySelectedTab === "buy"
+                    ? `(BNB)`
+                    : selectedTokenInfo?.symbol
+                    ? `(${
+                        selectedTokenInfo?.symbol
+                      })`
+                    : ""}
+                </div>
               </div>
               <PercentagesGroup
                 darkModeClass="text-gray-700"
@@ -688,17 +720,18 @@ export default function TradingPage() {
               <div className="flex justify-between">
                 <label
                   htmlFor="amountTo"
-                  className="block text-sm font-medium text-pequod-white"
+                  className="text-pequod-white block text-xs whitespace-nowrap flex flex-row"
                 >
-                  Total{' '}
-                  {currentlySelectedTab === 'buy'
-                    ? selectedTokenInfo?.symbol
-                      ? `(${
-                          selectedTokenInfo?.symbol
-                        }) Balance: ${userSelectedTokenBalance.toFixed(6)}`
-                      : ''
-                    : `(BNB) Balance: ${userBnbBalance.toFixed(3)}`}
+                  <p className="text-pequod-pink ml-1">
+                    {currentlySelectedTab === "sell"
+                    ? `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(2)} USD)` : 
+                    selectedTokenInfo?.symbol
+                    ? <><span className="text-pequod-white">Amount received</span> ({selectedTokenInfo?.symbol})</>
+                    : ""}
+                    </p>
                 </label>
+
+                <div className="float-right text-xs text-pequod-white opacity-50">Balance: {userSelectedTokenBalance.toFixed(6)}</div>
               </div>
               <div className="mt-1">
                 <input
@@ -991,6 +1024,12 @@ export default function TradingPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-10">
+        <h1 className="text-pequod-white ml-4 text-xl">Notifications</h1>
+        <NotificationTable
+          notifications={userNotifications}></NotificationTable>
       </div>
       <TradeSettingsDialog slippage={slippage} setSlippage={setSlippage} />
     </>
