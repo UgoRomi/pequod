@@ -497,7 +497,13 @@ export default function TradingPage() {
                       <p>{token.earningPercentage}%</p>
                     </div>
                     <button
-                      onClick={() => setTokenSearch(token.address)}
+                      onClick={() => {
+                        setTokenSearch(token.address);
+                        setTakeProfit(token.takeProfit || 0);
+                        setStopLoss(token.stopLoss || 0);
+                        if (token.takeProfit || token.stopLoss)
+                          setShowAutoSwap(true);
+                      }}
                       className="h-40 rounded-md border border-pequod-white bg-pequod-gray px-4 py-1"
                     >
                       Trade now

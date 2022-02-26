@@ -17,6 +17,8 @@ export interface UserInfoResponse {
       earningInUsdt?: number;
       earningPercentageInCrypto?: number;
       earningPercentageInUsdt?: number;
+      takeProfit?: number;
+      stopLoss?: number;
     }[];
   };
   pequodFarms: {
