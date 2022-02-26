@@ -122,7 +122,9 @@ export function useUserInfo() {
 
     const bnbUsdPrice =
       userData?.personalWallet?.tokens?.find(
-        (token) => token.address === process.env.REACT_APP_BNB_ADDRESS
+        (token) =>
+          token.address.toUpperCase() ===
+          process.env.REACT_APP_BNB_ADDRESS?.toUpperCase()
       )?.currentPrice || 0;
     dispatch(setBnbUsdPrice(bnbUsdPrice));
 
