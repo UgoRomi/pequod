@@ -181,7 +181,7 @@ export default function TradingPage() {
     percentageButton: number | null = null
   ) => {
     const valueNumeric = parseFloat(value);
-    setAmountFrom(value.toString());
+    setAmountFrom(value);
     setIsFullSell(fullSell);
     setPercentageButtonActive(
       percentageButton === null
@@ -409,32 +409,25 @@ export default function TradingPage() {
   ]);
 
   const percentageButtonClicked = async (percentage: Percentages) => {
+    let newAmount;
     switch (percentage) {
       case Percentages['25%']:
-        updateFrom(
-          formatAmount((fromTokenBalance * 0.25).toString()),
-          false,
-          25
-        );
+        newAmount = fromTokenBalance * 0.25 < 0 ? 0 : fromTokenBalance * 0.25;
+        updateFrom(formatAmount(newAmount.toString()), false, 25);
         break;
       case Percentages['50%']:
-        updateFrom(
-          formatAmount((fromTokenBalance * 0.5).toString()),
-          false,
-          50
-        );
+        newAmount = fromTokenBalance * 0.5 < 0 ? 0 : fromTokenBalance * 0.5;
+        updateFrom(formatAmount(newAmount.toString()), false, 50);
         break;
       case Percentages['75%']:
-        updateFrom(
-          formatAmount((fromTokenBalance * 0.75).toString()),
-          false,
-          75
-        );
+        newAmount = fromTokenBalance * 0.75 < 0 ? 0 : fromTokenBalance * 0.75;
+        updateFrom(formatAmount(newAmount.toString()), false, 75);
         break;
       case Percentages['100%']:
+        newAmount = fromTokenBalance < 0 ? 0 : fromTokenBalance;
         // We check if the currently selected tab is sell because we want to set "isFullSell" to true only when the user is selling
         updateFrom(
-          formatAmount(fromTokenBalance.toString()),
+          formatAmount(newAmount.toString()),
           currentlySelectedTab === 'sell',
           100
         );
