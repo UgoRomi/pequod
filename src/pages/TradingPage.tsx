@@ -36,6 +36,7 @@ import { selectTokensList } from '../store/miscSlice';
 import { TokensListResponse } from '../utils/apiTypes';
 import { useTakeProfitStopLossEvent } from '../utils/events';
 import { Switch } from '@headlessui/react';
+import { selectBnbUsdPrice } from '../store/pricesSlice';
 
 interface TokenDetails {
   name: string;
@@ -138,6 +139,8 @@ export default function TradingPage() {
   const [topEarners, setTopEarners] = useState<UserToken[]>([]);
   const [tpslAllowance, setTpslAllowance] = useState<boolean>(false);
   const [settingTpsl, setSettingTpsl] = useState<boolean>(false);
+  const bnbUsdPrice = useAppSelector(selectBnbUsdPrice);
+
   const maxBnbAmount = userBnbBalance - MIN_ETH;
   const userSelectedTokenBalance: number = useAppSelector(
     (state: RootState) =>
@@ -197,12 +200,20 @@ export default function TradingPage() {
   };
 
   const updateProfit = (tp: number) => {
-    setProfitInUsd((parseInt(amountFrom) * tp) / 100);
-    setProfitInBnb((parseInt(amountFrom) * tp) / 100);
+    const profitInBnb = parseFloat(
+      ((parseFloat(amountFrom) * tp) / 100).toFixed(2)
+    );
+    const profitInUsd = parseFloat((profitInBnb * bnbUsdPrice).toFixed(2));
+    setProfitInBnb(profitInBnb);
+    setProfitInUsd(profitInUsd);
   };
-  const updateLoss = (tp: number) => {
-    setLossInUsd((parseInt(amountFrom) * tp) / 100);
-    setLossInBnb((parseInt(amountFrom) * tp) / 100);
+  const updateLoss = (sl: number) => {
+    const lossInBnb = parseFloat(
+      ((parseFloat(amountFrom) * sl) / 100).toFixed(2)
+    );
+    const lossInUsd = parseFloat((lossInBnb * bnbUsdPrice).toFixed(2));
+    setLossInBnb(lossInBnb);
+    setLossInUsd(lossInUsd);
   };
 
   const updateTo = (value: string) => {
@@ -440,6 +451,7 @@ export default function TradingPage() {
     setAmountTo('0');
     setTakeProfit(0);
     setStopLoss(0);
+    setShowAutoSwap(false);
   };
 
   return (
