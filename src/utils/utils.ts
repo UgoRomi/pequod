@@ -89,6 +89,10 @@ export function useUserInfo() {
       await pequodApiInstance.get(
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
       );
+    if (!userData.logged) {
+      dispatch(setSignedMessage(''));
+      return;
+    }
     const userFarms = userData?.pequodFarms?.map((farm): FarmState => {
       return {
         id: parseInt(farm.id),
