@@ -195,21 +195,27 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <nav className="space-y-1 px-2">
                     {navigation.map((item) => (
                       <Link
-                        key={item.name}
-                        to={item.href}
+                      key={item.name}
+                      to={item.href}
+                      onClick={(e)=> {
+                        if(item.disabled) e.preventDefault();
+                      }}
+                      className={classNames(
+                        item.current
+                          ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
+                          : item.disabled ? "text-white opacity-60 cursor-default" : "pl-3 hover:bg-pequod-white-300 text-pequod-white",
+                        "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                      )}
+                    >
+                      <img src={item.icon} alt=""
                         className={classNames(
-                          item.current
-                            ? "bg-pequod-purple"
-                            : item.disabled ? "opacity-75 tex-gray" : "hover:bg-pequod-white-300 text-pequod-white",
-                          "group flex items-center rounded-md px-2 py-2 text-base font-medium"
+                          item.disabled ? "filter grayscale text-white opacity-60 cursor-default" : "text-pequod-pink",
+                            "mr-3 h-6 w-6 flex-shrink-0"
                         )}
-                      >
-                        <img src={item.icon} alt=""
-                          className="mr-4 h-6 w-6 flex-shrink-0 text-purple-300"
-                          aria-hidden="true"
-                        />
-                        {item.name}
-                      </Link>
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
                     ))}
                   </nav>
                 </div>
@@ -301,7 +307,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   >
                     <img src={item.icon} alt=""
                       className={classNames(
-                        item.disabled ? "text-white opacity-60 cursor-default" : "text-pequod-pink",
+                        item.disabled ? "filter grayscale text-white opacity-60 cursor-default" : "text-pequod-pink",
                           "mr-3 h-6 w-6 flex-shrink-0"
                       )}
                       aria-hidden="true"
