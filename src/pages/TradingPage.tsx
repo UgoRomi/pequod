@@ -782,7 +782,7 @@ export default function TradingPage() {
                   Balance: {userSelectedTokenBalance.toFixed(6)}
                 </div>
               </div>
-              <div className="mt-1">
+              <div className="relative mt-1 rounded-md shadow-sm">
                 <input
                   type="text"
                   name="amountTo"
@@ -802,6 +802,13 @@ export default function TradingPage() {
                     updateTo(e.target.value);
                   }}
                 />
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
+                  {currentlySelectedTab === 'sell'
+                    ? `(BNB)`
+                    : selectedTokenInfo?.symbol
+                    ? `(${selectedTokenInfo?.symbol})`
+                    : ''}
+                </div>
               </div>
             </div>
             <div className="flex w-full justify-center">
