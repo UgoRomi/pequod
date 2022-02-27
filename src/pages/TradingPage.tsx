@@ -295,11 +295,12 @@ export default function TradingPage() {
             return;
           }
           const { data: response }: { data: TokenInfoResponse } = res;
-          const { name, symbol, decimals } = response;
+          const { name, symbol, decimals, logoUrl } = response;
           setSelectedTokenInfo(
             (selectedTokenInfo) =>
               ({
                 ...selectedTokenInfo,
+                logoUrl,
                 name,
                 symbol,
                 decimals: decimals,
@@ -648,7 +649,7 @@ export default function TradingPage() {
                 type="button"
                 className="inline-flex h-50 w-full flex-row items-center justify-center rounded-15 border border-pequod-white border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp2" />
+                <img src={currentlySelectedTab === 'sell' ? bnbLogo : selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp2" />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'sell'
