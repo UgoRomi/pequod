@@ -126,7 +126,7 @@ export function useUserInfo() {
           token.address.toUpperCase() ===
           process.env.REACT_APP_BNB_ADDRESS?.toUpperCase()
       )?.currentPrice || 0;
-    dispatch(setBnbUsdPrice(bnbUsdPrice));
+    if (bnbUsdPrice) dispatch(setBnbUsdPrice(bnbUsdPrice));
 
     return userData;
   };
