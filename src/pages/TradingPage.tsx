@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import {
-  MinusIcon,
-  PlusIcon
-} from '@heroicons/react/outline';
+import { MinusIcon, PlusIcon } from '@heroicons/react/outline';
 import { classNames, formatMoney, useApiCall } from '../utils/utils';
 import { useAppSelector } from '../store/hooks';
 import TradeSettingsDialog from '../components/TradeSettingsDialog';
@@ -36,12 +33,11 @@ import { TokensListResponse } from '../utils/apiTypes';
 import { useTakeProfitStopLossEvent } from '../utils/events';
 import { Switch } from '@headlessui/react';
 import { selectBnbUsdPrice } from '../store/pricesSlice';
-import NotificationTable from "../components/NotificationTable";
-import { useWeb3React } from "@web3-react/core";
-
+import NotificationTable from '../components/NotificationTable';
+import { useWeb3React } from '@web3-react/core';
 
 import searchIcon from '../images/search.png';
-import swapArrows from '../images/swaparrow.png'
+import swapArrows from '../images/swaparrow.png';
 interface TokenDetails {
   name: string;
   symbol: string;
@@ -108,12 +104,14 @@ const emptyTokenDetails: TokenDetails = {
   tokenReserve: 0,
   allowance: 0,
   allowanceFetched: false,
-  logoUrl: ''
+  logoUrl: '',
 };
 
 export default function TradingPage() {
   const tokensList = useAppSelector(selectTokensList);
-  const [tokenSearch, setTokenSearch] = useState<string>('');
+  const [tokenSearch, setTokenSearch] = useState<string>(
+    process.env.REACT_APP_WOT_ADDRESS as string
+  );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
@@ -438,20 +436,20 @@ export default function TradingPage() {
     selectedTokenInfo.tokenReserve,
   ]);
 
-
   // Get notifications
   useEffect(() => {
-    pequodApiCall(`/users/${account}/${process.env.REACT_APP_CHAIN_ID}/notifications/list/ALL`, {}).then(
-      (res) => {
-        if (!res?.data) {
-          return;
-        }
-        setUserNotifications(res.data)
+    pequodApiCall(
+      `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/notifications/list/ALL`,
+      {}
+    ).then((res) => {
+      if (!res?.data) {
+        return;
       }
-    );
+      setUserNotifications(res.data);
+    });
     // TODO: Fix dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
+  }, []);
   const percentageButtonClicked = async (percentage: Percentages) => {
     let newAmount;
     switch (percentage) {
@@ -491,7 +489,9 @@ export default function TradingPage() {
     <>
       <div className="flex flex-col gap-10">
         <div>
-          <h1 className="mt-6 ml-4 text-xl font-bold text-pequod-white">Swap</h1>
+          <h1 className="mt-6 ml-4 text-xl font-bold text-pequod-white">
+            Swap
+          </h1>
           <Carousel
             itemClass="mx-4 mt-4"
             responsive={responsive}
@@ -564,7 +564,12 @@ export default function TradingPage() {
                 </label>
                 <div className="relative flex h-50 w-full flex-row text-pequod-white xl:pr-12">
                   <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center">
-                    <img src={searchIcon} alt="" className="ml-2 mr-2 h-5 w-5" aria-hidden="true" />
+                    <img
+                      src={searchIcon}
+                      alt=""
+                      className="ml-2 mr-2 h-5 w-5"
+                      aria-hidden="true"
+                    />
                   </div>
                   <input
                     id="search-field"
@@ -622,7 +627,17 @@ export default function TradingPage() {
                 type="button"
                 className="inline-flex h-50 w-full items-center justify-center rounded-15 border border-pequod-pink border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={currentlySelectedTab === 'buy' ? bnbLogo : selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp" />
+                <img
+                  src={
+                    currentlySelectedTab === 'buy'
+                      ? bnbLogo
+                      : selectedTokenInfo?.logoUrl
+                      ? selectedTokenInfo?.logoUrl
+                      : unknownTokenLogo
+                  }
+                  width={20}
+                  alt="temp"
+                />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'buy'
@@ -642,13 +657,21 @@ export default function TradingPage() {
                   resetForm();
                 }}
               >
-                <img src={swapArrows} alt="" className="text-sm"/>
+                <img src={swapArrows} alt="" className="text-sm" />
               </button>
               <button
                 type="button"
                 className="inline-flex h-50 w-full flex-row items-center justify-center rounded-15 border border-pequod-white border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp2" />
+                <img
+                  src={
+                    selectedTokenInfo?.logoUrl
+                      ? selectedTokenInfo?.logoUrl
+                      : unknownTokenLogo
+                  }
+                  width={20}
+                  alt="temp2"
+                />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'sell'
@@ -673,18 +696,26 @@ export default function TradingPage() {
               <div className="flex justify-between">
                 <label
                   htmlFor="amountFrom"
-                  className="text-pequod-pink block text-xs"
+                  className="block text-xs text-pequod-pink"
                 >
-                  {currentlySelectedTab === "buy"
-                    ? `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(2)} USD)` : 
-                    selectedTokenInfo?.symbol
-                    ? <><span className="text-pequod-white">Amount</span> ({selectedTokenInfo?.symbol})</>
-                    : ""}
-                  
+                  {currentlySelectedTab === 'buy' ? (
+                    `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(
+                      2
+                    )} USD)`
+                  ) : selectedTokenInfo?.symbol ? (
+                    <>
+                      <span className="text-pequod-white">Amount</span> (
+                      {selectedTokenInfo?.symbol})
+                    </>
+                  ) : (
+                    ''
+                  )}
                 </label>
-                <div className="float-right text-xs text-pequod-white font-regular opacity-50">Balance: {userBnbBalance.toFixed(3)}</div>
+                <div className="font-regular float-right text-xs text-pequod-white opacity-50">
+                  Balance: {userBnbBalance.toFixed(3)}
+                </div>
               </div>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="relative mt-1 rounded-md shadow-sm">
                 <input
                   type="text"
                   name="amountFrom"
@@ -701,20 +732,18 @@ export default function TradingPage() {
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountFrom)}
                   onChange={(e) => {
-                      updateFrom(e.target.value);
-                      updateProfit(takeProfit);
-                      updateLoss(takeProfit);
+                    updateFrom(e.target.value);
+                    updateProfit(takeProfit);
+                    updateLoss(takeProfit);
                   }}
                 />
 
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-white opacity-75">
-                  {currentlySelectedTab === "buy"
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
+                  {currentlySelectedTab === 'buy'
                     ? `(BNB)`
                     : selectedTokenInfo?.symbol
-                    ? `(${
-                        selectedTokenInfo?.symbol
-                      })`
-                    : ""}
+                    ? `(${selectedTokenInfo?.symbol})`
+                    : ''}
                 </div>
               </div>
               <PercentagesGroup
@@ -730,18 +759,29 @@ export default function TradingPage() {
               <div className="flex justify-between">
                 <label
                   htmlFor="amountTo"
-                  className="text-pequod-white block text-xs whitespace-nowrap flex flex-row"
+                  className="block flex flex-row whitespace-nowrap text-xs text-pequod-white"
                 >
-                  <p className="text-pequod-pink ml-1">
-                    {currentlySelectedTab === "sell"
-                    ? `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(2)} USD)` : 
-                    selectedTokenInfo?.symbol
-                    ? <><span className="text-pequod-white">Amount received</span> ({selectedTokenInfo?.symbol})</>
-                    : ""}
-                    </p>
+                  <p className="ml-1 text-pequod-pink">
+                    {currentlySelectedTab === 'sell' ? (
+                      `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(
+                        2
+                      )} USD)`
+                    ) : selectedTokenInfo?.symbol ? (
+                      <>
+                        <span className="text-pequod-white">
+                          Amount received
+                        </span>{' '}
+                        ({selectedTokenInfo?.symbol})
+                      </>
+                    ) : (
+                      ''
+                    )}
+                  </p>
                 </label>
 
-                <div className="float-right text-xs text-pequod-white opacity-50">Balance: {userSelectedTokenBalance.toFixed(6)}</div>
+                <div className="float-right text-xs text-pequod-white opacity-50">
+                  Balance: {userSelectedTokenBalance.toFixed(6)}
+                </div>
               </div>
               <div className="mt-1">
                 <input
@@ -803,7 +843,7 @@ export default function TradingPage() {
                       setApprovalInProgress(false);
                     });
                   }}
-                  className='b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50'
+                  className="b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
                   disabled={
                     approve === undefined || !selectedTokenInfo.allowanceFetched
                   }
@@ -849,9 +889,9 @@ export default function TradingPage() {
                 <label
                   htmlFor="autoSwap"
                   className={classNames(
-                    showAutoSwap ? "text-pequod-pink" : "text-pequod-white",
-                    "font-regular ml-4 block text-sm opacity-75"
-                    )}
+                    showAutoSwap ? 'text-pequod-pink' : 'text-pequod-white',
+                    'font-regular ml-4 block text-sm opacity-75'
+                  )}
                 >
                   PEQUOD SWAP
                 </label>
@@ -920,7 +960,9 @@ export default function TradingPage() {
                     Profit: {profitInUsd} $ / {profitInBnb} BNB
                   </label>
                 ) : (
-                  <label className="mt-2 block text-sm font-medium text-white">&nbsp;</label>
+                  <label className="mt-2 block text-sm font-medium text-white">
+                    &nbsp;
+                  </label>
                 )}
               </div>
               <div>
@@ -1040,9 +1082,10 @@ export default function TradingPage() {
       </div>
 
       <div className="flex flex-col gap-10">
-        <h1 className="text-pequod-white ml-4 text-xl">Notifications</h1>
+        <h1 className="ml-4 text-xl text-pequod-white">Notifications</h1>
         <NotificationTable
-          notifications={userNotifications}></NotificationTable>
+          notifications={userNotifications}
+        ></NotificationTable>
       </div>
       <TradeSettingsDialog slippage={slippage} setSlippage={setSlippage} />
     </>
