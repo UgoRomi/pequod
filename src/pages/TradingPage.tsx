@@ -112,7 +112,6 @@ export default function TradingPage() {
   const [tokenSearch, setTokenSearch] = useState<string>(
     process.env.REACT_APP_WOT_ADDRESS as string
   );
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [showAutoSwap, setShowAutoSwap] = useState(false);
@@ -899,7 +898,7 @@ export default function TradingPage() {
             </div>
             <div
               className={classNames(
-                showAutoSwap ? '' : 'hidden',
+                showAutoSwap ? '' : 'invisible',
                 'flex gap-x-10'
               )}
             >
@@ -1027,7 +1026,7 @@ export default function TradingPage() {
             {/* 4th row */}
             <div
               className={classNames(
-                showAutoSwap ? '' : 'hidden',
+                showAutoSwap ? '' : 'invisible',
                 'mt-5 grid w-full gap-x-5'
               )}
             >
