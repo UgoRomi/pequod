@@ -89,6 +89,10 @@ export function useUserInfo() {
       await pequodApiInstance.get(
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
       );
+    if (!userData.logged) {
+      dispatch(setSignedMessage(''));
+      return;
+    }
     const userFarms = userData?.pequodFarms?.map((farm): FarmState => {
       return {
         id: parseInt(farm.id),
@@ -126,7 +130,7 @@ export function useUserInfo() {
           token.address.toUpperCase() ===
           process.env.REACT_APP_BNB_ADDRESS?.toUpperCase()
       )?.currentPrice || 0;
-    dispatch(setBnbUsdPrice(bnbUsdPrice));
+    if (bnbUsdPrice) dispatch(setBnbUsdPrice(bnbUsdPrice));
 
     return userData;
   };
