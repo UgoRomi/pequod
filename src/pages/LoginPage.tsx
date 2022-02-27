@@ -22,8 +22,11 @@ export default function LoginPage() {
   return (
     <div className="flex h-full flex-col items-center justify-center bg-pequod-dark px-4 sm:px-0">
       <div className="w-full rounded-md bg-pequod-gray shadow-lg sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex w-full items-center justify-center py-4">
+        <div className="flex w-full items-center flex-col justify-center py-4">
           <Logo className="flex-shrink-0" />
+          <p className="text-center text-md text-pequod-white mb-2">
+            BETA V 1.0.0
+          </p>
         </div>
         <p className="text-center text-xl font-semibold text-pequod-white">
           Connect your wallet
