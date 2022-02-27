@@ -1,13 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
-  CashIcon,
   LogoutIcon,
   XIcon,
-  ChartPieIcon,
   DocumentDuplicateIcon,
   MenuAlt2Icon,
 } from "@heroicons/react/outline";
+
 import { useWeb3React } from "@web3-react/core";
 import useAuth from "../hooks/useAuth";
 import { useLocation } from "react-router";
@@ -21,6 +20,16 @@ import Spinner from "./Spinner";
 import { toast } from "react-toastify";
 import '../override_toastify.css'
 
+
+import swapIcon from '../images/swap.png';
+import stakingIcon from '../images/stake.png';
+import notificationIcon from '../images/notifications.png';
+import launchpadIcon from '../images/launchpad.png';
+import liquidityIcon from '../images/liquiditypool.png';
+import aiIcon from '../images/ai.png';
+import giveawayIcon from '../images/giveaway.png';
+import airdropIcon from '../images/airdrop.png';
+
 export default function Layout({ children }: { children: JSX.Element }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { account } = useWeb3React();
@@ -31,8 +40,14 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const [signInProgress, setSignInProgress] = useState(false);
 
   const [navigation, setNavigation] = useState([
-    { name: "Trading", href: "/", icon: ChartPieIcon, current: false },
-    { name: "Staking", href: "/staking", icon: CashIcon, current: false },
+    { name: "Swap", href: "/", icon: swapIcon, current: false, disabled: false },
+    { name: "Staking", href: "/staking", icon: stakingIcon, current: false, disabled: false },
+    { name: "Notifications", href: "/notifications", icon: notificationIcon, current: false, disabled: true },
+    { name: "Launchpad", href: "/notifications", icon: launchpadIcon, current: false, disabled: true },
+    { name: "Liquidity pool", href: "/notifications", icon: liquidityIcon, current: false, disabled: true },
+    { name: "Achab Services (AI)", href: "/notifications", icon: aiIcon, current: false, disabled: true },
+    { name: "Giveaways", href: "/notifications", icon: giveawayIcon, current: false, disabled: true },
+    { name: "Airdrops", href: "/notifications", icon: airdropIcon, current: false, disabled: true }
   ]);
 
   useEffect(() => {
@@ -185,11 +200,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         className={classNames(
                           item.current
                             ? "bg-pequod-purple"
-                            : "hover:bg-pequod-pink",
-                          "group flex items-center rounded-md px-2 py-2 text-base font-medium text-pequod-white"
+                            : item.disabled ? "opacity-75 tex-gray" : "hover:bg-pequod-white-300 text-pequod-white",
+                          "group flex items-center rounded-md px-2 py-2 text-base font-medium"
                         )}
                       >
-                        <item.icon
+                        <img src={item.icon} alt=""
                           className="mr-4 h-6 w-6 flex-shrink-0 text-purple-300"
                           aria-hidden="true"
                         />
@@ -211,7 +226,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r border-pequod-white bg-pequod-gray pt-5">
             <div className="flex flex-shrink-0 items-center flex-col justify-center px-4">
-              <Logo className="h-28 w-auto" />
+              <Logo className="h-28 w-auto mt-10" />
               
               <p className="text-center text-md text-pequod-white mb-2">
                     BETA V 1.0.0
@@ -274,15 +289,21 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <Link
                     key={item.name}
                     to={item.href}
+                    onClick={(e)=> {
+                      if(item.disabled) e.preventDefault();
+                    }}
                     className={classNames(
                       item.current
-                        ? "border-l-4 border-pequod-pink bg-pequod-white-300"
-                        : "pl-3 hover:bg-pequod-purple",
-                      "group flex items-center justify-center px-2 py-3 text-sm font-medium text-pequod-white"
+                        ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
+                        : item.disabled ? "text-white opacity-60 cursor-default" : "pl-3 hover:bg-pequod-white-300 text-pequod-white",
+                      "group flex items-center justify-center px-2 py-3 text-sm font-medium"
                     )}
                   >
-                    <item.icon
-                      className="mr-3 h-6 w-6 flex-shrink-0 text-pequod-pink"
+                    <img src={item.icon} alt=""
+                      className={classNames(
+                        item.disabled ? "text-white opacity-60 cursor-default" : "text-pequod-pink",
+                          "mr-3 h-6 w-6 flex-shrink-0"
+                      )}
                       aria-hidden="true"
                     />
                     {item.name}

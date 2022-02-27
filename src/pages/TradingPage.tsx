@@ -2,9 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   MinusIcon,
-  PlusIcon,
-  SearchIcon,
-  SwitchHorizontalIcon,
+  PlusIcon
 } from '@heroicons/react/outline';
 import { classNames, formatMoney, useApiCall } from '../utils/utils';
 import { useAppSelector } from '../store/hooks';
@@ -19,6 +17,7 @@ import {
   useSwap,
 } from '../utils/contractsUtils';
 import unknownTokenLogo from '../images/unknown-token.svg';
+import bnbLogo from '../images/bnblogo.png';
 import wotLogo from '../images/wot-logo.svg';
 
 import {
@@ -40,6 +39,9 @@ import { selectBnbUsdPrice } from '../store/pricesSlice';
 import NotificationTable from "../components/NotificationTable";
 import { useWeb3React } from "@web3-react/core";
 
+
+import searchIcon from '../images/search.png';
+import swapArrows from '../images/swaparrow.png'
 interface TokenDetails {
   name: string;
   symbol: string;
@@ -50,6 +52,7 @@ interface TokenDetails {
   priceBNB: number;
   allowance: number;
   allowanceFetched: boolean;
+  logoUrl: string;
 }
 
 interface TokenInfoResponse {
@@ -105,6 +108,7 @@ const emptyTokenDetails: TokenDetails = {
   tokenReserve: 0,
   allowance: 0,
   allowanceFetched: false,
+  logoUrl: ''
 };
 
 export default function TradingPage() {
@@ -481,7 +485,7 @@ export default function TradingPage() {
     <>
       <div className="flex flex-col gap-10">
         <div>
-          <h1 className="ml-4 text-3xl font-bold text-pequod-white">Trading</h1>
+          <h1 className="mt-6 ml-4 text-xl font-bold text-pequod-white">Swap</h1>
           <Carousel
             itemClass="mx-4 mt-4"
             responsive={responsive}
@@ -545,7 +549,7 @@ export default function TradingPage() {
         <div className="grid grid-cols-buy gap-y-8 xl:rounded-md xl:bg-pequod-dark xl:p-5">
           <div className="col-span-2 grid gap-y-2 xl:col-span-1 xl:gap-0">
             <div className="flex flex-1 flex-col">
-              <span className="mb-4 text-xl text-pequod-white">
+              <span className="mb-8 text-xl text-pequod-white">
                 Search token
               </span>
               <form className="justify-left flex w-full flex-row md:ml-0">
@@ -554,11 +558,11 @@ export default function TradingPage() {
                 </label>
                 <div className="relative flex h-50 w-full flex-row text-pequod-white xl:pr-12">
                   <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center">
-                    <SearchIcon className="h-5 w-5" aria-hidden="true" />
+                    <img src={searchIcon} alt="" className="ml-2 mr-2 h-5 w-5" aria-hidden="true" />
                   </div>
                   <input
                     id="search-field"
-                    className="b-1 focus:outline-none mr-4 block h-50 w-4/5 rounded-md border bg-transparent py-2 pl-10 pr-3 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple sm:text-sm"
+                    className="b-1 focus:outline-none mr-4 block h-50 w-4/5 rounded-15 border bg-transparent py-2 pl-12 pr-3 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple sm:text-sm"
                     placeholder="0xe861...."
                     type="search"
                     name="search"
@@ -587,7 +591,7 @@ export default function TradingPage() {
                   )}
 
                   <button
-                    className="b-1 focus:outline-none block h-50 w-1/5 rounded-md border bg-transparent py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple disabled:cursor-default sm:text-sm"
+                    className="b-1 focus:outline-none block h-50 w-1/5 rounded-15 border bg-transparent py-2 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple disabled:cursor-default sm:text-sm"
                     disabled={true}
                     onClick={() => {}}
                   >
@@ -612,7 +616,7 @@ export default function TradingPage() {
                 type="button"
                 className="inline-flex h-50 w-full items-center justify-center rounded-15 border border-pequod-pink border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={unknownTokenLogo} width={20} alt="temp" />
+                <img src={currentlySelectedTab === 'buy' ? bnbLogo : selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp" />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'buy'
@@ -632,13 +636,13 @@ export default function TradingPage() {
                   resetForm();
                 }}
               >
-                <SwitchHorizontalIcon className="w-6 text-sm"></SwitchHorizontalIcon>
+                <img src={swapArrows} alt="" className="text-sm"/>
               </button>
               <button
                 type="button"
                 className="inline-flex h-50 w-full flex-row items-center justify-center rounded-15 border border-pequod-white border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={unknownTokenLogo} width={20} alt="temp2" />
+                <img src={selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp2" />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'sell'
@@ -691,9 +695,9 @@ export default function TradingPage() {
                   disabled={!selectedTokenInfo.address}
                   value={formatAmount(amountFrom)}
                   onChange={(e) => {
-                    updateFrom(e.target.value);
-                    updateProfit(takeProfit);
-                    updateLoss(takeProfit);
+                      updateFrom(e.target.value);
+                      updateProfit(takeProfit);
+                      updateLoss(takeProfit);
                   }}
                 />
 
@@ -793,7 +797,7 @@ export default function TradingPage() {
                       setApprovalInProgress(false);
                     });
                   }}
-                  className="flex w-full items-center justify-center rounded-10 bg-pequod-purple py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
+                  className='b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50'
                   disabled={
                     approve === undefined || !selectedTokenInfo.allowanceFetched
                   }
@@ -815,7 +819,7 @@ export default function TradingPage() {
                 htmlFor="autoSwap"
                 className="block text-sm font-medium text-white opacity-75"
               >
-                AUTO SWAP
+                AUTO SWAP IF
               </label>
               <div className="flex flex-row items-center">
                 <Switch
@@ -838,7 +842,10 @@ export default function TradingPage() {
                 </Switch>
                 <label
                   htmlFor="autoSwap"
-                  className="font-regular ml-4 block text-sm text-pequod-pink opacity-75"
+                  className={classNames(
+                    showAutoSwap ? "text-pequod-pink" : "text-pequod-white",
+                    "font-regular ml-4 block text-sm opacity-75"
+                    )}
                 >
                   PEQUOD SWAP
                 </label>
@@ -853,7 +860,7 @@ export default function TradingPage() {
               <div>
                 <label
                   htmlFor="takeProfit"
-                  className="block text-sm font-medium text-green-600"
+                  className="block text-sm text-pequod-green"
                 >
                   Gain (%)
                 </label>
@@ -907,13 +914,13 @@ export default function TradingPage() {
                     Profit: {profitInUsd} $ / {profitInBnb} BNB
                   </label>
                 ) : (
-                  <></>
+                  <label className="mt-2 block text-sm font-medium text-white">&nbsp;</label>
                 )}
               </div>
               <div>
                 <label
                   htmlFor="stopLoss"
-                  className="block text-sm font-medium text-red-600"
+                  className="block text-sm font-medium text-pequod-red"
                 >
                   Loss (%)
                 </label>
@@ -983,7 +990,7 @@ export default function TradingPage() {
                       setSettingTpsl(true);
                       autoSwap().then(() => setSettingTpsl(false));
                     }}
-                    className="b-2 flex w-full items-center justify-center rounded-md  border-2 border-pequod-pink py-2  px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
+                    className="b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2  px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
                   >
                     {settingTpsl ? (
                       <>
@@ -1008,7 +1015,7 @@ export default function TradingPage() {
                           setTpslApprovalInProgress(false);
                         });
                     }}
-                    className="b-2 flex w-full items-center justify-center rounded-md border-2 border-pequod-pink py-2  px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
+                    className="b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2  px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
                   >
                     {tpslApprovalInProgress ? (
                       <>

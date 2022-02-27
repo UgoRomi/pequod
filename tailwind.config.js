@@ -37,6 +37,8 @@ module.exports = {
         "pequod-white-400": "#f2f2f22e",
         "pequod-white-500": "#f2f2f2af",
         "pequod-gray": "#231e3e",
+        "pequod-green": "#2EF000",
+        "pequod-red": "#F00000"
       },
       borderRadius: {
         '40': '40px',

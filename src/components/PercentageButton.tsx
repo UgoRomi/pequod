@@ -26,7 +26,7 @@ export default function PercentageButton({
     <div
       onClick={buttonClick}
       className={classNames(
-        disabled ? "cursor-default opacity-70" : "cursor-pointer",
+        disabled ? "cursor-default opacity-40" : "cursor-pointer",
         "flex flex-col justify-center "
       )}
     >
@@ -40,7 +40,7 @@ export default function PercentageButton({
         {" "}
       </button>
       <span
-        className={`flex w-full justify-center text-xs text-pequod-pink ${darkModeClass}`}
+        className={`flex w-full mt-1 justify-center text-xs text-pequod-pink ${darkModeClass}`}
       >
         {percentage}%
       </span>
