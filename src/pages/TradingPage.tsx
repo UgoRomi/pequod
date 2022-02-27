@@ -228,6 +228,12 @@ export default function TradingPage() {
     }
   };
 
+  useEffect(() => {
+    updateLoss(stopLoss);
+    updateProfit(takeProfit);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amountFrom, stopLoss, takeProfit]);
+
   const formatAmount = (amount: string): string => {
     if (amount.toString().indexOf('e') === -1) return amount;
 
