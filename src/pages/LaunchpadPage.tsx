@@ -11,7 +11,8 @@ export default function LaunchpadPage() {
           title: "MIDA PROJECT",
           data: "30/03/2022",
           description: "Dai musei al Metaverso. MIDA offre alle Istituzioni che conservano capolavori artistici un nuovo modo di valorizzarli tramite la creazione e la vendita di opere NFT uniche ai grandi collezionisti del Metaverso.",
-          imageUrl: midaImage
+          imageUrl: midaImage,
+          redirectUrl: "https://midanft.com/it/dai-musei-al-metaverso/"
       }
   ]
 
@@ -32,12 +33,14 @@ export default function LaunchpadPage() {
             return (
                 <div className="flex flex-col py-12 border-b-2 md:flex-row">
                     <div className="">
-                        <img src={item.imageUrl} alt={item.title} />
+                        <a href={item.redirectUrl} target="_blank" rel="noreferrer"><img src={item.imageUrl} alt={item.title} /></a>
                     </div>
                     <div className="flex flex-col text-white px-4 mt-4 md:mt-0 md:px-12 ">
-                        <div className="text-xl md:text-3xl flex flex-row mb-2">{item.title}&nbsp;<LinkIcon className="ml-4 w-4 md:w-8"/></div>
-                        <div className="text-md md:text-xl text-pequod-pink mb-4 md:mb-6">{item.data}</div>
-                        <div className="text-md md:text-xl text-white max-w-md">{item.description}</div>
+                        <a href={item.redirectUrl} target="_blank" rel="noreferrer">
+                            <div className="text-md md:text-3xl flex flex-row mb-2">{item.title}&nbsp;<LinkIcon className="ml-4 w-4 md:w-8"/></div>
+                        </a>
+                        <div className="text-sm md:text-xl text-pequod-pink mb-4 md:mb-6">{item.data}</div>
+                        <div className="text-sm md:text-md text-white max-w-md">{item.description}</div>
                     </div>
                 </div>
             ) 
