@@ -1,25 +1,24 @@
-import { Fragment, useEffect, useState } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Fragment, useEffect, useState } from 'react';
+import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
   LogoutIcon,
   XIcon,
   DocumentDuplicateIcon,
   MenuAlt2Icon,
-} from "@heroicons/react/outline";
+} from '@heroicons/react/outline';
 
-import { useWeb3React } from "@web3-react/core";
-import useAuth from "../hooks/useAuth";
-import { useLocation } from "react-router";
-import { Link } from "react-router-dom";
-import { classNames, useValidateSessionIfInvalid } from "../utils/utils";
-import { ReactComponent as Logo } from "../images/logo.svg";
-import logoPng from "../images/logo.png";
-import { useAppSelector } from "../store/hooks";
-import { selectUserSignedMessage } from "../store/userInfoSlice";
-import Spinner from "./Spinner";
-import { toast } from "react-toastify";
-import '../override_toastify.css'
-
+import { useWeb3React } from '@web3-react/core';
+import useAuth from '../hooks/useAuth';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
+import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
+import { ReactComponent as Logo } from '../images/logo.svg';
+import logoPng from '../images/logo.png';
+import { useAppSelector } from '../store/hooks';
+import { selectUserSignedMessage } from '../store/userInfoSlice';
+import Spinner from './Spinner';
+import { toast } from 'react-toastify';
+import '../override_toastify.css';
 
 import swapIcon from '../images/swap.png';
 import stakingIcon from '../images/stake.png';
@@ -40,14 +39,62 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const [signInProgress, setSignInProgress] = useState(false);
 
   const [navigation, setNavigation] = useState([
-    { name: "Swap", href: "/", icon: swapIcon, current: false, disabled: false },
-    { name: "Staking", href: "/staking", icon: stakingIcon, current: false, disabled: false },
-    { name: "Notifications", href: "/notifications", icon: notificationIcon, current: false, disabled: true },
-    { name: "Launchpad", href: "/launchpad", icon: launchpadIcon, current: false, disabled: true },
-    { name: "Liquidity pool", href: "/liquidity", icon: liquidityIcon, current: false, disabled: true },
-    { name: "Achab Services (AI)", href: "/achabservices", icon: aiIcon, current: false, disabled: true },
-    { name: "Giveaways", href: "/giveaways", icon: giveawayIcon, current: false, disabled: true },
-    { name: "Airdrops", href: "/airdrops", icon: airdropIcon, current: false, disabled: true }
+    {
+      name: 'Swap',
+      href: '/',
+      icon: swapIcon,
+      current: false,
+      disabled: false,
+    },
+    {
+      name: 'Staking',
+      href: '/staking',
+      icon: stakingIcon,
+      current: false,
+      disabled: false,
+    },
+    {
+      name: 'Notifications',
+      href: '/notifications',
+      icon: notificationIcon,
+      current: false,
+      disabled: true,
+    },
+    {
+      name: 'Launchpad',
+      href: '/launchpad',
+      icon: launchpadIcon,
+      current: false,
+      disabled: false,
+    },
+    {
+      name: 'Liquidity pool',
+      href: '/liquidity',
+      icon: liquidityIcon,
+      current: false,
+      disabled: true,
+    },
+    {
+      name: 'Achab Services (AI)',
+      href: '/achabservices',
+      icon: aiIcon,
+      current: false,
+      disabled: true,
+    },
+    {
+      name: 'Giveaways',
+      href: '/giveaways',
+      icon: giveawayIcon,
+      current: false,
+      disabled: true,
+    },
+    {
+      name: 'Airdrops',
+      href: '/airdrops',
+      icon: airdropIcon,
+      current: false,
+      disabled: true,
+    },
   ]);
 
   useEffect(() => {
@@ -66,12 +113,12 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const copyToClipboard = (e: any) => {
     e.preventDefault();
     /* Get the text field */
-    const accountUser = account ? account : "";
+    const accountUser = account ? account : '';
     navigator.clipboard.writeText(accountUser);
 
     /* Alert the copied text */
 
-    toast.success("Text copied");
+    toast.success('Text copied');
   };
 
   return (
@@ -90,7 +137,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <span>Signing in...</span>
                 </>
               ) : (
-                "Sign the message"
+                'Sign the message'
               )}
             </button>
           </div>
@@ -153,7 +200,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     <Menu.Button className="b-2 focus:outline-none flex max-w-xs items-center rounded-full border bg-transparent text-sm focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
                       <span className="focus:outline-none inline-flex items-center rounded-full bg-transparent px-5 py-1 text-base font-medium text-pequod-white shadow-sm hover:bg-transparent focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
-                        {account?.slice(0, 6) + "..." + account?.slice(37)}
+                        {account?.slice(0, 6) + '...' + account?.slice(37)}
                       </span>
                       <DocumentDuplicateIcon
                         className="mr-3 h-6 w-6 flex-shrink-0 text-white"
@@ -176,8 +223,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         {({ active }) => (
                           <span
                             className={classNames(
-                              active ? "bg-pequod-dark" : "",
-                              "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
+                              active ? 'bg-pequod-dark' : '',
+                              'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
                             )}
                           >
                             <LogoutIcon
@@ -195,27 +242,33 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <nav className="space-y-1 px-2">
                     {navigation.map((item) => (
                       <Link
-                      key={item.name}
-                      to={item.href}
-                      onClick={(e)=> {
-                        if(item.disabled) e.preventDefault();
-                      }}
-                      className={classNames(
-                        item.current
-                          ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
-                          : item.disabled ? "text-white opacity-60 cursor-default" : "pl-3 hover:bg-pequod-white-300 text-pequod-white",
-                        "group flex items-center justify-center px-2 py-3 text-sm font-medium"
-                      )}
-                    >
-                      <img src={item.icon} alt=""
+                        key={item.name}
+                        to={item.href}
+                        onClick={(e) => {
+                          if (item.disabled) e.preventDefault();
+                        }}
                         className={classNames(
-                          item.disabled ? "filter grayscale text-white opacity-60 cursor-default" : "text-pequod-pink",
-                            "mr-3 h-6 w-6 flex-shrink-0"
+                          item.current
+                            ? 'border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white'
+                            : item.disabled
+                            ? 'cursor-default text-white opacity-60'
+                            : 'pl-3 text-pequod-white hover:bg-pequod-white-300',
+                          'group flex items-center justify-center px-2 py-3 text-sm font-medium'
                         )}
-                        aria-hidden="true"
-                      />
-                      {item.name}
-                    </Link>
+                      >
+                        <img
+                          src={item.icon}
+                          alt=""
+                          className={classNames(
+                            item.disabled
+                              ? 'cursor-default text-white opacity-60 grayscale filter'
+                              : 'text-pequod-pink',
+                            'mr-3 h-6 w-6 flex-shrink-0'
+                          )}
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </Link>
                     ))}
                   </nav>
                 </div>
@@ -231,12 +284,12 @@ export default function Layout({ children }: { children: JSX.Element }) {
         <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r border-pequod-white bg-pequod-gray pt-5">
-            <div className="flex flex-shrink-0 items-center flex-col justify-center px-4">
-              <Logo className="h-28 w-auto mt-10" />
-              
-              <p className="text-center text-md text-pequod-white mb-2">
-                    BETA V 1.0.0
-                  </p>
+            <div className="flex flex-shrink-0 flex-col items-center justify-center px-4">
+              <Logo className="mt-10 h-28 w-auto" />
+
+              <p className="text-md mb-2 text-center text-pequod-white">
+                BETA V 1.0.0
+              </p>
             </div>
             <div className="sticky top-0 z-10 flex h-20 flex-shrink-0 flex-col items-center justify-center">
               <div className="flex flex-1 items-center justify-center">
@@ -247,7 +300,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       <Menu.Button className="b-2 focus:outline-none flex max-w-xs items-center  rounded-full border bg-transparent text-sm focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <span className="focus:outline-none inline-flex items-center rounded-full bg-transparent px-5 py-1 text-base font-medium text-pequod-white shadow-sm hover:bg-transparent focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
-                          {account?.slice(0, 6) + "..." + account?.slice(37)}
+                          {account?.slice(0, 6) + '...' + account?.slice(37)}
                         </span>
                         <DocumentDuplicateIcon
                           className="mr-3 h-6 w-6 flex-shrink-0 text-white"
@@ -270,8 +323,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                           {({ active }) => (
                             <span
                               className={classNames(
-                                active ? "bg-pequod-dark" : "",
-                                "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
+                                active ? 'bg-pequod-dark' : '',
+                                'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
                               )}
                             >
                               <LogoutIcon
@@ -295,20 +348,26 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <Link
                     key={item.name}
                     to={item.href}
-                    onClick={(e)=> {
-                      if(item.disabled) e.preventDefault();
+                    onClick={(e) => {
+                      if (item.disabled) e.preventDefault();
                     }}
                     className={classNames(
                       item.current
-                        ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
-                        : item.disabled ? "text-white opacity-60 cursor-default" : "pl-3 hover:bg-pequod-white-300 text-pequod-white",
-                      "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                        ? 'border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white'
+                        : item.disabled
+                        ? 'cursor-default text-white opacity-60'
+                        : 'pl-3 text-pequod-white hover:bg-pequod-white-300',
+                      'group flex items-center justify-center px-2 py-3 text-sm font-medium'
                     )}
                   >
-                    <img src={item.icon} alt=""
+                    <img
+                      src={item.icon}
+                      alt=""
                       className={classNames(
-                        item.disabled ? "filter grayscale text-white opacity-60 cursor-default" : "text-pequod-pink",
-                          "mr-3 h-6 w-6 flex-shrink-0"
+                        item.disabled
+                          ? 'cursor-default text-white opacity-60 grayscale filter'
+                          : 'text-pequod-pink',
+                        'mr-3 h-6 w-6 flex-shrink-0'
                       )}
                       aria-hidden="true"
                     />
@@ -347,8 +406,8 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         {({ active }) => (
                           <span
                             className={classNames(
-                              active ? "bg-pequod-gray" : "",
-                              "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
+                              active ? 'bg-pequod-gray' : '',
+                              'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
                             )}
                           >
                             <LogoutIcon
