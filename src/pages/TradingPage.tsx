@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { MinusIcon, PlusIcon } from '@heroicons/react/outline';
 import { classNames, formatMoney, useApiCall } from '../utils/utils';
@@ -15,7 +15,6 @@ import {
 } from '../utils/contractsUtils';
 import unknownTokenLogo from '../images/unknown-token.svg';
 import bnbLogo from '../images/bnblogo.png';
-import wotLogo from '../images/wot-logo.svg';
 
 import {
   selectUserBnbAmount,
@@ -163,7 +162,6 @@ export default function TradingPage() {
   );
   const fromTokenBalance =
     currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
-
   const [profitInUsd, setProfitInUsd] = useState<number>(0);
   const [profitInBnb, setProfitInBnb] = useState<number>(0);
   const [lossInUsd, setLossInUsd] = useState<number>(0);
@@ -486,6 +484,13 @@ export default function TradingPage() {
     setShowAutoSwap(false);
   };
 
+  const setDefaultTokenLogo = (
+    ev: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    const target = ev.target as HTMLInputElement;
+    target.src = unknownTokenLogo;
+  };
+
   return (
     <>
       <div className="flex flex-col gap-10">
@@ -513,13 +518,8 @@ export default function TradingPage() {
               >
                 <div className="grid grid-cols-cards grid-rows-2 gap-4">
                   <img
-                    src={
-                      token.logoUrl
-                        ? token.logoUrl
-                        : token.symbol === process.env.REACT_APP_WOT_SYMBOL
-                        ? wotLogo
-                        : unknownTokenLogo
-                    }
+                    onError={setDefaultTokenLogo}
+                    src={token.logoUrl ?? unknownTokenLogo}
                     alt={token.symbol}
                     className="row-span-2 h-10"
                   />
@@ -633,9 +633,8 @@ export default function TradingPage() {
                     currentlySelectedTab === 'buy'
                       ? bnbLogo
                       : selectedTokenInfo?.logoUrl
-                      ? selectedTokenInfo?.logoUrl
-                      : unknownTokenLogo
                   }
+                  onError={setDefaultTokenLogo}
                   width={20}
                   alt="temp"
                 />
@@ -664,7 +663,16 @@ export default function TradingPage() {
                 type="button"
                 className="inline-flex h-50 w-full flex-row items-center justify-center rounded-15 border border-pequod-white border-transparent px-2 py-2 text-sm font-medium leading-4 text-pequod-white"
               >
-                <img src={currentlySelectedTab === 'sell' ? bnbLogo : selectedTokenInfo?.logoUrl ? selectedTokenInfo?.logoUrl : unknownTokenLogo} width={20} alt="temp2" />
+                <img
+                  onError={setDefaultTokenLogo}
+                  src={
+                    currentlySelectedTab === 'sell'
+                      ? bnbLogo
+                      : selectedTokenInfo?.logoUrl
+                  }
+                  width={20}
+                  alt="token"
+                />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
                   {currentlySelectedTab === 'sell'
@@ -752,7 +760,7 @@ export default function TradingPage() {
               <div className="flex justify-between">
                 <label
                   htmlFor="amountTo"
-                  className="block flex flex-row whitespace-nowrap text-xs text-pequod-white"
+                  className="flex flex-row whitespace-nowrap text-xs text-pequod-white"
                 >
                   <p className="ml-1 text-pequod-pink">
                     {currentlySelectedTab === 'sell' ? (
