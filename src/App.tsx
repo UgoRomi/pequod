@@ -14,7 +14,6 @@ import { TokensListResponse } from "./utils/apiTypes";
 import { setTokens } from "./store/miscSlice";
 import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
-import MaintenanceCheck from "./components/MaintenanceCheck";
 
 function App() {
   useEagerConnect();
@@ -46,45 +45,35 @@ function App() {
       <Route
         path="/"
         element={
-          <MaintenanceCheck>
             <RequireAuth>
               <Layout>
                 <TradingPage />
               </Layout>
             </RequireAuth>
-          </MaintenanceCheck>
         }
       />
       <Route
         path="/staking"
         element={
-          
-          <MaintenanceCheck>
             <RequireAuth>
               <Layout>
                 <StakingPage />
               </Layout>
             </RequireAuth>
-          </MaintenanceCheck>
         }
       />
       <Route
         path="/login"
         element={
-          <MaintenanceCheck>
             <RequireNoAuth>
               <LoginPage />
             </RequireNoAuth>
-          </MaintenanceCheck>
         }
       />
       <Route
         path="/maintenance"
         element={
-          
-          <RequireNoAuth>
             <MaintenancePage />
-          </RequireNoAuth>
         }
       />
     </Routes>
