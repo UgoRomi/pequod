@@ -491,6 +491,11 @@ export default function TradingPage() {
     target.src = unknownTokenLogo;
   };
 
+  useEffect(() => {
+    resetForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentlySelectedTab]);
+
   return (
     <>
       <div className="flex flex-col gap-10">
