@@ -55,6 +55,7 @@ interface TokenInfoResponse {
   name: string;
   symbol: string;
   decimals: number;
+  logoUrl: string;
 }
 
 interface PairPriceHistoryApiResponse {
