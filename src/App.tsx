@@ -14,6 +14,7 @@ import { TokensListResponse } from "./utils/apiTypes";
 import { setTokens } from "./store/miscSlice";
 import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
+import LaunchpadPage from "./pages/LaunchpadPage";
 
 function App() {
   useEagerConnect();
@@ -58,6 +59,16 @@ function App() {
             <RequireAuth>
               <Layout>
                 <StakingPage />
+              </Layout>
+            </RequireAuth>
+        }
+      />
+      <Route
+        path="/launchpad"
+        element={
+            <RequireAuth>
+              <Layout>
+                <LaunchpadPage />
               </Layout>
             </RequireAuth>
         }

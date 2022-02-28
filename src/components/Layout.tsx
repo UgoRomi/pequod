@@ -43,11 +43,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
     { name: "Swap", href: "/", icon: swapIcon, current: false, disabled: false },
     { name: "Staking", href: "/staking", icon: stakingIcon, current: false, disabled: false },
     { name: "Notifications", href: "/notifications", icon: notificationIcon, current: false, disabled: true },
-    { name: "Launchpad", href: "/notifications", icon: launchpadIcon, current: false, disabled: true },
-    { name: "Liquidity pool", href: "/notifications", icon: liquidityIcon, current: false, disabled: true },
-    { name: "Achab Services (AI)", href: "/notifications", icon: aiIcon, current: false, disabled: true },
-    { name: "Giveaways", href: "/notifications", icon: giveawayIcon, current: false, disabled: true },
-    { name: "Airdrops", href: "/notifications", icon: airdropIcon, current: false, disabled: true }
+    { name: "Launchpad", href: "/launchpad", icon: launchpadIcon, current: false, disabled: true },
+    { name: "Liquidity pool", href: "/liquidity", icon: liquidityIcon, current: false, disabled: true },
+    { name: "Achab Services (AI)", href: "/achabservices", icon: aiIcon, current: false, disabled: true },
+    { name: "Giveaways", href: "/giveaways", icon: giveawayIcon, current: false, disabled: true },
+    { name: "Airdrops", href: "/airdrops", icon: airdropIcon, current: false, disabled: true }
   ]);
 
   useEffect(() => {
