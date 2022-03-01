@@ -494,7 +494,7 @@ export default function TradingPage() {
   useEffect(() => {
     resetForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentlySelectedTab]);
+  }, [currentlySelectedTab, selectedTokenInfo.address]);
 
   return (
     <>
