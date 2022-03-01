@@ -718,7 +718,10 @@ export default function TradingPage() {
                   )}
                 </label>
                 <div className="font-regular float-right text-xs text-pequod-white opacity-50">
-                  Balance: {userBnbBalance.toFixed(3)}
+                  Balance:{' '}
+                  {currentlySelectedTab === 'buy'
+                    ? userBnbBalance.toFixed(3)
+                    : userSelectedTokenBalance.toFixed(6)}
                 </div>
               </div>
               <div className="relative mt-1 rounded-md shadow-sm">
@@ -786,7 +789,10 @@ export default function TradingPage() {
                 </label>
 
                 <div className="float-right text-xs text-pequod-white opacity-50">
-                  Balance: {userSelectedTokenBalance.toFixed(6)}
+                  Balance:{' '}
+                  {currentlySelectedTab === 'sell'
+                    ? userBnbBalance.toFixed(3)
+                    : userSelectedTokenBalance.toFixed(6)}
                 </div>
               </div>
               <div className="relative mt-1 rounded-md shadow-sm">
