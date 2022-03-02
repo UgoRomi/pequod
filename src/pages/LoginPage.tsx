@@ -1,22 +1,22 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import { ReactComponent as MetamaskStackedLogo } from "../images/metamask-logo-stacked.svg";
-import { ReactComponent as WalletConnectLogo } from "../images/walletconnect-logo.svg";
-import { connectorLocalStorageKey, ConnectorNames } from "../utils/connectors";
-import { ReactComponent as Logo } from "../images/logo.svg";
+import {useLocation, useNavigate} from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
+import {ReactComponent as MetamaskStackedLogo} from '../images/metamask-logo-stacked.svg';
+import {ReactComponent as WalletConnectLogo} from '../images/walletconnect-logo.svg';
+import {connectorLocalStorageKey, ConnectorNames} from '../utils/connectors';
+import {ReactComponent as Logo} from '../images/logo.svg';
 
 export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const {login} = useAuth();
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || '/';
 
   const connectToWallet = async (connectorId: ConnectorNames) => {
     await login(connectorId);
     localStorage.setItem(connectorLocalStorageKey, connectorId);
 
-    navigate(from, { replace: true });
+    navigate(from, {replace: true});
   };
 
   return (
@@ -25,7 +25,7 @@ export default function LoginPage() {
         <div className="flex w-full items-center flex-col justify-center py-4">
           <Logo className="flex-shrink-0" />
           <p className="text-center text-md text-pequod-white mb-2">
-            BETA V 1.0.0
+            BETA V 1.1.0
           </p>
         </div>
         <p className="text-center text-xl font-semibold text-pequod-white">
