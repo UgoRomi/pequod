@@ -539,7 +539,7 @@ export default function TradingPage() {
                 <div className="grid grid-cols-cards grid-rows-2 gap-4">
                   <img
                     onError={setDefaultTokenLogo}
-                    src={token.logoUrl ?? unknownTokenLogo}
+                    src={token.logoUrl}
                     alt={token.symbol}
                     className="row-span-2 h-10"
                   />
