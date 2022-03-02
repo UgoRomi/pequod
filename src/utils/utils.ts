@@ -106,7 +106,9 @@ export function useUserInfo() {
         farmContractAddress: farm.address,
         secondsInStaking: farm.secondsInStaking,
         initialAmountInUsdt: farm.initialAmountInUsdt,
+        totalEarningInToken: farm.totalEarningInToken,
         totalEarningInUsdt: farm.totalEarningInUsdt,
+        initialAmountInToken: farm.initialAmountInToken
       };
     });
     if (userFarms) dispatch(addUserFarms(userFarms));

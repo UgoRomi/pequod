@@ -71,6 +71,7 @@ export default function StakingPage() {
               minimumToStake: farm.minimumToStake,
               earningPercentage: 0,
               token: farm.token,
+              active: farm.active
             };
           });
         dispatch(addAvailableFarms(availableFarms));
@@ -152,6 +153,7 @@ export default function StakingPage() {
             </h1>
             <StakingTable
               farms={userStakings}
+              availableFarms={availableFarms}
               setStakeId={setStakeId}
               toggleModal={setShowStakeModal}
             ></StakingTable>

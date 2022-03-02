@@ -1,6 +1,7 @@
 import unknownTokenLogo from '../images/unknown-token.svg';
 import { sub } from 'date-fns';
 import { FarmState } from '../store/userInfoSlice';
+import { AvailableFarmState } from '../store/farmsSlice';
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -8,13 +9,16 @@ export function classNames(...classes: string[]) {
 
 export default function StakingTable({
   farms,
+  availableFarms,
   toggleModal,
   setStakeId,
 }: {
   farms: FarmState[];
+  availableFarms: AvailableFarmState[];
   toggleModal: React.Dispatch<React.SetStateAction<boolean>>;
   setStakeId: React.Dispatch<React.SetStateAction<number>>;
 }) {
+
   return (
     <div className="mx-4 flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -76,7 +80,7 @@ export default function StakingTable({
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm text-white">
-                        {farm.totalAmount}
+                        {parseFloat(farm.initialAmountInToken).toFixed(2)}
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
@@ -87,22 +91,19 @@ export default function StakingTable({
                       </div>
                     </td>
                     <td
-                      className={classNames(
-                        farm.totalEarningInUsdt < 0
-                          ? 'text-red-500'
-                          : 'text-green-500',
-                        'whitespace-nowrap px-6 py-4 text-sm'
-                      )}
+                      className='text-green-500 whitespace-nowrap px-6 py-4 text-sm'
                     >
-                      {farm.totalEarningInUsdt}
+                      {farm.totalEarningInToken.toFixed(2)}<br/>
+                      $ {farm.totalEarningInUsdt.toFixed(2)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                       <button
+                        disabled={!availableFarms.find(item => item.id === farm.id)?.active}
                         onClick={() => {
                           setStakeId(farm.id);
                           toggleModal(true);
                         }}
-                        className="mr-4 rounded-md border py-2 px-4 text-white"
+                        className="mr-4 rounded-md border py-2 px-4 text-white disabled:cursor-default disabled:opacity-70"
                       >
                         Add funds
                       </button>

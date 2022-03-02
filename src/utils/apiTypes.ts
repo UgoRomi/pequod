@@ -41,7 +41,7 @@ export interface UserInfoResponse {
       }
     ];
     risk: string;
-    initialAmountInToken: number;
+    initialAmountInToken: string;
     initialAmountInUsdt: number;
     earnedAMountAmount: number;
     totalEarningInToken: number;

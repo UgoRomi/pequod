@@ -13,8 +13,10 @@ export interface FarmState {
   unStakingTimeInSeconds: number;
   secondsInStaking: number;
   totalEarningInUsdt: number;
+  totalEarningInToken: number;
   initialAmountInUsdt: number;
   imageUrl?: string;
+  initialAmountInToken: string;
 }
 
 export interface UserToken {
