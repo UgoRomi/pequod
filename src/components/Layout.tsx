@@ -288,7 +288,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               <Logo className="mt-10 h-28 w-auto" />
 
               <p className="text-md mb-2 text-center text-pequod-white">
-                BETA V 1.0.0
+                BETA V 1.1.0
               </p>
             </div>
             <div className="sticky top-0 z-10 flex h-20 flex-shrink-0 flex-col items-center justify-center">

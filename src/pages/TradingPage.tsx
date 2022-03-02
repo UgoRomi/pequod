@@ -539,7 +539,7 @@ export default function TradingPage() {
                 <div className="grid grid-cols-cards grid-rows-2 gap-4">
                   <img
                     onError={setDefaultTokenLogo}
-                    src={token.logoUrl ?? unknownTokenLogo}
+                    src={token.logoUrl}
                     alt={token.symbol}
                     className="row-span-2 h-10"
                   />
@@ -594,7 +594,7 @@ export default function TradingPage() {
                   </div>
                   <input
                     id="search-field"
-                    className="b-1 focus:outline-none mr-4 block h-50 w-4/5 rounded-15 border appearance-none bg-transparent hover:bg-transparent focus:bg-transparent py-2 pl-12 pr-3 text-white placeholder-gray-400 focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple sm:text-sm"
+                    className="b-1 focus:outline-none mr-4 block h-50 w-4/5 appearance-none rounded-15 border bg-transparent py-2 pl-12 pr-3 text-white placeholder-gray-400 hover:bg-transparent focus:bg-transparent focus:placeholder-gray-400 focus:ring focus:ring-pequod-purple sm:text-sm"
                     placeholder="0xe861...."
                     type="search"
                     name="search"
@@ -787,7 +787,7 @@ export default function TradingPage() {
                 >
                   <p className="ml-1 text-pequod-pink">
                     {currentlySelectedTab === 'sell' ? (
-                      `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(
+                      `(≈ ${(parseFloat(amountTo) * bnbUsdPrice).toFixed(
                         2
                       )} USD)`
                     ) : selectedTokenInfo?.symbol ? (

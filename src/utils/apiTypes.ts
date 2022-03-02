@@ -19,6 +19,7 @@ export interface UserInfoResponse {
       earningPercentageInUsdt?: number;
       takeProfit?: number;
       stopLoss?: number;
+      logoUrl?: string;
     }[];
   };
   pequodFarms: {
