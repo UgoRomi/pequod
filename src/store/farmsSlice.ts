@@ -11,6 +11,7 @@ export interface AvailableFarmState {
   minimumToStake: number;
   earningPercentage: number;
   token: any;
+  active: boolean;
 }
 interface FarmsState {
   available: AvailableFarmState[];
