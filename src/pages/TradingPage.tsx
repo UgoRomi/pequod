@@ -190,17 +190,20 @@ export default function TradingPage() {
   const updateFrom = (
     value: string,
     fullSell = false,
-    percentageButton: number | null = null
+    percentageButton: number | null = null,
+    updateTo = true
   ) => {
-    const valueNumeric = parseFloat(value);
-    setAmountFrom(value);
+    // replace comma with dot
+    const newValue = value.replace(',', '.');
+    const valueNumeric = parseFloat(newValue);
+    setAmountFrom(newValue);
     setIsFullSell(fullSell);
     setPercentageButtonActive(
       percentageButton === null
         ? 100 / (fromTokenBalance / valueNumeric)
         : percentageButton
     );
-    if (!selectedTokenInfo?.priceBNB) return;
+    if (!selectedTokenInfo?.priceBNB || !updateTo) return;
     if (currentlySelectedTab === 'buy') {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     } else {
@@ -226,14 +229,26 @@ export default function TradingPage() {
   };
 
   const updateTo = (value: string) => {
-    const valueNumeric = parseFloat(value);
+    // replace comma with dot
+    const newValue = value.replace(',', '.');
+    const valueNumeric = parseFloat(newValue);
 
-    setAmountTo(value.toString());
+    setAmountTo(newValue.toString());
     if (!selectedTokenInfo?.priceBNB) return;
     if (currentlySelectedTab === 'buy') {
-      updateFrom((valueNumeric * selectedTokenInfo.priceBNB).toString());
+      updateFrom(
+        (valueNumeric * selectedTokenInfo.priceBNB).toString(),
+        false,
+        null,
+        false
+      );
     } else {
-      setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
+      updateFrom(
+        (valueNumeric / selectedTokenInfo.priceBNB).toString(),
+        false,
+        null,
+        false
+      );
     }
   };
 
