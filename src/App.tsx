@@ -25,7 +25,7 @@ function App() {
   useEffect(() => {
     getAndUpdateUserInfo();
 
-    const interval = setInterval(getAndUpdateUserInfo, 30000);
+    const interval = setInterval(getAndUpdateUserInfo, 10000);
 
     return () => clearInterval(interval);
   }, [getAndUpdateUserInfo]);
