@@ -15,6 +15,7 @@ export interface FarmState {
   totalEarningInUsdt: number;
   totalEarningInToken: number;
   initialAmountInUsdt: number;
+  token: any;
   imageUrl?: string;
   initialAmountInToken: string;
 }

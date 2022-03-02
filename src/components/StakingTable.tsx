@@ -67,7 +67,7 @@ export default function StakingTable({
                         <div className="h-10 w-10 flex-shrink-0">
                           <img
                             className="h-10 w-10 rounded-full"
-                            src={farm.imageUrl || unknownTokenLogo}
+                            src={farm.token.logoUrl || unknownTokenLogo}
                             alt="farm token"
                           />
                         </div>

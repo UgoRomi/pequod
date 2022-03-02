@@ -108,7 +108,8 @@ export function useUserInfo() {
         initialAmountInUsdt: farm.initialAmountInUsdt,
         totalEarningInToken: farm.totalEarningInToken,
         totalEarningInUsdt: farm.totalEarningInUsdt,
-        initialAmountInToken: farm.initialAmountInToken
+        initialAmountInToken: farm.initialAmountInToken,
+        token: farm.token
       };
     });
     if (userFarms) dispatch(addUserFarms(userFarms));
