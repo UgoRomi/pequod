@@ -1,20 +1,20 @@
-import { Route, Routes } from "react-router-dom";
-import Layout from "./components/Layout";
-import RequireAuth from "./components/RequireAuth";
-import RequireNoAuth from "./components/RequireNoAuth";
-import useEagerConnect from "./hooks/useEagerConnect";
-import LoginPage from "./pages/LoginPage";
-import StakingPage from "./pages/StakingPage";
-import { useEffect } from "react";
-import { useUserInfo } from "./utils/utils";
-import TradingPage from "./pages/TradingPage";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { selectPequodApiInstance } from "./store/axiosInstancesSlice";
-import { TokensListResponse } from "./utils/apiTypes";
-import { setTokens } from "./store/miscSlice";
-import _ from "lodash";
-import MaintenancePage from "./pages/MaintenancePage";
-import LaunchpadPage from "./pages/LaunchpadPage";
+import {Route, Routes} from 'react-router-dom';
+import Layout from './components/Layout';
+import RequireAuth from './components/RequireAuth';
+import RequireNoAuth from './components/RequireNoAuth';
+import useEagerConnect from './hooks/useEagerConnect';
+import LoginPage from './pages/LoginPage';
+import StakingPage from './pages/StakingPage';
+import {useEffect} from 'react';
+import {useUserInfo} from './utils/utils';
+import TradingPage from './pages/TradingPage';
+import {useAppDispatch, useAppSelector} from './store/hooks';
+import {selectPequodApiInstance} from './store/axiosInstancesSlice';
+import {TokensListResponse} from './utils/apiTypes';
+import {setTokens} from './store/miscSlice';
+import _ from 'lodash';
+import MaintenancePage from './pages/MaintenancePage';
+import LaunchpadPage from './pages/LaunchpadPage';
 
 function App() {
   useEagerConnect();
@@ -32,9 +32,9 @@ function App() {
 
   useEffect(() => {
     const getTokens = async () => {
-      const { data: tokensList }: { data: TokensListResponse[] } =
-        await pequodApiInstance.get("/tokens/list");
-      dispatch(setTokens(_.uniqBy(tokensList, "address")));
+      const {data: tokensList}: {data: TokensListResponse[]} =
+        await pequodApiInstance.get('/tokens/list');
+      dispatch(setTokens(_.uniqBy(tokensList, 'address')));
     };
     getTokens();
     // TODO: FIX
@@ -46,47 +46,42 @@ function App() {
       <Route
         path="/"
         element={
-            <RequireAuth>
-              <Layout>
-                <TradingPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <TradingPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
         path="/staking"
         element={
-            <RequireAuth>
-              <Layout>
-                <StakingPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <StakingPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
         path="/launchpad"
         element={
-            <RequireAuth>
-              <Layout>
-                <LaunchpadPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <LaunchpadPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
         path="/login"
         element={
-            <RequireNoAuth>
-              <LoginPage />
-            </RequireNoAuth>
+          <RequireNoAuth>
+            <LoginPage />
+          </RequireNoAuth>
         }
       />
-      <Route
-        path="/maintenance"
-        element={
-            <MaintenancePage />
-        }
-      />
+      <Route path="/maintenance" element={<MaintenancePage />} />
     </Routes>
   );
 }
