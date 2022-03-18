@@ -1,6 +1,8 @@
 import { useWeb3React } from "@web3-react/core";
 import { toast } from "react-toastify";
 import BEP20_ABI from "../BEP20.json";
+import LAUNCHPAD_ABI from "../launchpadABI.json";
+import LAUNCHPAD_BNB_ABI from "../launchpadBnbABI.json";
 import PANCAKE_FACTORY_ABI from "../pancakeFactoryABI.json";
 import PANCAKE_PAIR_ABI from "../pancakePairABI.json";
 import PANCAKE_ROUTER_ABI from "../pancakeRouterABI.json";
@@ -285,4 +287,47 @@ export function useWotStake() {
     }
   };
   return stake;
+}
+
+export function useLaunchpad(launchpadAddress: string) {
+  const { library, account } = useWeb3React();
+  const ABI =
+    launchpadAddress === process.env.REACT_APP_LAUNCHPAD_ADDRESS
+      ? LAUNCHPAD_ABI
+      : LAUNCHPAD_BNB_ABI;
+
+  const launchpadContract = new library.eth.Contract(ABI, launchpadAddress, {
+    from: account,
+  });
+  const canClaim = async (): Promise<boolean> => {
+    await launchpadContract.methods.canClaim().send({ from: account });
+    return true;
+  };
+
+  const claim = async (): Promise<{ success: boolean; txHash?: string }> => {
+    try {
+      const result = await launchpadContract.methods
+        .claim()
+        .send({ from: account });
+      return { success: true, txHash: result.transactionHash };
+    } catch (error) {
+      toast.error(`There was an claiming your\nPlease retry`);
+      console.error(error);
+      return { success: false, txHash: "" };
+    }
+  };
+
+  const amountOfTokenThatWillReceive = async (): Promise<number> => {
+    try {
+      const result = await launchpadContract.methods
+        .claim()
+        .send({ from: account });
+      return result;
+    } catch (error) {
+      toast.error(`There was an claiming your\nPlease retry`);
+      console.error(error);
+      return 0;
+    }
+  };
+  return { canClaim, claim, amountOfTokenThatWillReceive };
 }
