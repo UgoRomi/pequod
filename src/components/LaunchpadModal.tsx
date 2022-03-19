@@ -1,24 +1,76 @@
-/* This example requires Tailwind CSS v2.0+ */
 import swapIcon from "../images/swapIconLaunchpad.png";
 import walletReceived from "../images/walletIconReceived.png";
 import walletInitial from "../images/walletIconWhite.png";
 import claimIcon from "../images/claimIcon.svg";
 
 import { ArrowCircleRightIcon, XIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { formatAmount } from "../utils/utils";
+import { useWeb3React } from "@web3-react/core";
+import Web3 from "web3";
+
 export default function LaunchpadModal({
   setOpen,
   hidden,
-  step,
+  initialStep,
+  conversionRate,
+  presaleAddress,
 }: {
   setOpen: any;
   hidden: boolean;
-  step: 0 | 1 | 2 | 3;
+  initialStep: 0 | 1 | 2 | 3;
+  conversionRate?: number;
+  presaleAddress?: string;
 }) {
+  const [amountTo, setAmountTo] = useState<string>("0");
+  const [amountFrom, setAmountFrom] = useState<string>("0");
+  const [sendingBnb, setSendingBnb] = useState<boolean>(false);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(initialStep);
+  const { account, library } = useWeb3React();
+
+  const updateFrom = (value: string, updateTo = true) => {
+    // replace comma with dot
+    const newValue = value.replace(",", ".");
+    const valueNumeric = parseFloat(newValue);
+    setAmountFrom(newValue);
+    if (!conversionRate || !updateTo) return;
+    setAmountTo((valueNumeric * conversionRate).toString());
+  };
+
+  const updateTo = (value: string) => {
+    // replace comma with dot
+    const newValue = value.replace(",", ".");
+    const valueNumeric = parseFloat(newValue);
+    setAmountTo(newValue);
+    if (!conversionRate) return;
+    updateFrom((valueNumeric / conversionRate).toString(), false);
+  };
+
+  useEffect(() => {
+    setStep(initialStep);
+  }, [initialStep]);
+
+  const sendBnbToPresaleAddress = async () => {
+    try {
+      setSendingBnb(true);
+      await library.eth.sendTransaction({
+        from: account,
+        to: presaleAddress,
+        value: Web3.utils.toWei(amountFrom, "ether"),
+      });
+      setStep(1);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSendingBnb(false);
+    }
+  };
+
   return hidden ? (
     <></>
   ) : (
     <div className="fixed top-0 left-0 flex min-h-screen w-screen flex-col items-center justify-center bg-pequod-gray-300 text-center">
-      {/* BUY FORM - RIMUOVI HIDDEN COME CLS*/}
+      {/* BUY FORM */}
       <div
         className={`${
           step === 0 ? "flex" : "hidden"
@@ -49,6 +101,10 @@ export default function LaunchpadModal({
               maxLength={79}
               spellCheck="false"
               className="focus:outline-none block h-50 w-full rounded-10 border border-pequod-white bg-transparent px-2 py-1.5 text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+              value={formatAmount(amountFrom || "0")}
+              onChange={(e) => {
+                updateFrom(e.target.value);
+              }}
             />
 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
@@ -72,6 +128,10 @@ export default function LaunchpadModal({
               maxLength={79}
               spellCheck="false"
               className="focus:outline-none block h-50 w-full rounded-10 border border-pequod-white bg-transparent px-2 py-1.5 text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+              value={formatAmount(amountTo || "0")}
+              onChange={(e) => {
+                updateTo(e.target.value);
+              }}
             />
 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
@@ -83,8 +143,9 @@ export default function LaunchpadModal({
             <button
               style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
               className="focus:outline-none block h-50 w-full rounded-10 border border-pequod-white bg-transparent px-2 py-1.5 text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
+              onClick={sendBnbToPresaleAddress}
             >
-              Acquista
+              {sendingBnb ? "Acquisto in corso..." : "Acquista"}
             </button>
           </div>
         </div>

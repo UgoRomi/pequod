@@ -3,8 +3,9 @@ import { LinkIcon } from "@heroicons/react/outline";
 import midaImage from "../images/mida.png";
 import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
+import { useLaunchpad } from "../utils/contractsUtils";
 
 export default function LaunchpadPage() {
   const launchpads = [
@@ -53,15 +54,37 @@ export default function LaunchpadPage() {
   }
 
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
+  const [canClaim, setCanClaim] = useState<boolean>(false);
+  const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
+  const {
+    canClaim: checkCanClaim,
+    claim,
+    amountOfTokenThatWillReceive,
+  } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string);
 
-  // Qui gestire il canClaim in base alla chiamata al BE e farla per le info
-  const canClaim = false;
+  useEffect(() => {
+    amountOfTokenThatWillReceive().then((amountToReceive) => {
+      console.log("amountToReceive", amountToReceive);
+    });
+  });
+
+  // Check if the user can claim the tokens
+  useEffect(() => {
+    checkCanClaim().then((canClaim) => {
+      setModalStep(1);
+      setCanClaim(canClaim);
+    });
+  }, [checkCanClaim]);
+
   return launchpadId && launchpadData ? (
     <>
       <LaunchpadModal
         setOpen={setShowModal}
         hidden={!showModal}
-        step={0}
+        conversionRate={10000}
+        presaleAddress={process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string}
+        initialStep={modalStep}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
@@ -100,9 +123,18 @@ export default function LaunchpadPage() {
                 width: 200,
               }}
               hidden={!canClaim}
-              onClick={() => setShowModal(!showModal)}
+              onClick={() => {
+                setClaimInProgress(true);
+                claim()
+                  .then((result) => {
+                    if (!result.success) return;
+                    setModalStep(3);
+                    setShowModal(!showModal);
+                  })
+                  .finally(() => setClaimInProgress(false));
+              }}
             >
-              Claim
+              {claimInProgress ? "Claiming..." : "Claim"}
             </button>
             <button
               className="mt-10 text-xl font-normal underline"

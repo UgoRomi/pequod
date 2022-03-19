@@ -33,6 +33,11 @@ export function useGetTokenPrice() {
   const getPairAddress = useGetPairAddress();
 
   const getTokenPrice = async (tokenAddress: string) => {
+    const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
+      from: account,
+    });
+    const decimals = tokenContract.methods.decimals().call();
+
     // Get token/BNB pair address
     const pairAddress = await getPairAddress(tokenAddress);
 
@@ -53,6 +58,7 @@ export function useGetTokenPrice() {
     return {
       BNBReserve: isBNBToken0 ? reserve0 : reserve1,
       tokenReserve: isBNBToken0 ? reserve1 : reserve0,
+      tokenDecimals: decimals,
     };
   };
   return getTokenPrice;
@@ -311,7 +317,7 @@ export function useLaunchpad(launchpadAddress: string) {
         .send({ from: account });
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
-      toast.error(`There was an claiming your\nPlease retry`);
+      toast.error(`There was error an claiming your tokens\nPlease retry`);
       console.error(error);
       return { success: false, txHash: "" };
     }
@@ -320,11 +326,13 @@ export function useLaunchpad(launchpadAddress: string) {
   const amountOfTokenThatWillReceive = async (): Promise<number> => {
     try {
       const result = await launchpadContract.methods
-        .claim()
+        .amountOfTokenThatWillReceive()
         .call({ from: account });
       return result;
     } catch (error) {
-      toast.error(`There was an claiming your\nPlease retry`);
+      toast.error(
+        `There was an error checking how much you will receive\nPlease retry`
+      );
       console.error(error);
       return 0;
     }

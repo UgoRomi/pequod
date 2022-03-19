@@ -20,9 +20,17 @@ export default function MigrationPage() {
     useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
 
-  const { canClaim: checkCanClaim, claim } = useLaunchpad(
-    process.env.REACT_APP_LAUNCHPAD_ADDRESS as string
-  );
+  const {
+    canClaim: checkCanClaim,
+    claim,
+    amountOfTokenThatWillReceive,
+  } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_ADDRESS as string);
+
+  useEffect(() => {
+    amountOfTokenThatWillReceive().then((res) => {
+      console.log(res);
+    });
+  });
 
   // Check if the user has already allowed the spending of the tokens
   // to the presale contract
@@ -30,14 +38,14 @@ export default function MigrationPage() {
     checkAllowance(
       process.env.REACT_APP_WOT_ADDRESS as string,
       process.env.REACT_APP_LAUNCHPAD_ADDRESS as string
-    ).then((allowance: number) => {
+    ).then((allowance) => {
       setPresaleContractAllowance(allowance > 0);
     });
   }, [checkAllowance]);
 
   // Check if the user can claim the tokens
   useEffect(() => {
-    checkCanClaim().then((canClaim: boolean) => {
+    checkCanClaim().then((canClaim) => {
       setCanClaim(canClaim);
     });
   }, [checkCanClaim, presaleContractAllowance]);
@@ -59,7 +67,7 @@ export default function MigrationPage() {
       <LaunchpadModal
         setOpen={setShowModal}
         hidden={!showModal}
-        step={3}
+        initialStep={3}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
