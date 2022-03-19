@@ -1,14 +1,11 @@
-import {LinkIcon} from "@heroicons/react/outline";
+import { LinkIcon } from "@heroicons/react/outline";
 
 import midaImage from "../images/mida.png";
 import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import {useState} from "react";
+import { useState } from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 
-export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 export default function LaunchpadPage() {
   const launchpads = [
     {
@@ -64,24 +61,25 @@ export default function LaunchpadPage() {
       <LaunchpadModal
         setOpen={setShowModal}
         hidden={!showModal}
+        step={0}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
-        <h1 className="text-3xl mt-6 font-normal text-pequod-white">
+        <h1 className="mt-6 text-3xl font-normal text-pequod-white">
           {launchpadData.launchpadTitle}
         </h1>
         <hr />
         <img src={launchpadData.launchpadBg} alt="launchpad pequod" />
         <div className="p-4 text-center">
-          <h1 className="text-3xl mt-6 font-normal text-pequod-white">
+          <h1 className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData.launchpadSubTitle}
           </h1>
-          <h1 className="text-xl mt-3 font-normal text-pequod-pink">
+          <h1 className="mt-3 text-xl font-normal text-pequod-pink">
             {launchpadData.data}
           </h1>
-          <h2 className="text-xl mt-8 font-light text-pequod-white">
+          <h2 className="mt-8 text-xl font-light text-pequod-white">
             {launchpadData.launchpadDesc}
           </h2>
-          <div className="flex flex-col mt-24 justify-center items-center">
+          <div className="mt-24 flex flex-col items-center justify-center">
             <button
               className="rounded-3xl px-3 py-3"
               style={{
@@ -107,8 +105,8 @@ export default function LaunchpadPage() {
               Claim
             </button>
             <button
-              className="text-xl mt-10 font-normal underline"
-              style={{color: launchpadData.buttonDetailTextColor}}
+              className="mt-10 text-xl font-normal underline"
+              style={{ color: launchpadData.buttonDetailTextColor }}
             >
               {launchpadData.detailButtonText}
             </button>
@@ -134,23 +132,23 @@ export default function LaunchpadPage() {
 
         {launchpads.map((item) => {
           return (
-            <div className="flex flex-col py-12 border-b-2 md:flex-row">
+            <div className="flex flex-col border-b-2 py-12 md:flex-row">
               <div className="">
                 <a href={item.redirectUrl} target="_blank" rel="noreferrer">
                   <img src={item.imageUrl} alt={item.title} />
                 </a>
               </div>
-              <div className="flex flex-col text-white px-4 mt-4 md:mt-0 md:px-12 ">
+              <div className="mt-4 flex flex-col px-4 text-white md:mt-0 md:px-12 ">
                 <a href={item.redirectUrl} target="_blank" rel="noreferrer">
-                  <div className="text-md md:text-3xl flex flex-row mb-2">
+                  <div className="text-md mb-2 flex flex-row md:text-3xl">
                     {item.title}&nbsp;
                     <LinkIcon className="ml-4 w-4 md:w-8" />
                   </div>
                 </a>
-                <div className="text-sm md:text-xl text-pequod-pink mb-4 md:mb-6">
+                <div className="mb-4 text-sm text-pequod-pink md:mb-6 md:text-xl">
                   {item.data}
                 </div>
-                <div className="text-sm md:text-md text-white max-w-md">
+                <div className="md:text-md max-w-md text-sm text-white">
                   {item.description}
                 </div>
               </div>

@@ -300,7 +300,7 @@ export function useLaunchpad(launchpadAddress: string) {
     from: account,
   });
   const canClaim = async (): Promise<boolean> => {
-    await launchpadContract.methods.canClaim().send({ from: account });
+    await launchpadContract.methods.canClaim().call({ from: account });
     return true;
   };
 
@@ -321,7 +321,7 @@ export function useLaunchpad(launchpadAddress: string) {
     try {
       const result = await launchpadContract.methods
         .claim()
-        .send({ from: account });
+        .call({ from: account });
       return result;
     } catch (error) {
       toast.error(`There was an claiming your\nPlease retry`);

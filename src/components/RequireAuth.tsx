@@ -5,8 +5,7 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
   const { active } = useWeb3React();
 
   const location = useLocation();
-  console.log(process.env.REACT_APP_MAINTENANCE)
-  if(process.env.REACT_APP_MAINTENANCE === "True"){
+  if (process.env.REACT_APP_MAINTENANCE === "True") {
     return <Navigate to="/maintenance" state={{ from: location }} />;
   }
 
