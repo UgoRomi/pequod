@@ -9,12 +9,12 @@ tokenNew: 0x89FC4ae7FfFfD6c549c0Dc53F8FE958D2ff35c5A
 
 Al momento per ogni token vecchio dara' 1/100, cioe' 100 token vecchi danno 1 token nuovo.
 Steps per farlo funzionare:
-Dare allowance (chiamando funzione approve) del wallet per il massimo di token della presale (0x43fc9d1259BD6797cE5717278CC1947B6dC8269e) al contratto di presale 0xf359aB6a155fa0C583c670CBCc786D00A78d2c57
-chiamare: canClaim sul contratto di presale 0xf359aB6a155fa0C583c670CBCc786D00A78d2c57 per capire quando e' possibile fare claim
-chiamare: claim sul contratto di presale 0xf359aB6a155fa0C583c670CBCc786D00A78d2c57 una volta che e' possibile fare claim
+Dare allowance (chiamando funzione approve) del wallet per il massimo di token della presale (0x43fc9d1259BD6797cE5717278CC1947B6dC8269e) al contratto di presale 0x1Fe8be0955ff21f0B15f8F7A9c22a15105471384
+chiamare: canClaim sul contratto di presale 0x1Fe8be0955ff21f0B15f8F7A9c22a15105471384 per capire quando e' possibile fare claim
+chiamare: claim sul contratto di presale 0x1Fe8be0955ff21f0B15f8F7A9c22a15105471384 una volta che e' possibile fare claim
 controllare che i token  0x43fc9d1259BD6797cE5717278CC1947B6dC8269e vengano prelevati e portati sul contratto di presale, e vengano inviati i token 0x89FC4ae7FfFfD6c549c0Dc53F8FE958D2ff35c5A al wallet collegato a pequod
 
 By the way, la funzione amountOfTokenThatWillReceive, da il totale dei token (con i decimali), che il wallet ricevera' in entrambi i casi.
 
-L'altro launchpad e' diverso dal primo, qui si manderanno bnb al contratto di presale, 0xFAC0e52980B8E4b960Dcb7D17C9b2e72230899c4, al momento c'e' un rate 10000 Moby per ogni BNB
+L'altro launchpad e' diverso dal primo, qui si manderanno bnb al contratto di presale, 0x21134cf4AFDe5593Ea932c2fc6Eb7bcE9Ce92A46, al momento c'e' un rate 10000 Moby per ogni BNB
 ugualmente ha la funzione canClaim che restiuisce false finche' non sara' possibile recuperarli, quando restituisce true si chiama claim e i token vengono mandati al wallet.
