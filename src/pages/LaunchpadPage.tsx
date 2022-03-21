@@ -72,6 +72,7 @@ export default function LaunchpadPage() {
   // Check if the user can claim the tokens
   useEffect(() => {
     checkCanClaim().then((canClaim) => {
+      console.log("canClaim", canClaim);
       setModalStep(1);
       setCanClaim(canClaim);
     });

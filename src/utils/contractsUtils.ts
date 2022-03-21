@@ -306,8 +306,7 @@ export function useLaunchpad(launchpadAddress: string) {
     from: account,
   });
   const canClaim = async (): Promise<boolean> => {
-    await launchpadContract.methods.canClaim().call({ from: account });
-    return true;
+    return await launchpadContract.methods.canClaim().call({ from: account });
   };
 
   const claim = async (): Promise<{ success: boolean; txHash?: string }> => {

@@ -27,8 +27,8 @@ export default function MigrationPage() {
   } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_ADDRESS as string);
 
   useEffect(() => {
-    amountOfTokenThatWillReceive().then((res) => {
-      console.log(res);
+    amountOfTokenThatWillReceive().then((amountToReceive) => {
+      console.log("amountToReceive", amountToReceive);
     });
   });
 
@@ -46,6 +46,7 @@ export default function MigrationPage() {
   // Check if the user can claim the tokens
   useEffect(() => {
     checkCanClaim().then((canClaim) => {
+      console.log("canClaim", canClaim);
       setCanClaim(canClaim);
     });
   }, [checkCanClaim, presaleContractAllowance]);
