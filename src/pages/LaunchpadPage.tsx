@@ -17,7 +17,7 @@ export default function LaunchpadPage() {
       description:
         "Dai musei al Metaverso. MIDA offre alle Istituzioni che conservano capolavori artistici un nuovo modo di valorizzarli tramite la creazione e la vendita di opere NFT uniche ai grandi collezionisti del Metaverso.",
       imageUrl: midaImage,
-      redirectUrl: "https://midanft.com/it/dai-musei-al-metaverso/",
+      redirectUrl: "https://midanft.com/it/home/",
     },
     {
       id: "moby",
