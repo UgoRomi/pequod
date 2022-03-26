@@ -336,5 +336,33 @@ export function useLaunchpad(launchpadAddress: string) {
       return 0;
     }
   };
-  return { canClaim, claim, amountOfTokenThatWillReceive };
+
+  const getPresaleStatus = async (): Promise<{
+    hardCap: number;
+    softCap: number;
+    currentRaised: number;
+  }> => {
+    try {
+      const hardCap = library.utils.fromWei(
+        await launchpadContract.methods.hardCap().call({ from: account })
+      );
+      const softCap = library.utils.fromWei(
+        await launchpadContract.methods.hardCap().call({ from: account })
+      );
+      const currentRaised = library.utils.fromWei(
+        await launchpadContract.methods
+          .totalContributed()
+          .call({ from: account })
+      );
+      return { hardCap, softCap, currentRaised };
+    } catch (error) {
+      toast.error(
+        `There was an error checking the presale status\nPlease retry`
+      );
+      console.error(error);
+      return { hardCap: 0, softCap: 0, currentRaised: 0 };
+    }
+  };
+
+  return { canClaim, claim, amountOfTokenThatWillReceive, getPresaleStatus };
 }

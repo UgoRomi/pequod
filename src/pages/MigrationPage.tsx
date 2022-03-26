@@ -69,6 +69,7 @@ export default function MigrationPage() {
         setOpen={setShowModal}
         hidden={!showModal}
         initialStep={3}
+        presaleStatus={{ currentRaised: 0, hardCap: 0, softCap: 0 }}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">

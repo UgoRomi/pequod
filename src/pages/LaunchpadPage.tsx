@@ -35,6 +35,7 @@ export default function LaunchpadPage() {
 
       // Button
       buyButtonText: "Acquista Moby",
+      claimButtonText: "Claim your Moby",
       buttonBgColor: "#00FFFF",
       buttonTextColor: "#0B0629",
       detailButtonText: "Stato Presale",
@@ -45,7 +46,7 @@ export default function LaunchpadPage() {
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
   //const arr = url.split("/");
   const launchpadId = "moby";
-  let launchpadData;
+  let launchpadData: any;
   if (launchpadId) {
     launchpadData = launchpads.find((item) => {
       if (item.id) return item.id === launchpadId;
@@ -54,29 +55,35 @@ export default function LaunchpadPage() {
   }
 
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showPresaleStatus, setShowPresaleStatus] = useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
+  const [presaleStatus, setPresaleStatus] = useState<{
+    currentRaised: number;
+    hardCap: number;
+    softCap: number;
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
   const {
     canClaim: checkCanClaim,
     claim,
-    amountOfTokenThatWillReceive,
+    getPresaleStatus,
   } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string);
-
-  useEffect(() => {
-    amountOfTokenThatWillReceive().then((amountToReceive) => {
-      console.log("amountToReceive", amountToReceive);
-    });
-  });
 
   // Check if the user can claim the tokens
   useEffect(() => {
     checkCanClaim().then((canClaim) => {
-      console.log("canClaim", canClaim);
-      setModalStep(1);
       setCanClaim(canClaim);
     });
   }, [checkCanClaim]);
+
+  // check the presale status
+  useEffect(() => {
+    getPresaleStatus().then(({ currentRaised, hardCap, softCap }) => {
+      setPresaleStatus({ currentRaised, hardCap, softCap });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return launchpadId && launchpadData ? (
     <>
@@ -86,6 +93,14 @@ export default function LaunchpadPage() {
         conversionRate={10000}
         presaleAddress={process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string}
         initialStep={modalStep}
+        presaleStatus={presaleStatus}
+      ></LaunchpadModal>
+      <LaunchpadModal
+        setOpen={setShowPresaleStatus}
+        hidden={!showPresaleStatus}
+        initialStep={2}
+        conversionRate={10000}
+        presaleStatus={presaleStatus}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
@@ -104,42 +119,48 @@ export default function LaunchpadPage() {
             {launchpadData.launchpadDesc}
           </h2>
           <div className="mt-24 flex flex-col items-center justify-center">
-            <button
-              className="rounded-3xl px-3 py-3"
-              style={{
-                backgroundColor: launchpadData.buttonBgColor,
-                color: launchpadData.buttonTextColor,
-                width: 200,
-              }}
-              hidden={canClaim}
-              onClick={() => setShowModal(!showModal)}
-            >
-              {launchpadData.buyButtonText}
-            </button>
-            <button
-              className="rounded-3xl px-3 py-3"
-              style={{
-                backgroundColor: launchpadData.buttonBgColor,
-                color: launchpadData.buttonTextColor,
-                width: 200,
-              }}
-              hidden={!canClaim}
-              onClick={() => {
-                setClaimInProgress(true);
-                claim()
-                  .then((result) => {
-                    if (!result.success) return;
-                    setModalStep(3);
-                    setShowModal(!showModal);
-                  })
-                  .finally(() => setClaimInProgress(false));
-              }}
-            >
-              {claimInProgress ? "Claiming..." : "Claim"}
-            </button>
+            {canClaim ? (
+              <button
+                className="rounded-3xl px-3 py-3"
+                style={{
+                  backgroundColor: launchpadData.buttonBgColor,
+                  color: launchpadData.buttonTextColor,
+                  width: 200,
+                }}
+                onClick={() => {
+                  setClaimInProgress(true);
+                  claim()
+                    .then((result) => {
+                      if (!result.success) return;
+                      setModalStep(3);
+                      setShowModal(!showModal);
+                    })
+                    .finally(() => setClaimInProgress(false));
+                }}
+              >
+                {claimInProgress
+                  ? "Claiming..."
+                  : launchpadData.claimButtonText}
+              </button>
+            ) : (
+              <button
+                className="rounded-3xl px-3 py-3"
+                style={{
+                  backgroundColor: launchpadData.buttonBgColor,
+                  color: launchpadData.buttonTextColor,
+                  width: 200,
+                }}
+                onClick={() => setShowModal(!showModal)}
+              >
+                {launchpadData.buyButtonText}
+              </button>
+            )}
             <button
               className="mt-10 text-xl font-normal underline"
               style={{ color: launchpadData.buttonDetailTextColor }}
+              onClick={() => {
+                setShowPresaleStatus(true);
+              }}
             >
               {launchpadData.detailButtonText}
             </button>

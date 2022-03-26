@@ -15,12 +15,18 @@ export default function LaunchpadModal({
   initialStep,
   conversionRate,
   presaleAddress,
+  presaleStatus,
 }: {
   setOpen: any;
   hidden: boolean;
   initialStep: 0 | 1 | 2 | 3;
   conversionRate?: number;
   presaleAddress?: string;
+  presaleStatus: {
+    currentRaised: number;
+    hardCap: number;
+    softCap: number;
+  };
 }) {
   const [amountTo, setAmountTo] = useState<string>("0");
   const [amountFrom, setAmountFrom] = useState<string>("0");
@@ -82,7 +88,10 @@ export default function LaunchpadModal({
           <div className="">
             <XIcon
               className="w-6 cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setStep(0);
+              }}
             ></XIcon>
           </div>
         </div>
@@ -163,7 +172,10 @@ export default function LaunchpadModal({
           <div className="">
             <XIcon
               className="w-6 cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setStep(0);
+              }}
             ></XIcon>
           </div>
         </div>
@@ -197,22 +209,29 @@ export default function LaunchpadModal({
           <div className="">
             <XIcon
               className="w-6 cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+              }}
             ></XIcon>
           </div>
         </div>
         <div className="relative mt-10 w-3/5 rounded-md shadow-sm">
-          <div className="focus:outline-none block flex h-50 w-full flex-row justify-between rounded-10 border border-pequod-white bg-transparent text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm">
+          <div className="focus:outline-none flex h-50 w-full flex-row justify-between rounded-10 border border-pequod-white bg-transparent text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm">
             <div
-              style={{ width: "50%", backgroundColor: "#00FFFF4f" }}
+              style={{
+                width: `${
+                  (presaleStatus.currentRaised * 100) / presaleStatus.hardCap
+                }%`,
+                backgroundColor: "#00FFFF4f",
+              }}
               className="flex h-50 items-center justify-center rounded-10 rounded-tr-40 rounded-br-40 border-r bg-white"
             >
-              <h1>310</h1>
+              <h1>{presaleStatus.currentRaised}</h1>
             </div>
             <div className="h-50 w-20 border-l border-dashed">
               <div style={{ position: "fixed", marginTop: "50px" }}>
                 HC
-                <br /> 1000
+                <br /> {presaleStatus.hardCap}
               </div>
             </div>
           </div>
@@ -223,12 +242,17 @@ export default function LaunchpadModal({
         </div>
 
         <div className="relative mt-16 w-3/5 rounded-md shadow-sm">
-          <div className="focus:outline-none flex-row-end block flex h-50 w-full justify-between rounded-10 border border-pequod-white bg-transparent text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm">
+          <div className="focus:outline-none flex-row-end flex h-50 w-full justify-between rounded-10 border border-pequod-white bg-transparent text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm">
             <div
-              style={{ width: "100%", backgroundColor: "#00FFFF4f" }}
+              style={{
+                width: `${
+                  (presaleStatus.currentRaised * 100) / presaleStatus.hardCap
+                }%`,
+                backgroundColor: "#00FFFF4f",
+              }}
               className="absolute right-0 flex h-50 items-center justify-center rounded-15 rounded-tl-40 rounded-bl-40 border-r bg-white pr-10"
             >
-              <h1>920.054.460</h1>
+              <h1>{presaleStatus.currentRaised * (conversionRate || 0)}</h1>
             </div>
           </div>
 
@@ -250,7 +274,10 @@ export default function LaunchpadModal({
           <div className="">
             <XIcon
               className="w-6 cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setStep(0);
+              }}
             ></XIcon>
           </div>
         </div>
