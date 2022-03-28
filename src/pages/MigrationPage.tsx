@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 import Spinner from "../components/Spinner";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import {
-  useAllowance,
-  useApprove,
-  useLaunchpad,
-} from "../utils/contractsUtils";
+import {useAllowance, useApprove, useLaunchpad} from "../utils/contractsUtils";
 
 export default function MigrationPage() {
   const checkAllowance = useAllowance();
@@ -69,7 +65,7 @@ export default function MigrationPage() {
         setOpen={setShowModal}
         hidden={!showModal}
         initialStep={3}
-        presaleStatus={{ currentRaised: 0, hardCap: 0, softCap: 0 }}
+        presaleStatus={{currentRaised: 0, hardCap: 0, softCap: 0}}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
@@ -82,7 +78,7 @@ export default function MigrationPage() {
             Migrazione a V2
           </h1>
           <h3 className="mt-3 text-xl font-normal text-pequod-pink">
-            21/03/2022
+            28/03/2022
           </h3>
           <h2 className="mt-8 text-xl font-light text-pequod-white">
             Cosa accadrà con la migrazione a V2? A seguito della migrazione i
