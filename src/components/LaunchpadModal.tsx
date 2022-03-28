@@ -3,10 +3,10 @@ import walletReceived from "../images/walletIconReceived.png";
 import walletInitial from "../images/walletIconWhite.png";
 import claimIcon from "../images/claimIcon.svg";
 
-import { ArrowCircleRightIcon, XIcon } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
-import { formatAmount } from "../utils/utils";
-import { useWeb3React } from "@web3-react/core";
+import {ArrowCircleRightIcon, XIcon} from "@heroicons/react/outline";
+import {useEffect, useState} from "react";
+import {formatAmount} from "../utils/utils";
+import {useWeb3React} from "@web3-react/core";
 import Web3 from "web3";
 
 export default function LaunchpadModal({
@@ -32,7 +32,7 @@ export default function LaunchpadModal({
   const [amountFrom, setAmountFrom] = useState<string>("0");
   const [sendingBnb, setSendingBnb] = useState<boolean>(false);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(initialStep);
-  const { account, library } = useWeb3React();
+  const {account, library} = useWeb3React();
 
   const updateFrom = (value: string, updateTo = true) => {
     // replace comma with dot
@@ -80,7 +80,7 @@ export default function LaunchpadModal({
       <div
         className={`${
           step === 0 ? "flex" : "hidden"
-        } w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white`}
+        } w-full md:w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white`}
       >
         <div className="flex w-full flex-row justify-between">
           <div>&nbsp;</div>
@@ -150,7 +150,7 @@ export default function LaunchpadModal({
 
           <div className="relative mt-10 w-4/5 rounded-md shadow-sm">
             <button
-              style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
+              style={{borderColor: "#00FFFF", color: "#00FFFF"}}
               className="focus:outline-none block h-50 w-full rounded-10 border border-pequod-white bg-transparent px-2 py-1.5 text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
               onClick={sendBnbToPresaleAddress}
             >
@@ -164,7 +164,7 @@ export default function LaunchpadModal({
       <div
         className={`${
           step === 1 ? "flex" : "hidden"
-        } w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
+        } w-full md:w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
       >
         <div className="flex w-full flex-row justify-between">
           <div>&nbsp;</div>
@@ -190,7 +190,7 @@ export default function LaunchpadModal({
         </div>
         <button
           disabled={true}
-          style={{ backgroundColor: "#B3B6BF", color: "#2d2d2d" }}
+          style={{backgroundColor: "#B3B6BF", color: "#2d2d2d"}}
           className="block h-50 w-3/5 rounded-10 border border-pequod-white disabled:cursor-not-allowed sm:text-sm"
         >
           Token acquistati correttamente
@@ -201,7 +201,7 @@ export default function LaunchpadModal({
       <div
         className={`${
           step === 2 ? "flex" : "hidden"
-        } w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
+        } w-full md:w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
       >
         <div className="flex w-full flex-row justify-between">
           <div>&nbsp;</div>
@@ -229,7 +229,7 @@ export default function LaunchpadModal({
               <h1>{presaleStatus.currentRaised}</h1>
             </div>
             <div className="h-50 w-20 border-l border-dashed">
-              <div style={{ position: "fixed", marginTop: "50px" }}>
+              <div style={{position: "fixed", marginTop: "50px"}}>
                 HC
                 <br /> {presaleStatus.hardCap}
               </div>
@@ -266,7 +266,7 @@ export default function LaunchpadModal({
       <div
         className={`${
           step === 3 ? "flex" : "hidden"
-        } w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
+        } w-full md:w-1/5 flex-col items-center justify-center rounded-40 bg-pequod-gray p-12 text-white md:w-2/5`}
       >
         <div className="flex w-full flex-row justify-between">
           <div>&nbsp;</div>
