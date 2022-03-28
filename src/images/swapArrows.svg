@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24.635" height="19.249" viewBox="0 0 24.635 19.249">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#8f199d"/>
+      <stop offset="1" stop-color="#c923dd"/>
+    </linearGradient>
+  </defs>
+  <path id="Icon_awesome-exchange-alt" data-name="Icon awesome-exchange-alt" d="M0,9.326v-.77A1.155,1.155,0,0,1,1.155,7.4H18.477V5.092a1.156,1.156,0,0,1,1.971-.817L24.3,8.124a1.155,1.155,0,0,1,0,1.633l-3.849,3.849a1.156,1.156,0,0,1-1.971-.817v-2.31H1.155A1.155,1.155,0,0,1,0,9.326ZM23.481,16.64H6.159V14.33a1.156,1.156,0,0,0-1.971-.817L.338,17.363A1.155,1.155,0,0,0,.338,19l3.849,3.849a1.156,1.156,0,0,0,1.971-.817v-2.31H23.481a1.155,1.155,0,0,0,1.155-1.155v-.77A1.155,1.155,0,0,0,23.481,16.64Z" transform="translate(0 -3.936)" fill="url(#linear-gradient)"/>
+</svg>

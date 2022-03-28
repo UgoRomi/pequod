@@ -1,38 +1,38 @@
-import { Fragment, useEffect, useState } from 'react';
-import { Dialog, Menu, Transition } from '@headlessui/react';
+import {Fragment, useEffect, useState} from "react";
+import {Dialog, Menu, Transition} from "@headlessui/react";
 import {
   LogoutIcon,
   XIcon,
   DocumentDuplicateIcon,
   MenuAlt2Icon,
-} from '@heroicons/react/outline';
+} from "@heroicons/react/outline";
 
-import { useWeb3React } from '@web3-react/core';
-import useAuth from '../hooks/useAuth';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
-import { classNames, useValidateSessionIfInvalid } from '../utils/utils';
-import { ReactComponent as Logo } from '../images/logo.svg';
-import logoPng from '../images/logo.png';
-import { useAppSelector } from '../store/hooks';
-import { selectUserSignedMessage } from '../store/userInfoSlice';
-import Spinner from './Spinner';
-import { toast } from 'react-toastify';
-import '../override_toastify.css';
+import {useWeb3React} from "@web3-react/core";
+import useAuth from "../hooks/useAuth";
+import {useLocation} from "react-router";
+import {Link} from "react-router-dom";
+import {classNames, useValidateSessionIfInvalid} from "../utils/utils";
+import {ReactComponent as Logo} from "../images/logo.svg";
+import logoPng from "../images/logo.png";
+import {useAppSelector} from "../store/hooks";
+import {selectUserSignedMessage} from "../store/userInfoSlice";
+import Spinner from "./Spinner";
+import {toast} from "react-toastify";
+import "../override_toastify.css";
 
-import swapIcon from '../images/swap.png';
-import stakingIcon from '../images/stake.png';
-import notificationIcon from '../images/notifications.png';
-import launchpadIcon from '../images/launchpad.png';
-import liquidityIcon from '../images/liquiditypool.png';
-import aiIcon from '../images/ai.png';
-import giveawayIcon from '../images/giveaway.png';
-import airdropIcon from '../images/airdrop.png';
-
-export default function Layout({ children }: { children: JSX.Element }) {
+import swapIcon from "../images/swap.png";
+import stakingIcon from "../images/stake.png";
+import notificationIcon from "../images/notifications.png";
+import launchpadIcon from "../images/launchpad.png";
+import liquidityIcon from "../images/liquiditypool.png";
+import aiIcon from "../images/ai.png";
+import giveawayIcon from "../images/giveaway.png";
+import airdropIcon from "../images/airdrop.png";
+import swapArrowsIcon from "../images/swapArrows.svg";
+export default function Layout({children}: {children: JSX.Element}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { account } = useWeb3React();
-  const { logout } = useAuth();
+  const {account} = useWeb3React();
+  const {logout} = useAuth();
   const location = useLocation();
   const userSignedMessage = useAppSelector(selectUserSignedMessage);
   const validateSessionIfInvalid = useValidateSessionIfInvalid();
@@ -40,68 +40,75 @@ export default function Layout({ children }: { children: JSX.Element }) {
 
   const [navigation, setNavigation] = useState([
     {
-      name: 'Swap',
-      href: '/',
+      name: "Swap",
+      href: "/",
       icon: swapIcon,
       current: false,
       disabled: false,
     },
     {
-      name: 'Staking',
-      href: '/staking',
+      name: "Staking",
+      href: "/staking",
       icon: stakingIcon,
       current: false,
       disabled: false,
     },
     {
-      name: 'Notifications',
-      href: '/notifications',
+      name: "Notifications",
+      href: "/notifications",
       icon: notificationIcon,
       current: false,
       disabled: true,
     },
     {
-      name: 'Launchpad',
-      href: '/launchpad',
+      name: "Launchpad",
+      href: "/launchpad",
       icon: launchpadIcon,
       current: false,
       disabled: false,
     },
     {
-      name: 'Liquidity pool',
-      href: '/liquidity',
+      name: "Liquidity pool",
+      href: "/liquidity",
       icon: liquidityIcon,
       current: false,
       disabled: true,
     },
     {
-      name: 'Achab Services (AI)',
-      href: '/achabservices',
+      name: "Achab Services (AI)",
+      href: "/achabservices",
       icon: aiIcon,
       current: false,
       disabled: true,
     },
     {
-      name: 'Giveaways',
-      href: '/giveaways',
+      name: "Giveaways",
+      href: "/giveaways",
       icon: giveawayIcon,
       current: false,
       disabled: true,
     },
     {
-      name: 'Airdrops',
-      href: '/airdrops',
+      name: "Airdrops",
+      href: "/airdrops",
       icon: airdropIcon,
+      current: false,
+      disabled: true,
+    },
+    {
+      name: "Migration",
+      href: "/migration",
+      icon: swapArrowsIcon,
       current: false,
       disabled: true,
     },
   ]);
 
   useEffect(() => {
-    const page = navigation.find(({ href }) => href === location.pathname);
+    const page = navigation.find(({href}) => href === location.pathname);
     if (!page || page.current) return;
     setNavigation(
-      navigation.map((item) => ({ ...item, current: item.href === page.href }))
+      navigation.map((item) => ({...item, current: item.href === page.href}))
     );
   }, [location.pathname, navigation]);
 
@@ -113,12 +120,12 @@ export default function Layout({ children }: { children: JSX.Element }) {
   const copyToClipboard = (e: any) => {
     e.preventDefault();
     /* Get the text field */
-    const accountUser = account ? account : '';
+    const accountUser = account ? account : "";
     navigator.clipboard.writeText(accountUser);
 
     /* Alert the copied text */
 
-    toast.success('Text copied');
+    toast.success("Text copied");
   };
 
   return (
@@ -137,7 +144,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   <span>Signing in...</span>
                 </>
               ) : (
-                'Sign the message'
+                "Sign the message"
               )}
             </button>
           </div>
@@ -200,7 +207,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     <Menu.Button className="b-2 focus:outline-none flex max-w-xs items-center rounded-full border bg-transparent text-sm focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
                       <span className="focus:outline-none inline-flex items-center rounded-full bg-transparent px-5 py-1 text-base font-medium text-pequod-white shadow-sm hover:bg-transparent focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
-                        {account?.slice(0, 6) + '...' + account?.slice(37)}
+                        {account?.slice(0, 6) + "..." + account?.slice(37)}
                       </span>
                       <DocumentDuplicateIcon
                         className="mr-3 h-6 w-6 flex-shrink-0 text-white"
@@ -220,11 +227,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   >
                     <Menu.Items className="focus:outline-none absolute mt-10 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-pequod-dark ring-opacity-5">
                       <Menu.Item onClick={logout}>
-                        {({ active }) => (
+                        {({active}) => (
                           <span
                             className={classNames(
-                              active ? 'bg-pequod-dark' : '',
-                              'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
+                              active ? "bg-pequod-dark" : "",
+                              "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
                             )}
                           >
                             <LogoutIcon
@@ -249,11 +256,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         }}
                         className={classNames(
                           item.current
-                            ? 'border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white'
+                            ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
                             : item.disabled
-                            ? 'cursor-default text-white opacity-60'
-                            : 'pl-3 text-pequod-white hover:bg-pequod-white-300',
-                          'group flex items-center justify-center px-2 py-3 text-sm font-medium'
+                            ? "cursor-default text-white opacity-60"
+                            : "pl-3 text-pequod-white hover:bg-pequod-white-300",
+                          "group flex items-center justify-center px-2 py-3 text-sm font-medium"
                         )}
                       >
                         <img
@@ -261,9 +268,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
                           alt=""
                           className={classNames(
                             item.disabled
-                              ? 'cursor-default text-white opacity-60 grayscale filter'
-                              : 'text-pequod-pink',
-                            'mr-3 h-6 w-6 flex-shrink-0'
+                              ? "cursor-default text-white opacity-60 grayscale filter"
+                              : "text-pequod-pink",
+                            "mr-3 h-6 w-6 flex-shrink-0"
                           )}
                           aria-hidden="true"
                         />
@@ -300,7 +307,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       <Menu.Button className="b-2 focus:outline-none flex max-w-xs items-center  rounded-full border bg-transparent text-sm focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <span className="focus:outline-none inline-flex items-center rounded-full bg-transparent px-5 py-1 text-base font-medium text-pequod-white shadow-sm hover:bg-transparent focus:ring-2 focus:ring-pequod-purple focus:ring-offset-2">
-                          {account?.slice(0, 6) + '...' + account?.slice(37)}
+                          {account?.slice(0, 6) + "..." + account?.slice(37)}
                         </span>
                         <DocumentDuplicateIcon
                           className="mr-3 h-6 w-6 flex-shrink-0 text-white"
@@ -320,11 +327,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     >
                       <Menu.Items className="focus:outline-none absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-pequod-dark ring-opacity-5">
                         <Menu.Item onClick={logout}>
-                          {({ active }) => (
+                          {({active}) => (
                             <span
                               className={classNames(
-                                active ? 'bg-pequod-dark' : '',
-                                'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
+                                active ? "bg-pequod-dark" : "",
+                                "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
                               )}
                             >
                               <LogoutIcon
@@ -353,11 +360,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     }}
                     className={classNames(
                       item.current
-                        ? 'border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white'
+                        ? "border-l-4 border-pequod-pink bg-pequod-white-300 text-pequod-white"
                         : item.disabled
-                        ? 'cursor-default text-white opacity-60'
-                        : 'pl-3 text-pequod-white hover:bg-pequod-white-300',
-                      'group flex items-center justify-center px-2 py-3 text-sm font-medium'
+                        ? "cursor-default text-white opacity-60"
+                        : "pl-3 text-pequod-white hover:bg-pequod-white-300",
+                      "group flex items-center justify-center px-2 py-3 text-sm font-medium"
                     )}
                   >
                     <img
@@ -365,9 +372,9 @@ export default function Layout({ children }: { children: JSX.Element }) {
                       alt=""
                       className={classNames(
                         item.disabled
-                          ? 'cursor-default text-white opacity-60 grayscale filter'
-                          : 'text-pequod-pink',
-                        'mr-3 h-6 w-6 flex-shrink-0'
+                          ? "cursor-default text-white opacity-60 grayscale filter"
+                          : "text-pequod-pink",
+                        "mr-3 h-6 w-6 flex-shrink-0"
                       )}
                       aria-hidden="true"
                     />
@@ -403,11 +410,11 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   >
                     <Menu.Items className="focus:outline-none absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                       <Menu.Item onClick={logout}>
-                        {({ active }) => (
+                        {({active}) => (
                           <span
                             className={classNames(
-                              active ? 'bg-pequod-gray' : '',
-                              'flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white'
+                              active ? "bg-pequod-gray" : "",
+                              "flex cursor-pointer items-center px-4 py-2 text-sm text-pequod-white"
                             )}
                           >
                             <LogoutIcon

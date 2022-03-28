@@ -19,6 +19,7 @@ module.exports = {
         "pequod-white": "#f2f2f2",
         "pequod-white-300": "#f2f2f20f",
         "pequod-gray": "#231e3e",
+        "pequod-gray-300": "#231e3eaf",
       },
       borderColor: {
         "pequod-white": "#f2f2f2",
@@ -38,27 +39,27 @@ module.exports = {
         "pequod-white-500": "#f2f2f2af",
         "pequod-gray": "#231e3e",
         "pequod-green": "#2EF000",
-        "pequod-red": "#F00000"
+        "pequod-red": "#F00000",
       },
       borderRadius: {
-        '40': '40px',
-        '15': '15px',
-        '10': '10px',
+        40: "40px",
+        15: "15px",
+        10: "10px",
       },
       width: {
-        '55': '55px',
+        55: "55px",
       },
       height: {
-        '50': '50px',
-        '40': '40px',
-        '35': '35px',
+        50: "50px",
+        40: "40px",
+        35: "35px",
       },
       maxHeight: {
-        '400': '400px',
+        400: "400px",
       },
       minWidth: {
-        '55': '55px',
-      }
+        55: "55px",
+      },
     },
   },
   variants: {

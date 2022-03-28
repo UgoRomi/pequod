@@ -15,6 +15,7 @@ import { setTokens } from "./store/miscSlice";
 import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
 import LaunchpadPage from "./pages/LaunchpadPage";
+import MigrationPage from "./pages/MigrationPage";
 
 function App() {
   useEagerConnect();
@@ -46,47 +47,62 @@ function App() {
       <Route
         path="/"
         element={
-            <RequireAuth>
-              <Layout>
-                <TradingPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <TradingPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
         path="/staking"
         element={
-            <RequireAuth>
-              <Layout>
-                <StakingPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <StakingPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
-        path="/launchpad"
+        path="/launchpad/:launchpadId"
         element={
-            <RequireAuth>
-              <Layout>
-                <LaunchpadPage />
-              </Layout>
-            </RequireAuth>
+          <RequireAuth>
+            <Layout>
+              <LaunchpadPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/launchpad/"
+        element={
+          <RequireAuth>
+            <Layout>
+              <LaunchpadPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/migration"
+        element={
+          <RequireAuth>
+            <Layout>
+              <MigrationPage />
+            </Layout>
+          </RequireAuth>
         }
       />
       <Route
         path="/login"
         element={
-            <RequireNoAuth>
-              <LoginPage />
-            </RequireNoAuth>
+          <RequireNoAuth>
+            <LoginPage />
+          </RequireNoAuth>
         }
       />
-      <Route
-        path="/maintenance"
-        element={
-            <MaintenancePage />
-        }
-      />
+      <Route path="/maintenance" element={<MaintenancePage />} />
     </Routes>
   );
 }
