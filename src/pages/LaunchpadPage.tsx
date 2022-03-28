@@ -5,7 +5,7 @@ import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
 import {useEffect, useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
-import { Link, useParams } from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useLaunchpad} from "../utils/contractsUtils";
 
 export default function LaunchpadPage() {
@@ -22,7 +22,7 @@ export default function LaunchpadPage() {
     {
       id: "moby",
       title: "MOBY V2",
-      data: "21/03/2022",
+      data: "28/03/2022",
       description:
         "La migrazione da V1 a V2 ti regala un’incredibile opportunità. Potrai acquistare i nuovi token MOBY a un prezzo invariabile. Vogliamo far crescere la nostra ciurma. Cogli l’opportunità al volo.",
       imageUrl: mobyImage,
@@ -48,7 +48,7 @@ export default function LaunchpadPage() {
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
   //const arr = url.split("/");
 
-  let { launchpadId } = useParams();
+  let {launchpadId} = useParams();
   let launchpadData: any;
   if (launchpadId) {
     launchpadData = launchpads.find((item) => {
