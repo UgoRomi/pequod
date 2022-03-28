@@ -102,7 +102,7 @@ export default function LaunchpadPage() {
         setOpen={setShowPresaleStatus}
         hidden={!showPresaleStatus}
         initialStep={2}
-        conversionRate={10000}
+        conversionRate={40000}
         presaleStatus={presaleStatus}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
