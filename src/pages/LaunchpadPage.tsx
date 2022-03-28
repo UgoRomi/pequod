@@ -1,12 +1,12 @@
-import { LinkIcon } from "@heroicons/react/outline";
+import {LinkIcon} from "@heroicons/react/outline";
 
 import midaImage from "../images/mida.png";
 import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 import {Link, useParams} from "react-router-dom";
-import { useLaunchpad } from "../utils/contractsUtils";
+import {useLaunchpad} from "../utils/contractsUtils";
 
 export default function LaunchpadPage() {
   const launchpads = [
@@ -66,7 +66,7 @@ export default function LaunchpadPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
+  }>({currentRaised: 0, hardCap: 0, softCap: 0});
   const {
     canClaim: checkCanClaim,
     claim,
@@ -82,8 +82,8 @@ export default function LaunchpadPage() {
 
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({ currentRaised, hardCap, softCap }) => {
-      setPresaleStatus({ currentRaised, hardCap, softCap });
+    getPresaleStatus().then(({currentRaised, hardCap, softCap}) => {
+      setPresaleStatus({currentRaised, hardCap, softCap});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -160,7 +160,7 @@ export default function LaunchpadPage() {
             )}
             <button
               className="mt-10 text-xl font-normal underline"
-              style={{ color: launchpadData.buttonDetailTextColor }}
+              style={{color: launchpadData.buttonDetailTextColor}}
               onClick={() => {
                 setShowPresaleStatus(true);
               }}
@@ -194,17 +194,33 @@ export default function LaunchpadPage() {
               className="flex flex-col border-b-2 py-12 md:flex-row"
             >
               <div className="">
-                <Link to={item.redirectUrl} rel="noreferrer">
-                  <img src={item.imageUrl} alt={item.title} />
-                </Link>
+                {item.redirectUrl.indexOf("http") > -1 ? (
+                  <a href={item.redirectUrl} rel="noreferrer">
+                    <img src={item.imageUrl} alt={item.title} />
+                  </a>
+                ) : (
+                  <Link to={item.redirectUrl} rel="noreferrer">
+                    <img src={item.imageUrl} alt={item.title} />
+                  </Link>
+                )}
               </div>
               <div className="mt-4 flex flex-col px-4 text-white md:mt-0 md:px-12 ">
-                <Link to={item.redirectUrl} rel="noreferrer">
-                  <div className="text-md mb-2 flex flex-row md:text-3xl">
-                    {item.title}&nbsp;
-                    <LinkIcon className="ml-4 w-4 md:w-8" />
-                  </div>
-                </Link>
+                {item.redirectUrl.indexOf("http") > -1 ? (
+                  <a href={item.redirectUrl} rel="noreferrer">
+                    <div className="text-md mb-2 flex flex-row md:text-3xl">
+                      {item.title}&nbsp;
+                      <LinkIcon className="ml-4 w-4 md:w-8" />
+                    </div>
+                  </a>
+                ) : (
+                  <Link to={item.redirectUrl} rel="noreferrer">
+                    <div className="text-md mb-2 flex flex-row md:text-3xl">
+                      {item.title}&nbsp;
+                      <LinkIcon className="ml-4 w-4 md:w-8" />
+                    </div>
+                  </Link>
+                )}
+
                 <div className="mb-4 text-sm text-pequod-pink md:mb-6 md:text-xl">
                   {item.data}
                 </div>
