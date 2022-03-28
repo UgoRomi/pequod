@@ -90,7 +90,7 @@ export function useUserInfo() {
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
       );
     if (!userData.logged) {
-      dispatch(setSignedMessage(""));
+      dispatch(setSignedMessage(":)"));
       return;
     }
     const userFarms = userData?.pequodFarms?.map((farm): FarmState => {
