@@ -65,7 +65,17 @@ function App() {
         }
       />
       <Route
-        path="/launchpad"
+        path="/launchpad/:launchpadId"
+        element={
+          <RequireAuth>
+            <Layout>
+              <LaunchpadPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/launchpad/"
         element={
           <RequireAuth>
             <Layout>

@@ -5,6 +5,7 @@ import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
 import {useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
+import {Link, useParams} from "react-router-dom";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -12,6 +13,7 @@ export function classNames(...classes: string[]) {
 export default function LaunchpadPage() {
   const launchpads = [
     {
+      id: "mida",
       title: "MIDA PROJECT",
       data: "30/03/2022",
       description:
@@ -46,7 +48,8 @@ export default function LaunchpadPage() {
   //const url = window.location.href;
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
   //const arr = url.split("/");
-  const launchpadId = "moby";
+
+  let {launchpadId} = useParams();
   let launchpadData;
   if (launchpadId) {
     launchpadData = launchpads.find((item) => {
@@ -134,19 +137,22 @@ export default function LaunchpadPage() {
 
         {launchpads.map((item) => {
           return (
-            <div className="flex flex-col py-12 border-b-2 md:flex-row">
+            <div
+              key={item.id}
+              className="flex flex-col py-12 border-b-2 md:flex-row"
+            >
               <div className="">
-                <a href={item.redirectUrl} target="_blank" rel="noreferrer">
+                <Link to={item.redirectUrl} rel="noreferrer">
                   <img src={item.imageUrl} alt={item.title} />
-                </a>
+                </Link>
               </div>
               <div className="flex flex-col text-white px-4 mt-4 md:mt-0 md:px-12 ">
-                <a href={item.redirectUrl} target="_blank" rel="noreferrer">
+                <Link to={item.redirectUrl} rel="noreferrer">
                   <div className="text-md md:text-3xl flex flex-row mb-2">
                     {item.title}&nbsp;
                     <LinkIcon className="ml-4 w-4 md:w-8" />
                   </div>
-                </a>
+                </Link>
                 <div className="text-sm md:text-xl text-pequod-pink mb-4 md:mb-6">
                   {item.data}
                 </div>
