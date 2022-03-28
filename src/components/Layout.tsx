@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import {Fragment, useEffect, useState} from "react";
+import {Dialog, Menu, Transition} from "@headlessui/react";
 import {
   LogoutIcon,
   XIcon,
@@ -7,17 +7,17 @@ import {
   MenuAlt2Icon,
 } from "@heroicons/react/outline";
 
-import { useWeb3React } from "@web3-react/core";
+import {useWeb3React} from "@web3-react/core";
 import useAuth from "../hooks/useAuth";
-import { useLocation } from "react-router";
-import { Link } from "react-router-dom";
-import { classNames, useValidateSessionIfInvalid } from "../utils/utils";
-import { ReactComponent as Logo } from "../images/logo.svg";
+import {useLocation} from "react-router";
+import {Link} from "react-router-dom";
+import {classNames, useValidateSessionIfInvalid} from "../utils/utils";
+import {ReactComponent as Logo} from "../images/logo.svg";
 import logoPng from "../images/logo.png";
-import { useAppSelector } from "../store/hooks";
-import { selectUserSignedMessage } from "../store/userInfoSlice";
+import {useAppSelector} from "../store/hooks";
+import {selectUserSignedMessage} from "../store/userInfoSlice";
 import Spinner from "./Spinner";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import "../override_toastify.css";
 
 import swapIcon from "../images/swap.png";
@@ -29,10 +29,10 @@ import aiIcon from "../images/ai.png";
 import giveawayIcon from "../images/giveaway.png";
 import airdropIcon from "../images/airdrop.png";
 import swapArrowsIcon from "../images/swapArrows.svg";
-export default function Layout({ children }: { children: JSX.Element }) {
+export default function Layout({children}: {children: JSX.Element}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { account } = useWeb3React();
-  const { logout } = useAuth();
+  const {account} = useWeb3React();
+  const {logout} = useAuth();
   const location = useLocation();
   const userSignedMessage = useAppSelector(selectUserSignedMessage);
   const validateSessionIfInvalid = useValidateSessionIfInvalid();
@@ -100,15 +100,15 @@ export default function Layout({ children }: { children: JSX.Element }) {
       href: "/migration",
       icon: swapArrowsIcon,
       current: false,
-      disabled: false,
+      disabled: true,
     },
   ]);
 
   useEffect(() => {
-    const page = navigation.find(({ href }) => href === location.pathname);
+    const page = navigation.find(({href}) => href === location.pathname);
     if (!page || page.current) return;
     setNavigation(
-      navigation.map((item) => ({ ...item, current: item.href === page.href }))
+      navigation.map((item) => ({...item, current: item.href === page.href}))
     );
   }, [location.pathname, navigation]);
 
@@ -227,7 +227,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   >
                     <Menu.Items className="focus:outline-none absolute mt-10 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-pequod-dark ring-opacity-5">
                       <Menu.Item onClick={logout}>
-                        {({ active }) => (
+                        {({active}) => (
                           <span
                             className={classNames(
                               active ? "bg-pequod-dark" : "",
@@ -327,7 +327,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                     >
                       <Menu.Items className="focus:outline-none absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-pequod-dark ring-opacity-5">
                         <Menu.Item onClick={logout}>
-                          {({ active }) => (
+                          {({active}) => (
                             <span
                               className={classNames(
                                 active ? "bg-pequod-dark" : "",
@@ -410,7 +410,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                   >
                     <Menu.Items className="focus:outline-none absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-pequod-dark py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                       <Menu.Item onClick={logout}>
-                        {({ active }) => (
+                        {({active}) => (
                           <span
                             className={classNames(
                               active ? "bg-pequod-gray" : "",
