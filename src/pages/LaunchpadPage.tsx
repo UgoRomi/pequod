@@ -33,7 +33,7 @@ export default function LaunchpadPage() {
       launchpadBg: mobyLaunchpadBg,
       launchpadSubTitle: "Pre-sale Moby V2",
       launchpadDesc:
-        "Approfitta della presale e acquista i nuovi Moby al prezzo fissato di 0.018 MOBY/$. Scegli la quantità di BNB che vuoi comprare, l’hard cap della presale è di 1000 BNB. Puoi verificare l’avanzamento della presale in “presale status”.",
+        "Approfitta della presale e acquista i nuovi Moby al prezzo fissato di 0.01 MOBY/$. Scegli la quantità di BNB che vuoi comprare, l’hard cap della presale è di 1000 BNB. Puoi verificare l’avanzamento della presale in “presale status”.",
 
       // Button
       buyButtonText: "Acquista Moby",
