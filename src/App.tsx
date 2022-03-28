@@ -1,21 +1,21 @@
-import {Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth";
 import RequireNoAuth from "./components/RequireNoAuth";
 import useEagerConnect from "./hooks/useEagerConnect";
 import LoginPage from "./pages/LoginPage";
 import StakingPage from "./pages/StakingPage";
-import {useEffect} from "react";
-import {useUserInfo} from "./utils/utils";
+import { useEffect } from "react";
+import { useUserInfo } from "./utils/utils";
 import TradingPage from "./pages/TradingPage";
-import {useAppDispatch, useAppSelector} from "./store/hooks";
-import {selectPequodApiInstance} from "./store/axiosInstancesSlice";
-import {TokensListResponse} from "./utils/apiTypes";
-import {setTokens} from "./store/miscSlice";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { selectPequodApiInstance } from "./store/axiosInstancesSlice";
+import { TokensListResponse } from "./utils/apiTypes";
+import { setTokens } from "./store/miscSlice";
 import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
 import LaunchpadPage from "./pages/LaunchpadPage";
-import MigrazionePage from "./pages/MigrazionePage";
+import MigrationPage from "./pages/MigrationPage";
 
 function App() {
   useEagerConnect();
@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     const getTokens = async () => {
-      const {data: tokensList}: {data: TokensListResponse[]} =
+      const { data: tokensList }: { data: TokensListResponse[] } =
         await pequodApiInstance.get("/tokens/list");
       dispatch(setTokens(_.uniqBy(tokensList, "address")));
     };
@@ -85,11 +85,11 @@ function App() {
         }
       />
       <Route
-        path="/migrazione"
+        path="/migration"
         element={
           <RequireAuth>
             <Layout>
-              <MigrazionePage />
+              <MigrationPage />
             </Layout>
           </RequireAuth>
         }

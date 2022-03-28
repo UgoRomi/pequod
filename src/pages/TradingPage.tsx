@@ -1,42 +1,47 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { MinusIcon, PlusIcon } from '@heroicons/react/outline';
-import { classNames, formatMoney, useApiCall } from '../utils/utils';
-import { useAppSelector } from '../store/hooks';
-import TradeSettingsDialog from '../components/TradeSettingsDialog';
-import Web3 from 'web3';
-import Carousel from 'react-multi-carousel';
-import { PairDataTimeWindowEnum } from '../utils/chart';
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { MinusIcon, PlusIcon } from "@heroicons/react/outline";
+import {
+  classNames,
+  formatAmount,
+  formatMoney,
+  useApiCall,
+} from "../utils/utils";
+import { useAppSelector } from "../store/hooks";
+import TradeSettingsDialog from "../components/TradeSettingsDialog";
+import Web3 from "web3";
+import Carousel from "react-multi-carousel";
+import { PairDataTimeWindowEnum } from "../utils/chart";
 import {
   useGetTokenPrice,
   useAllowance,
   useApprove,
   useSwap,
-} from '../utils/contractsUtils';
-import unknownTokenLogo from '../images/unknown-token.svg';
-import bnbLogo from '../images/bnblogo.png';
+} from "../utils/contractsUtils";
+import unknownTokenLogo from "../images/unknown-token.svg";
+import bnbLogo from "../images/bnblogo.png";
 
 import {
   selectUserBnbAmount,
   selectUserTokens,
   UserToken,
-} from '../store/userInfoSlice';
-import PercentagesGroup, { Percentages } from '../components/PercentagesGroup';
-import { RootState } from '../store/store';
-import TradingPageChart from '../components/TradingPageChart';
-import { MIN_ETH } from '../utils/consts';
-import Spinner from '../components/Spinner';
-import _ from 'lodash';
-import { selectTokensList } from '../store/miscSlice';
-import { TokensListResponse } from '../utils/apiTypes';
-import { useTakeProfitStopLossEvent } from '../utils/events';
-import { Switch } from '@headlessui/react';
-import { selectBnbUsdPrice } from '../store/pricesSlice';
-import NotificationTable from '../components/NotificationTable';
-import { useWeb3React } from '@web3-react/core';
+} from "../store/userInfoSlice";
+import PercentagesGroup, { Percentages } from "../components/PercentagesGroup";
+import { RootState } from "../store/store";
+import TradingPageChart from "../components/TradingPageChart";
+import { MIN_ETH } from "../utils/consts";
+import Spinner from "../components/Spinner";
+import _ from "lodash";
+import { selectTokensList } from "../store/miscSlice";
+import { TokensListResponse } from "../utils/apiTypes";
+import { useTakeProfitStopLossEvent } from "../utils/events";
+import { Switch } from "@headlessui/react";
+import { selectBnbUsdPrice } from "../store/pricesSlice";
+import NotificationTable from "../components/NotificationTable";
+import { useWeb3React } from "@web3-react/core";
 
-import searchIcon from '../images/search.png';
-import swapArrows from '../images/swaparrow.png';
+import searchIcon from "../images/search.png";
+import swapArrows from "../images/swaparrow.png";
 interface TokenDetails {
   name: string;
   symbol: string;
@@ -57,7 +62,7 @@ interface TokenInfoResponse {
   logoUrl: string;
 }
 
-interface PairPriceHistoryApiResponse {
+export interface PairPriceHistoryApiResponse {
   date: string;
   open: number;
   low: number;
@@ -95,16 +100,16 @@ const responsive = {
 };
 
 const emptyTokenDetails: TokenDetails = {
-  name: '',
-  address: '',
-  symbol: '',
+  name: "",
+  address: "",
+  symbol: "",
   BNBReserve: 0,
   decimals: 0,
   priceBNB: 0,
   tokenReserve: 0,
   allowance: 0,
   allowanceFetched: false,
-  logoUrl: '',
+  logoUrl: "",
 };
 
 export default function TradingPage() {
@@ -119,10 +124,10 @@ export default function TradingPage() {
     useState<number>(0);
 
   const [currentlySelectedTab, setCurrentlySelectedTab] = useState<
-    'buy' | 'sell'
-  >('buy');
-  const [amountFrom, setAmountFrom] = useState<string>('0');
-  const [amountTo, setAmountTo] = useState<string>('0');
+    "buy" | "sell"
+  >("buy");
+  const [amountFrom, setAmountFrom] = useState<string>("0");
+  const [amountTo, setAmountTo] = useState<string>("0");
   const [stopLoss, setStopLoss] = useState<number>(0);
   const [takeProfit, setTakeProfit] = useState<number>(0);
   const [slippage, setSlippage] = useState<number>(30);
@@ -161,7 +166,7 @@ export default function TradingPage() {
       )?.amount || 0
   );
   const fromTokenBalance =
-    currentlySelectedTab === 'buy' ? maxBnbAmount : userSelectedTokenBalance;
+    currentlySelectedTab === "buy" ? maxBnbAmount : userSelectedTokenBalance;
   const [profitInUsd, setProfitInUsd] = useState<number>(0);
   const [profitInBnb, setProfitInBnb] = useState<number>(0);
   const [lossInUsd, setLossInUsd] = useState<number>(0);
@@ -194,7 +199,7 @@ export default function TradingPage() {
     updateTo = true
   ) => {
     // replace comma with dot
-    const newValue = value.replace(',', '.');
+    const newValue = value.replace(",", ".");
     const valueNumeric = parseFloat(newValue);
     setAmountFrom(newValue);
     setIsFullSell(fullSell);
@@ -204,7 +209,7 @@ export default function TradingPage() {
         : percentageButton
     );
     if (!selectedTokenInfo?.priceBNB || !updateTo) return;
-    if (currentlySelectedTab === 'buy') {
+    if (currentlySelectedTab === "buy") {
       setAmountTo((valueNumeric / selectedTokenInfo.priceBNB).toString());
     } else {
       setAmountTo((valueNumeric * selectedTokenInfo.priceBNB).toString());
@@ -230,12 +235,12 @@ export default function TradingPage() {
 
   const updateTo = (value: string) => {
     // replace comma with dot
-    const newValue = value.replace(',', '.');
+    const newValue = value.replace(",", ".");
     const valueNumeric = parseFloat(newValue);
 
-    setAmountTo(newValue.toString());
+    setAmountTo(newValue);
     if (!selectedTokenInfo?.priceBNB) return;
-    if (currentlySelectedTab === 'buy') {
+    if (currentlySelectedTab === "buy") {
       updateFrom(
         (valueNumeric * selectedTokenInfo.priceBNB).toString(),
         false,
@@ -258,12 +263,6 @@ export default function TradingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amountFrom, stopLoss, takeProfit]);
 
-  const formatAmount = (amount: string): string => {
-    if (amount.toString().indexOf('e') === -1) return amount;
-
-    return parseFloat(amount).toFixed(15);
-  };
-
   const swap = async () => {
     if (
       !selectedTokenInfo ||
@@ -272,7 +271,7 @@ export default function TradingPage() {
       !amountTo
     )
       return;
-    if (currentlySelectedTab === 'buy') {
+    if (currentlySelectedTab === "buy") {
       await buyCallback();
     } else {
       await sellCallback(isFullSell);
@@ -288,7 +287,7 @@ export default function TradingPage() {
             token.address.toUpperCase() ===
             selectedTokenInfo.address.toUpperCase()
         )
-        ?.amount.toString() || '0',
+        ?.amount.toString() || "0",
       takeProfit.toString(),
       stopLoss.toString()
     );
@@ -298,11 +297,11 @@ export default function TradingPage() {
     (tokenAddress: string) => {
       pequodApiCall(
         `tokens/info/${tokenAddress}/${process.env.REACT_APP_CHAIN_ID}`,
-        { method: 'GET' }
+        { method: "GET" }
       )
         .then((res) => {
           if (!res?.data) {
-            toast.error('Error retrieving token info, please retry');
+            toast.error("Error retrieving token info, please retry");
             return;
           }
           const { data: response }: { data: TokenInfoResponse } = res;
@@ -321,7 +320,7 @@ export default function TradingPage() {
         })
         .catch((err) => {
           console.error(err);
-          toast.error('Error retrieving token info, please retry');
+          toast.error("Error retrieving token info, please retry");
         });
     },
     [pequodApiCall]
@@ -332,11 +331,11 @@ export default function TradingPage() {
     if (!selectedTokenInfo.address) return;
     pequodApiCall(
       `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/${process.env.REACT_APP_CHAIN_ID}/bnb`,
-      { method: 'GET' }
+      { method: "GET" }
     )
       .then((res) => {
         if (!res?.data) {
-          toast.error('Error retrieving token price history, please retry');
+          toast.error("Error retrieving token price history, please retry");
           return;
         }
         const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
@@ -356,7 +355,7 @@ export default function TradingPage() {
       .catch((err) => {
         console.error(err);
         toast.error(
-          'Error retrieving token details from our API, please retry'
+          "Error retrieving token details from our API, please retry"
         );
       });
     // TODO: Resolve dependency cycle
@@ -467,24 +466,24 @@ export default function TradingPage() {
   const percentageButtonClicked = async (percentage: Percentages) => {
     let newAmount;
     switch (percentage) {
-      case Percentages['25%']:
+      case Percentages["25%"]:
         newAmount = fromTokenBalance * 0.25 < 0 ? 0 : fromTokenBalance * 0.25;
         updateFrom(formatAmount(newAmount.toString()), false, 25);
         break;
-      case Percentages['50%']:
+      case Percentages["50%"]:
         newAmount = fromTokenBalance * 0.5 < 0 ? 0 : fromTokenBalance * 0.5;
         updateFrom(formatAmount(newAmount.toString()), false, 50);
         break;
-      case Percentages['75%']:
+      case Percentages["75%"]:
         newAmount = fromTokenBalance * 0.75 < 0 ? 0 : fromTokenBalance * 0.75;
         updateFrom(formatAmount(newAmount.toString()), false, 75);
         break;
-      case Percentages['100%']:
+      case Percentages["100%"]:
         newAmount = fromTokenBalance < 0 ? 0 : fromTokenBalance;
         // We check if the currently selected tab is sell because we want to set "isFullSell" to true only when the user is selling
         updateFrom(
           formatAmount(newAmount.toString()),
-          currentlySelectedTab === 'sell',
+          currentlySelectedTab === "sell",
           100
         );
         break;
@@ -492,8 +491,8 @@ export default function TradingPage() {
   };
 
   const resetForm = () => {
-    updateFrom('0');
-    setAmountTo('0');
+    updateFrom("0");
+    setAmountTo("0");
     setTakeProfit(0);
     setStopLoss(0);
     setShowAutoSwap(false);
@@ -531,9 +530,9 @@ export default function TradingPage() {
                 key={i}
                 className={classNames(
                   token.earningPercentage && token.earningPercentage > 0
-                    ? 'from-green-800'
-                    : 'from-red-800',
-                  'border-white-400 h-full rounded-40  border bg-gradient-to-b p-8 text-white shadow-md'
+                    ? "from-green-800"
+                    : "from-red-800",
+                  "border-white-400 h-full rounded-40  border bg-gradient-to-b p-8 text-white shadow-md"
                 )}
               >
                 <div className="grid grid-cols-cards grid-rows-2 gap-4">
@@ -629,7 +628,7 @@ export default function TradingPage() {
                   >
                     {selectedTokenInfo?.symbol
                       ? `${selectedTokenInfo?.symbol}`
-                      : '-'}
+                      : "-"}
                   </button>
                 </div>
               </form>
@@ -650,7 +649,7 @@ export default function TradingPage() {
               >
                 <img
                   src={
-                    currentlySelectedTab === 'buy'
+                    currentlySelectedTab === "buy"
                       ? bnbLogo
                       : selectedTokenInfo?.logoUrl
                   }
@@ -660,11 +659,11 @@ export default function TradingPage() {
                 />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
-                  {currentlySelectedTab === 'buy'
+                  {currentlySelectedTab === "buy"
                     ? `BNB`
                     : selectedTokenInfo?.symbol
                     ? `${selectedTokenInfo?.symbol}`
-                    : '-'}
+                    : "-"}
                 </span>
               </button>
               <button
@@ -672,7 +671,7 @@ export default function TradingPage() {
                 className="mx-4 inline-flex h-35 w-55 min-w-55 items-center justify-center rounded-10 border border-pequod-white border-transparent text-sm font-medium leading-4 text-pequod-pink"
                 onClick={() => {
                   setCurrentlySelectedTab(
-                    currentlySelectedTab === 'buy' ? 'sell' : 'buy'
+                    currentlySelectedTab === "buy" ? "sell" : "buy"
                   );
                   resetForm();
                 }}
@@ -686,7 +685,7 @@ export default function TradingPage() {
                 <img
                   onError={setDefaultTokenLogo}
                   src={
-                    currentlySelectedTab === 'sell'
+                    currentlySelectedTab === "sell"
                       ? bnbLogo
                       : selectedTokenInfo?.logoUrl
                   }
@@ -695,11 +694,11 @@ export default function TradingPage() {
                 />
                 &nbsp;
                 <span className="max-w-full overflow-hidden text-ellipsis">
-                  {currentlySelectedTab === 'sell'
+                  {currentlySelectedTab === "sell"
                     ? `BNB`
                     : selectedTokenInfo?.symbol
                     ? `${selectedTokenInfo?.symbol}`
-                    : '-'}
+                    : "-"}
                 </span>
               </button>
             </div>
@@ -719,7 +718,7 @@ export default function TradingPage() {
                   htmlFor="amountFrom"
                   className="block text-xs text-pequod-pink"
                 >
-                  {currentlySelectedTab === 'buy' ? (
+                  {currentlySelectedTab === "buy" ? (
                     `(≈ ${(parseFloat(amountFrom) * bnbUsdPrice).toFixed(
                       2
                     )} USD)`
@@ -729,12 +728,12 @@ export default function TradingPage() {
                       {selectedTokenInfo?.symbol})
                     </>
                   ) : (
-                    ''
+                    ""
                   )}
                 </label>
                 <div className="font-regular float-right text-xs text-pequod-white opacity-50">
-                  Balance:{' '}
-                  {currentlySelectedTab === 'buy'
+                  Balance:{" "}
+                  {currentlySelectedTab === "buy"
                     ? userBnbBalance.toFixed(3)
                     : userSelectedTokenBalance.toFixed(6)}
                 </div>
@@ -763,11 +762,11 @@ export default function TradingPage() {
                 />
 
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
-                  {currentlySelectedTab === 'buy'
+                  {currentlySelectedTab === "buy"
                     ? `(BNB)`
                     : selectedTokenInfo?.symbol
                     ? `(${selectedTokenInfo?.symbol})`
-                    : ''}
+                    : ""}
                 </div>
               </div>
               <PercentagesGroup
@@ -786,7 +785,7 @@ export default function TradingPage() {
                   className="flex flex-row whitespace-nowrap text-xs text-pequod-white"
                 >
                   <p className="ml-1 text-pequod-pink">
-                    {currentlySelectedTab === 'sell' ? (
+                    {currentlySelectedTab === "sell" ? (
                       `(≈ ${(parseFloat(amountTo) * bnbUsdPrice).toFixed(
                         2
                       )} USD)`
@@ -794,18 +793,18 @@ export default function TradingPage() {
                       <>
                         <span className="text-pequod-white">
                           Amount received
-                        </span>{' '}
+                        </span>{" "}
                         ({selectedTokenInfo?.symbol})
                       </>
                     ) : (
-                      ''
+                      ""
                     )}
                   </p>
                 </label>
 
                 <div className="float-right text-xs text-pequod-white opacity-50">
-                  Balance:{' '}
-                  {currentlySelectedTab === 'sell'
+                  Balance:{" "}
+                  {currentlySelectedTab === "sell"
                     ? userBnbBalance.toFixed(3)
                     : userSelectedTokenBalance.toFixed(6)}
                 </div>
@@ -831,16 +830,16 @@ export default function TradingPage() {
                   }}
                 />
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-white opacity-75">
-                  {currentlySelectedTab === 'sell'
+                  {currentlySelectedTab === "sell"
                     ? `(BNB)`
                     : selectedTokenInfo?.symbol
                     ? `(${selectedTokenInfo?.symbol})`
-                    : ''}
+                    : ""}
                 </div>
               </div>
             </div>
             <div className="flex w-full justify-center">
-              {currentlySelectedTab === 'buy' ||
+              {currentlySelectedTab === "buy" ||
               selectedTokenInfo.allowance > 0 ? (
                 <button
                   onClick={() => {
@@ -848,7 +847,7 @@ export default function TradingPage() {
                     swap().then(() => setOrderInProgress(false));
                   }}
                   className={
-                    'b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50'
+                    "b-2 flex w-full items-center justify-center rounded-10 border-2 border-pequod-pink py-2 px-4 text-pequod-white disabled:cursor-default disabled:opacity-50"
                   }
                   disabled={
                     !selectedTokenInfo ||
@@ -863,7 +862,7 @@ export default function TradingPage() {
                       <span>Swapping...</span>
                     </>
                   ) : (
-                    'SWAP'
+                    "SWAP"
                   )}
                 </button>
               ) : (
@@ -903,28 +902,28 @@ export default function TradingPage() {
               </label>
               <div className="flex flex-row items-center">
                 <Switch
-                  disabled={currentlySelectedTab === 'sell' ? true : false}
+                  disabled={currentlySelectedTab === "sell" ? true : false}
                   checked={showAutoSwap}
                   onChange={setShowAutoSwap}
                   className={classNames(
-                    showAutoSwap ? 'bg-pequod-purple' : 'bg-gray-900',
-                    'focus:outline-none relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-offset-2 disabled:cursor-default disabled:opacity-75'
+                    showAutoSwap ? "bg-pequod-purple" : "bg-gray-900",
+                    "focus:outline-none relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-offset-2 disabled:cursor-default disabled:opacity-75"
                   )}
                 >
                   <span className="sr-only">Auto Swap</span>
                   <span
                     aria-hidden="true"
                     className={classNames(
-                      showAutoSwap ? 'translate-x-5' : 'translate-x-0',
-                      'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                      showAutoSwap ? "translate-x-5" : "translate-x-0",
+                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
                     )}
                   />
                 </Switch>
                 <label
                   htmlFor="autoSwap"
                   className={classNames(
-                    showAutoSwap ? 'text-pequod-pink' : 'text-pequod-white',
-                    'font-regular ml-4 block text-sm opacity-75'
+                    showAutoSwap ? "text-pequod-pink" : "text-pequod-white",
+                    "font-regular ml-4 block text-sm opacity-75"
                   )}
                 >
                   PEQUOD SWAP
@@ -933,8 +932,8 @@ export default function TradingPage() {
             </div>
             <div
               className={classNames(
-                showAutoSwap ? '' : 'invisible',
-                'flex gap-x-10'
+                showAutoSwap ? "" : "invisible",
+                "flex gap-x-10"
               )}
             >
               <div>
@@ -1061,8 +1060,8 @@ export default function TradingPage() {
             {/* 4th row */}
             <div
               className={classNames(
-                showAutoSwap ? '' : 'invisible',
-                'mt-5 grid w-full gap-x-5'
+                showAutoSwap ? "" : "invisible",
+                "mt-5 grid w-full gap-x-5"
               )}
             >
               <div className="flex w-full justify-center">
@@ -1105,7 +1104,7 @@ export default function TradingPage() {
                         <span>Approving...</span>
                       </>
                     ) : (
-                      ' Approve TP/SL'
+                      " Approve TP/SL"
                     )}
                   </button>
                 )}

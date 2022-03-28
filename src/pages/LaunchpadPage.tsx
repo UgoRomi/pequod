@@ -1,15 +1,13 @@
-import {LinkIcon} from "@heroicons/react/outline";
+import { LinkIcon } from "@heroicons/react/outline";
 
 import midaImage from "../images/mida.png";
 import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 import {Link, useParams} from "react-router-dom";
+import { useLaunchpad } from "../utils/contractsUtils";
 
-export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 export default function LaunchpadPage() {
   const launchpads = [
     {
@@ -39,6 +37,7 @@ export default function LaunchpadPage() {
 
       // Button
       buyButtonText: "Acquista Moby",
+      claimButtonText: "Claim your Moby",
       buttonBgColor: "#00FFFF",
       buttonTextColor: "#0B0629",
       detailButtonText: "Stato Presale",
@@ -50,7 +49,7 @@ export default function LaunchpadPage() {
   //const arr = url.split("/");
 
   let {launchpadId} = useParams();
-  let launchpadData;
+  let launchpadData: any;
   if (launchpadId) {
     launchpadData = launchpads.find((item) => {
       if (item.id) return item.id === launchpadId;
@@ -59,59 +58,112 @@ export default function LaunchpadPage() {
   }
 
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showPresaleStatus, setShowPresaleStatus] = useState<boolean>(false);
+  const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
+  const [canClaim, setCanClaim] = useState<boolean>(false);
+  const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
+  const [presaleStatus, setPresaleStatus] = useState<{
+    currentRaised: number;
+    hardCap: number;
+    softCap: number;
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
+  const {
+    canClaim: checkCanClaim,
+    claim,
+    getPresaleStatus,
+  } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string);
 
-  // Qui gestire il canClaim in base alla chiamata al BE e farla per le info
-  const canClaim = false;
+  // Check if the user can claim the tokens
+  useEffect(() => {
+    checkCanClaim().then((canClaim) => {
+      setCanClaim(canClaim);
+    });
+  }, [checkCanClaim]);
+
+  // check the presale status
+  useEffect(() => {
+    getPresaleStatus().then(({ currentRaised, hardCap, softCap }) => {
+      setPresaleStatus({ currentRaised, hardCap, softCap });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return launchpadId && launchpadData ? (
     <>
       <LaunchpadModal
         setOpen={setShowModal}
         hidden={!showModal}
+        conversionRate={10000}
+        presaleAddress={process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string}
+        initialStep={modalStep}
+        presaleStatus={presaleStatus}
+      ></LaunchpadModal>
+      <LaunchpadModal
+        setOpen={setShowPresaleStatus}
+        hidden={!showPresaleStatus}
+        initialStep={2}
+        conversionRate={10000}
+        presaleStatus={presaleStatus}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
-        <h1 className="text-3xl mt-6 font-normal text-pequod-white">
+        <h1 className="mt-6 text-3xl font-normal text-pequod-white">
           {launchpadData.launchpadTitle}
         </h1>
         <hr />
         <img src={launchpadData.launchpadBg} alt="launchpad pequod" />
         <div className="p-4 text-center">
-          <h1 className="text-3xl mt-6 font-normal text-pequod-white">
+          <h1 className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData.launchpadSubTitle}
           </h1>
-          <h1 className="text-xl mt-3 font-normal text-pequod-pink">
+          <h1 className="mt-3 text-xl font-normal text-pequod-pink">
             {launchpadData.data}
           </h1>
-          <h2 className="text-xl mt-8 font-light text-pequod-white">
+          <h2 className="mt-8 text-xl font-light text-pequod-white">
             {launchpadData.launchpadDesc}
           </h2>
-          <div className="flex flex-col mt-24 justify-center items-center">
+          <div className="mt-24 flex flex-col items-center justify-center">
+            {canClaim ? (
+              <button
+                className="rounded-3xl px-3 py-3"
+                style={{
+                  backgroundColor: launchpadData.buttonBgColor,
+                  color: launchpadData.buttonTextColor,
+                  width: 200,
+                }}
+                onClick={() => {
+                  setClaimInProgress(true);
+                  claim()
+                    .then((result) => {
+                      if (!result.success) return;
+                      setModalStep(3);
+                      setShowModal(!showModal);
+                    })
+                    .finally(() => setClaimInProgress(false));
+                }}
+              >
+                {claimInProgress
+                  ? "Claiming..."
+                  : launchpadData.claimButtonText}
+              </button>
+            ) : (
+              <button
+                className="rounded-3xl px-3 py-3"
+                style={{
+                  backgroundColor: launchpadData.buttonBgColor,
+                  color: launchpadData.buttonTextColor,
+                  width: 200,
+                }}
+                onClick={() => setShowModal(!showModal)}
+              >
+                {launchpadData.buyButtonText}
+              </button>
+            )}
             <button
-              className="rounded-3xl px-3 py-3"
-              style={{
-                backgroundColor: launchpadData.buttonBgColor,
-                color: launchpadData.buttonTextColor,
-                width: 200,
+              className="mt-10 text-xl font-normal underline"
+              style={{ color: launchpadData.buttonDetailTextColor }}
+              onClick={() => {
+                setShowPresaleStatus(true);
               }}
-              hidden={canClaim}
-              onClick={() => setShowModal(!showModal)}
-            >
-              {launchpadData.buyButtonText}
-            </button>
-            <button
-              className="rounded-3xl px-3 py-3"
-              style={{
-                backgroundColor: launchpadData.buttonBgColor,
-                color: launchpadData.buttonTextColor,
-                width: 200,
-              }}
-              hidden={!canClaim}
-              onClick={() => setShowModal(!showModal)}
-            >
-              Claim
-            </button>
-            <button
-              className="text-xl mt-10 font-normal underline"
-              style={{color: launchpadData.buttonDetailTextColor}}
             >
               {launchpadData.detailButtonText}
             </button>
@@ -139,24 +191,24 @@ export default function LaunchpadPage() {
           return (
             <div
               key={item.id}
-              className="flex flex-col py-12 border-b-2 md:flex-row"
+              className="flex flex-col border-b-2 py-12 md:flex-row"
             >
               <div className="">
                 <Link to={item.redirectUrl} rel="noreferrer">
                   <img src={item.imageUrl} alt={item.title} />
                 </Link>
               </div>
-              <div className="flex flex-col text-white px-4 mt-4 md:mt-0 md:px-12 ">
+              <div className="mt-4 flex flex-col px-4 text-white md:mt-0 md:px-12 ">
                 <Link to={item.redirectUrl} rel="noreferrer">
-                  <div className="text-md md:text-3xl flex flex-row mb-2">
+                  <div className="text-md mb-2 flex flex-row md:text-3xl">
                     {item.title}&nbsp;
                     <LinkIcon className="ml-4 w-4 md:w-8" />
                   </div>
                 </Link>
-                <div className="text-sm md:text-xl text-pequod-pink mb-4 md:mb-6">
+                <div className="mb-4 text-sm text-pequod-pink md:mb-6 md:text-xl">
                   {item.data}
                 </div>
-                <div className="text-sm md:text-md text-white max-w-md">
+                <div className="md:text-md max-w-md text-sm text-white">
                   {item.description}
                 </div>
               </div>

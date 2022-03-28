@@ -33,6 +33,11 @@ export function useGetTokenPrice() {
   const getPairAddress = useGetPairAddress();
 
   const getTokenPrice = async (tokenAddress: string) => {
+    const tokenContract = new library.eth.Contract(BEP20_ABI, tokenAddress, {
+      from: account,
+    });
+    const decimals = tokenContract.methods.decimals().call();
+
     // Get token/BNB pair address
     const pairAddress = await getPairAddress(tokenAddress);
 
@@ -53,6 +58,7 @@ export function useGetTokenPrice() {
     return {
       BNBReserve: isBNBToken0 ? reserve0 : reserve1,
       tokenReserve: isBNBToken0 ? reserve1 : reserve0,
+      tokenDecimals: decimals,
     };
   };
   return getTokenPrice;
@@ -300,8 +306,7 @@ export function useLaunchpad(launchpadAddress: string) {
     from: account,
   });
   const canClaim = async (): Promise<boolean> => {
-    await launchpadContract.methods.canClaim().send({ from: account });
-    return true;
+    return await launchpadContract.methods.canClaim().call({ from: account });
   };
 
   const claim = async (): Promise<{ success: boolean; txHash?: string }> => {
@@ -311,7 +316,7 @@ export function useLaunchpad(launchpadAddress: string) {
         .send({ from: account });
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
-      toast.error(`There was an claiming your\nPlease retry`);
+      toast.error(`There was error an claiming your tokens\nPlease retry`);
       console.error(error);
       return { success: false, txHash: "" };
     }
@@ -320,14 +325,44 @@ export function useLaunchpad(launchpadAddress: string) {
   const amountOfTokenThatWillReceive = async (): Promise<number> => {
     try {
       const result = await launchpadContract.methods
-        .claim()
-        .send({ from: account });
+        .amountOfTokenThatWillReceive()
+        .call({ from: account });
       return result;
     } catch (error) {
-      toast.error(`There was an claiming your\nPlease retry`);
+      toast.error(
+        `There was an error checking how much you will receive\nPlease retry`
+      );
       console.error(error);
       return 0;
     }
   };
-  return { canClaim, claim, amountOfTokenThatWillReceive };
+
+  const getPresaleStatus = async (): Promise<{
+    hardCap: number;
+    softCap: number;
+    currentRaised: number;
+  }> => {
+    try {
+      const hardCap = library.utils.fromWei(
+        await launchpadContract.methods.hardCap().call({ from: account })
+      );
+      const softCap = library.utils.fromWei(
+        await launchpadContract.methods.hardCap().call({ from: account })
+      );
+      const currentRaised = library.utils.fromWei(
+        await launchpadContract.methods
+          .totalContributed()
+          .call({ from: account })
+      );
+      return { hardCap, softCap, currentRaised };
+    } catch (error) {
+      toast.error(
+        `There was an error checking the presale status\nPlease retry`
+      );
+      console.error(error);
+      return { hardCap: 0, softCap: 0, currentRaised: 0 };
+    }
+  };
+
+  return { canClaim, claim, amountOfTokenThatWillReceive, getPresaleStatus };
 }
