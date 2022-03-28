@@ -5,7 +5,7 @@ import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
 import {useEffect, useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
-import {Link, useParams} from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {useLaunchpad} from "../utils/contractsUtils";
 
 export default function LaunchpadPage() {
@@ -48,7 +48,7 @@ export default function LaunchpadPage() {
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
   //const arr = url.split("/");
 
-  let {launchpadId} = useParams();
+  let { launchpadId } = useParams();
   let launchpadData: any;
   if (launchpadId) {
     launchpadData = launchpads.find((item) => {
@@ -93,7 +93,7 @@ export default function LaunchpadPage() {
       <LaunchpadModal
         setOpen={setShowModal}
         hidden={!showModal}
-        conversionRate={10000}
+        conversionRate={40000}
         presaleAddress={process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string}
         initialStep={modalStep}
         presaleStatus={presaleStatus}
@@ -102,7 +102,7 @@ export default function LaunchpadPage() {
         setOpen={setShowPresaleStatus}
         hidden={!showPresaleStatus}
         initialStep={2}
-        conversionRate={10000}
+        conversionRate={40000}
         presaleStatus={presaleStatus}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
