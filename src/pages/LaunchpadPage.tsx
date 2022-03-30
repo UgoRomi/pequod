@@ -13,7 +13,7 @@ export default function LaunchpadPage() {
     {
       id: "mida",
       title: "MIDA PROJECT",
-      data: "30/03/2022",
+      data: "Coming Soon",
       description:
         "Dai musei al Metaverso. MIDA offre alle Istituzioni che conservano capolavori artistici un nuovo modo di valorizzarli tramite la creazione e la vendita di opere NFT uniche ai grandi collezionisti del Metaverso.",
       imageUrl: midaImage,
