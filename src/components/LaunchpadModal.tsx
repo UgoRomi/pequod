@@ -3,11 +3,17 @@ import walletReceived from "../images/walletIconReceived.png";
 import walletInitial from "../images/walletIconWhite.png";
 import claimIcon from "../images/claimIcon.svg";
 
-import {ArrowCircleRightIcon, XIcon} from "@heroicons/react/outline";
+import {
+  ArrowCircleRightIcon,
+  DocumentDuplicateIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import {useEffect, useState} from "react";
 import {formatAmount} from "../utils/utils";
 import {useWeb3React} from "@web3-react/core";
 import Web3 from "web3";
+
+import {toast} from "react-toastify";
 
 export default function LaunchpadModal({
   setOpen,
@@ -55,7 +61,11 @@ export default function LaunchpadModal({
   useEffect(() => {
     setStep(initialStep);
   }, [initialStep]);
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(process.env.REACT_APP_WOT_V2_ADDRESS || "");
 
+    toast.success("Text copied");
+  };
   const sendBnbToPresaleAddress = async () => {
     try {
       setSendingBnb(true);
@@ -71,7 +81,6 @@ export default function LaunchpadModal({
       setSendingBnb(false);
     }
   };
-
   return hidden ? (
     <></>
   ) : (
@@ -270,7 +279,7 @@ export default function LaunchpadModal({
       >
         <div className="flex w-full flex-row justify-between">
           <div>&nbsp;</div>
-          <h3 className="self-center">Ben fatto!</h3>
+          <h3 className="self-center">Tokens inviati correttamente!</h3>
           <div className="">
             <XIcon
               className="w-6 cursor-pointer"
@@ -281,11 +290,27 @@ export default function LaunchpadModal({
             ></XIcon>
           </div>
         </div>
-        <div className="mt-20 mb-20 flex w-4/5 flex-row justify-center">
-          <img src={claimIcon} className="w-20" alt="" />
+        <div className="mt-20 mb-20 flex w-4/5 flex-col items-center justify-center">
+          <img src={claimIcon} className="w-20 mb-4" alt="" />
+          <div className="flex flex-row text-xl mt-4 w-full justify-center">
+            <p style={{color: "#00FFFF"}}>Contratto:</p>&nbsp;
+            <p className="w-4/5 md:w-5/5 md:w-auto overflow-hidden text-ellipsis">
+              {process.env.REACT_APP_WOT_V2_ADDRESS}
+            </p>
+            <DocumentDuplicateIcon
+              className="ml-3 h-6 w-6 flex-shrink-0 text-white cursor-pointer"
+              style={{color: "#00FFFF"}}
+              aria-hidden="true"
+              onClick={(e) => copyToClipboard()}
+            />
+          </div>
+          <div className="flex flex-row text-xl mt-4">
+            <p style={{color: "#00FFFF"}}>Simbolo:</p>&nbsp; MOBY
+          </div>
+          <div className="flex flex-row text-xl mt-4">
+            <p style={{color: "#00FFFF"}}>Decimali:</p>&nbsp; 18
+          </div>
         </div>
-
-        <h3 className="self-center">Claim ottenuto con successo</h3>
       </div>
     </div>
   );

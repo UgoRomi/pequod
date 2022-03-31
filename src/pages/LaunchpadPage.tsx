@@ -192,7 +192,7 @@ export default function LaunchpadPage() {
                     cursor: "default",
                   }}
                 >
-                  Claim Token
+                  Presale Closed
                 </button>
               )}
               <button
