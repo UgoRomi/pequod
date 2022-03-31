@@ -1,16 +1,16 @@
-import {useLocation, useNavigate} from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import {ReactComponent as MetamaskStackedLogo} from '../images/metamask-logo-stacked.svg';
-import {ReactComponent as WalletConnectLogo} from '../images/walletconnect-logo.svg';
-import {connectorLocalStorageKey, ConnectorNames} from '../utils/connectors';
-import {ReactComponent as Logo} from '../images/logo.svg';
+import {useLocation, useNavigate} from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import {ReactComponent as MetamaskStackedLogo} from "../images/metamask-logo-stacked.svg";
+import {ReactComponent as WalletConnectLogo} from "../images/walletconnect-logo.svg";
+import {connectorLocalStorageKey, ConnectorNames} from "../utils/connectors";
+import {ReactComponent as Logo} from "../images/logo.svg";
 
 export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const {login} = useAuth();
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || "/";
 
   const connectToWallet = async (connectorId: ConnectorNames) => {
     await login(connectorId);
@@ -25,7 +25,7 @@ export default function LoginPage() {
         <div className="flex w-full items-center flex-col justify-center py-4">
           <Logo className="flex-shrink-0" />
           <p className="text-center text-md text-pequod-white mb-2">
-            BETA V 1.1.0
+            BETA V 1.2.0
           </p>
         </div>
         <p className="text-center text-xl font-semibold text-pequod-white">
@@ -36,9 +36,9 @@ export default function LoginPage() {
             className="flex cursor-pointer flex-col items-center rounded-md bg-gray-200 pb-3"
             onClick={() => connectToWallet(ConnectorNames.Injected)}
           >
-            <MetamaskStackedLogo className="mx-auto h-28" />
+            <MetamaskStackedLogo className="mx-auto h-32" />
             <span className="font-semibold text-pequod-gray">
-              Connect using metamask
+              Connect using MetaMask or TrustWallet
             </span>
           </div>
           <div

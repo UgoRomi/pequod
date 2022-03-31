@@ -3,6 +3,7 @@ import {LinkIcon} from "@heroicons/react/outline";
 import midaImage from "../images/mida.png";
 import mobyImage from "../images/launch_moby.png";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
+import midaLaunchpadBg from "../images/midaLaunchpadBg.png";
 import {useEffect, useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 import {Link, useParams} from "react-router-dom";
@@ -18,6 +19,22 @@ export default function LaunchpadPage() {
         "Dai musei al Metaverso. MIDA offre alle Istituzioni che conservano capolavori artistici un nuovo modo di valorizzarli tramite la creazione e la vendita di opere NFT uniche ai grandi collezionisti del Metaverso.",
       imageUrl: midaImage,
       redirectUrl: "https://midanft.com/it/home/",
+
+      // Detail page
+      launchpadTitle: "Launchpad MIDA",
+      launchpadBg: midaLaunchpadBg,
+      launchpadSubTitle: "Pre-sale MIDA",
+      launchpadDesc:
+        "Acquista i token MIDA al prezzo bloccato di 0.000 MIDA/$. Scegli la quantità di BNB che vuoi scambiare, assicurati che sia tra 0.1 e 10 BNB e procedi allo scambio. L’hard-cap della presale è di 560 BNB ed il soft-cap è di 287,5 BNB.",
+
+      // Button
+      buyButtonText: "Buy Mida",
+      claimButtonText: "Claim your Mida",
+      buttonBgColor: "#FFC900",
+      buttonTextColor: "#0B0629",
+      detailButtonText: "Stato Presale",
+      buttonDetailTextColor: "#00FFFF",
+      hideButtons: true,
     },
     {
       id: "moby",
@@ -42,6 +59,9 @@ export default function LaunchpadPage() {
       buttonTextColor: "#0B0629",
       detailButtonText: "Stato Presale",
       buttonDetailTextColor: "#00FFFF",
+
+      //
+      isClosed: true,
     },
   ];
   //const url = window.location.href;
@@ -115,59 +135,79 @@ export default function LaunchpadPage() {
           <h1 className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData.launchpadSubTitle}
           </h1>
-          <h1 className="mt-3 text-xl font-normal text-pequod-pink">
+          <h1
+            className="mt-3 text-xl font-normal text-pequod-pink"
+            style={{color: launchpadData.buttonBgColor}}
+          >
             {launchpadData.data}
           </h1>
           <h2 className="mt-8 text-xl font-light text-pequod-white">
             {launchpadData.launchpadDesc}
           </h2>
-          <div className="mt-24 flex flex-col items-center justify-center">
-            {canClaim ? (
+          {!launchpadData.hideButtons ? (
+            <div className="mt-24 flex flex-col items-center justify-center">
+              {canClaim ? (
+                <button
+                  className="rounded-3xl px-3 py-3"
+                  style={{
+                    backgroundColor: launchpadData.buttonBgColor,
+                    color: launchpadData.buttonTextColor,
+                    width: 200,
+                  }}
+                  onClick={() => {
+                    setClaimInProgress(true);
+                    claim()
+                      .then((result) => {
+                        if (!result.success) return;
+                        setModalStep(3);
+                        setShowModal(!showModal);
+                      })
+                      .finally(() => setClaimInProgress(false));
+                  }}
+                >
+                  {claimInProgress
+                    ? "Claiming..."
+                    : launchpadData.claimButtonText}
+                </button>
+              ) : !launchpadData.isClosed ? (
+                <button
+                  className="rounded-3xl px-3 py-3"
+                  style={{
+                    backgroundColor: launchpadData.buttonBgColor,
+                    color: launchpadData.buttonTextColor,
+                    width: 200,
+                  }}
+                  onClick={() => setShowModal(!showModal)}
+                >
+                  {launchpadData.buyButtonText}
+                </button>
+              ) : (
+                <button
+                  className="rounded-3xl px-3 py-3"
+                  style={{
+                    backgroundColor: "#2d2d2d",
+                    color: "#f2f2f2",
+                    width: 200,
+                    opacity: 0.5,
+                    cursor: "default",
+                  }}
+                >
+                  Presale Closed
+                </button>
+              )}
               <button
-                className="rounded-3xl px-3 py-3"
-                style={{
-                  backgroundColor: launchpadData.buttonBgColor,
-                  color: launchpadData.buttonTextColor,
-                  width: 200,
-                }}
+                className="mt-10 text-xl font-normal underline"
+                style={{color: launchpadData.buttonDetailTextColor}}
                 onClick={() => {
-                  setClaimInProgress(true);
-                  claim()
-                    .then((result) => {
-                      if (!result.success) return;
-                      setModalStep(3);
-                      setShowModal(!showModal);
-                    })
-                    .finally(() => setClaimInProgress(false));
+                  setShowPresaleStatus(true);
                 }}
               >
-                {claimInProgress
-                  ? "Claiming..."
-                  : launchpadData.claimButtonText}
+                {launchpadData.detailButtonText}
               </button>
-            ) : (
-              <button
-                className="rounded-3xl px-3 py-3"
-                style={{
-                  backgroundColor: launchpadData.buttonBgColor,
-                  color: launchpadData.buttonTextColor,
-                  width: 200,
-                }}
-                onClick={() => setShowModal(!showModal)}
-              >
-                {launchpadData.buyButtonText}
-              </button>
-            )}
-            <button
-              className="mt-10 text-xl font-normal underline"
-              style={{color: launchpadData.buttonDetailTextColor}}
-              onClick={() => {
-                setShowPresaleStatus(true);
-              }}
-            >
-              {launchpadData.detailButtonText}
-            </button>
-          </div>
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </main>
     </>
