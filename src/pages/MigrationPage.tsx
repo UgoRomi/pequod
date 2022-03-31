@@ -1,8 +1,12 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
 import Spinner from "../components/Spinner";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
-import {useAllowance, useApprove, useLaunchpad} from "../utils/contractsUtils";
+import {
+  useAllowance,
+  useApprove,
+  useLaunchpad,
+} from "../utils/contractsUtils";
 
 export default function MigrationPage() {
   const checkAllowance = useAllowance();
@@ -65,7 +69,7 @@ export default function MigrationPage() {
         setOpen={setShowModal}
         hidden={!showModal}
         initialStep={3}
-        presaleStatus={{currentRaised: 0, hardCap: 0, softCap: 0}}
+        presaleStatus={{ currentRaised: 0, hardCap: 0, softCap: 0 }}
       ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
@@ -99,10 +103,10 @@ export default function MigrationPage() {
                 {allowanceInProgress ? (
                   <>
                     <Spinner className="h-5 text-pequod-white" />
-                    <span>Migrazione...</span>
+                    <span>Approving...</span>
                   </>
                 ) : (
-                  "Migra i token"
+                  "Approve"
                 )}
               </button>
             ) : (
