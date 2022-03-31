@@ -100,7 +100,7 @@ export default function Layout({children}: {children: JSX.Element}) {
       href: "/migration",
       icon: swapArrowsIcon,
       current: false,
-      disabled: true,
+      disabled: false,
     },
   ]);
 
