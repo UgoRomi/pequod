@@ -115,7 +115,7 @@ const emptyTokenDetails: TokenDetails = {
 export default function TradingPage() {
   const tokensList = useAppSelector(selectTokensList);
   const [tokenSearch, setTokenSearch] = useState<string>(
-    process.env.REACT_APP_WOT_ADDRESS as string
+    process.env.REACT_APP_WOT_V2_ADDRESS as string
   );
   const [searchResults, setSearchResults] = useState<TokensListResponse[]>([]);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
