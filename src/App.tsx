@@ -1,21 +1,22 @@
-import { Route, Routes } from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth";
 import RequireNoAuth from "./components/RequireNoAuth";
 import useEagerConnect from "./hooks/useEagerConnect";
 import LoginPage from "./pages/LoginPage";
 import StakingPage from "./pages/StakingPage";
-import { useEffect } from "react";
-import { useUserInfo } from "./utils/utils";
+import {useEffect} from "react";
+import {useUserInfo} from "./utils/utils";
 import TradingPage from "./pages/TradingPage";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { selectPequodApiInstance } from "./store/axiosInstancesSlice";
-import { TokensListResponse } from "./utils/apiTypes";
-import { setTokens } from "./store/miscSlice";
+import {useAppDispatch, useAppSelector} from "./store/hooks";
+import {selectPequodApiInstance} from "./store/axiosInstancesSlice";
+import {TokensListResponse} from "./utils/apiTypes";
+import {setTokens} from "./store/miscSlice";
 import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
 import LaunchpadPage from "./pages/LaunchpadPage";
 import MigrationPage from "./pages/MigrationPage";
+import LaunchpadDetailPage from "./pages/LaunchpadDetailPage";
 
 function App() {
   useEagerConnect();
@@ -33,7 +34,7 @@ function App() {
 
   useEffect(() => {
     const getTokens = async () => {
-      const { data: tokensList }: { data: TokensListResponse[] } =
+      const {data: tokensList}: {data: TokensListResponse[]} =
         await pequodApiInstance.get("/tokens/list");
       dispatch(setTokens(_.uniqBy(tokensList, "address")));
     };
@@ -69,7 +70,7 @@ function App() {
         element={
           <RequireAuth>
             <Layout>
-              <LaunchpadPage />
+              <LaunchpadDetailPage />
             </Layout>
           </RequireAuth>
         }

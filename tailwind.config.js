@@ -51,6 +51,7 @@ module.exports = {
       },
       height: {
         50: "50px",
+        80: "80px",
         40: "40px",
         35: "35px",
       },
