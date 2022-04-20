@@ -1,8 +1,9 @@
-import {useEffect, useState} from "react";
+/* eslint-disable */
+import { useEffect, useState } from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
-import {useParams} from "react-router-dom";
-import {useLaunchpad} from "../utils/contractsUtils";
-import {useApiCall} from "../utils/utils";
+import { useParams } from "react-router-dom";
+import { useLaunchpad } from "../utils/contractsUtils";
+import { useApiCall } from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -29,7 +30,7 @@ interface LaunchpadsResponse {
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
   const [launchpads, setLaunchpads] = useState<LaunchpadsResponse[]>([]);
-  const {launchpadId} = useParams();
+  const { launchpadId } = useParams();
   let [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
   //const url = window.location.href;
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
@@ -40,7 +41,7 @@ export default function LaunchpadDetailPage() {
       if (!res?.data) {
         return;
       }
-      const {data: response}: {data: LaunchpadsResponse[]} = res;
+      const { data: response }: { data: LaunchpadsResponse[] } = res;
       setLaunchpads(response);
       CheckForLaunchpadToShow();
     });
@@ -62,7 +63,7 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({currentRaised: 0, hardCap: 0, softCap: 0});
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
 
   /*const {
     canClaim: checkCanClaim,
@@ -114,7 +115,7 @@ export default function LaunchpadDetailPage() {
           </h1>
           <h1
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{color: launchpadData?.buttonBgColor}}
+            style={{ color: launchpadData?.buttonBgColor }}
           >
             {launchpadData?.data}
           </h1>
@@ -123,7 +124,7 @@ export default function LaunchpadDetailPage() {
           </h2>
 
           {/* DA MOSTRARE QUEST INUOVI TASTI */}
-          <div className="flex justify-center mt-5">
+          <div className="mt-5 flex justify-center">
             <button
               className="rounded-3xl px-3 py-3"
               style={{
@@ -135,7 +136,7 @@ export default function LaunchpadDetailPage() {
               {launchpadData?.buyButtonText}
             </button>
             <button
-              className="rounded-3xl px-3 py-3 ml-10"
+              className="ml-10 rounded-3xl px-3 py-3"
               style={{
                 backgroundColor: launchpadData?.buttonBgColor,
                 color: launchpadData?.buttonTextColor,
@@ -145,20 +146,20 @@ export default function LaunchpadDetailPage() {
               Tokenomics
             </button>
           </div>
-          <div className="flex justify-center mt-12">
+          <div className="mt-12 flex justify-center">
             <div
-              className="w-full h-50 rounded-3xl"
-              style={{backgroundColor: "#7B7663"}}
+              className="h-50 w-full rounded-3xl"
+              style={{ backgroundColor: "#7B7663" }}
             >
               <div
-                className="h-50 rounded-3xl flex justify-center items-center"
-                style={{width: "300px", backgroundColor: "#FFEBA0"}}
+                className="flex h-50 items-center justify-center rounded-3xl"
+                style={{ width: "300px", backgroundColor: "#FFEBA0" }}
               >
                 100 BNB
               </div>
             </div>
             <div
-              className="text-left text-white border-l px-2"
+              className="border-l px-2 text-left text-white"
               style={{
                 position: "absolute",
                 marginTop: "-25px",
@@ -172,7 +173,7 @@ export default function LaunchpadDetailPage() {
               100 BNB
             </div>
             <div
-              className="text-right text-white px-2"
+              className="px-2 text-right text-white"
               style={{
                 position: "absolute",
                 marginTop: "-25px",
@@ -240,7 +241,7 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{color: launchpadData?.buttonDetailTextColor}}
+                style={{ color: launchpadData?.buttonDetailTextColor }}
                 onClick={() => {
                   setShowPresaleStatus(true);
                 }}
