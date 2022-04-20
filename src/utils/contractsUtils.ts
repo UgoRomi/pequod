@@ -52,7 +52,10 @@ export function useGetTokenPrice() {
     // I have to check if BNB is the token 0 because it changes for every pair
     const isBNBToken0 =
       (await pairContract.methods.token0().call()) ===
-      process.env.REACT_APP_BNB_ADDRESS;
+      (tokenAddress.toLowerCase() ===
+      process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+        ? process.env.REACT_APP_USDT_ADDRESS
+        : process.env.REACT_APP_BNB_ADDRESS);
     const {_reserve0: reserve0, _reserve1: reserve1} =
       await pairContract.methods.getReserves().call();
     return {
@@ -169,7 +172,15 @@ export function useSwap(
       tokenDecimals,
     } = await swapData();
     try {
-      const path = [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
+      const path =
+        tokenAddress.toLowerCase() ===
+        process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+          ? [
+              process.env.REACT_APP_BNB_ADDRESS,
+              process.env.REACT_APP_USDT_ADDRESS,
+              tokenAddress,
+            ]
+          : [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
 
       const result = await routerContract.methods
         .swapExactETHForTokensSupportingFeeOnTransferTokens(
@@ -215,8 +226,16 @@ export function useSwap(
       tokenDecimals,
     } = await swapData();
     try {
-      const path = [tokenAddress, process.env.REACT_APP_BNB_ADDRESS];
-
+      const path =
+        tokenAddress.toLowerCase() ===
+        process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+          ? [
+              tokenAddress,
+              process.env.REACT_APP_USDT_ADDRESS,
+              process.env.REACT_APP_BNB_ADDRESS,
+            ]
+          : [tokenAddress, process.env.REACT_APP_BNB_ADDRESS];
+      console.log(path);
       const result = await routerContract.methods
         .swapExactTokensForETHSupportingFeeOnTransferTokens(
           toBigNumber(parseFloat(amountFrom), tokenDecimals),
