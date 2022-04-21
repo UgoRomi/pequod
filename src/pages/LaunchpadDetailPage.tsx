@@ -1,9 +1,9 @@
 /* eslint-disable */
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import LaunchpadModal from "../components/LaunchpadModal";
-import { useParams } from "react-router-dom";
-import { useLaunchpad } from "../utils/contractsUtils";
-import { useApiCall } from "../utils/utils";
+import {useParams} from "react-router-dom";
+import {useLaunchpad} from "../utils/contractsUtils";
+import {useApiCall} from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -29,8 +29,8 @@ interface LaunchpadsResponse {
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
-  const [launchpads, setLaunchpads] = useState<LaunchpadsResponse[]>([]);
-  const { launchpadId } = useParams();
+  let [launchpads, setLaunchpads] = useState([]);
+  const {launchpadId} = useParams();
   let [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
   //const url = window.location.href;
   // Qui va splittato e launchpadID diventa quello dopo /launchpad
@@ -41,18 +41,12 @@ export default function LaunchpadDetailPage() {
       if (!res?.data) {
         return;
       }
-      const { data: response }: { data: LaunchpadsResponse[] } = res;
-      setLaunchpads(response);
-      CheckForLaunchpadToShow();
+      if (res.data.length && launchpadId) {
+        setLaunchpadData(res.data.find((item: any) => item.id === launchpadId));
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatchEvent]);
-
-  const CheckForLaunchpadToShow = () => {
-    if (launchpadId) {
-      setLaunchpadData(launchpads.find((item) => item.id === launchpadId));
-    }
-  };
+  }, []);
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showPresaleStatus, setShowPresaleStatus] = useState<boolean>(false);
@@ -63,7 +57,7 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
+  }>({currentRaised: 0, hardCap: 0, softCap: 0});
 
   /*const {
     canClaim: checkCanClaim,
@@ -115,7 +109,7 @@ export default function LaunchpadDetailPage() {
           </h1>
           <h1
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{ color: launchpadData?.buttonBgColor }}
+            style={{color: launchpadData?.buttonBgColor}}
           >
             {launchpadData?.data}
           </h1>
@@ -149,42 +143,35 @@ export default function LaunchpadDetailPage() {
           <div className="mt-12 flex justify-center">
             <div
               className="h-50 w-full rounded-3xl"
-              style={{ backgroundColor: "#7B7663" }}
+              style={{backgroundColor: "#7B7663"}}
             >
               <div
                 className="flex h-50 items-center justify-center rounded-3xl"
-                style={{ width: "300px", backgroundColor: "#FFEBA0" }}
+                style={{width: "300px", backgroundColor: "#FFEBA0"}}
               >
                 100 BNB
               </div>
             </div>
+
             <div
-              className="border-l px-2 text-left text-white"
-              style={{
-                position: "absolute",
-                marginTop: "-25px",
-                marginLeft: "10%",
-              }}
+              className="grid grid-cols-8 grid-rows-4 absolute mb-10 text-white"
+              style={{width: "20%", marginTop: "-1%", marginLeft: "30%"}}
             >
-              SC
-              <br />
-              <br />
-              <br />
-              100 BNB
-            </div>
-            <div
-              className="px-2 text-right text-white"
-              style={{
-                position: "absolute",
-                marginTop: "-25px",
-                marginLeft: "60%",
-              }}
-            >
-              HC
-              <br />
-              <br />
-              <br />
-              300 BNB
+              <div className="border-l col-span-1 text-left px-10">SC</div>
+              <div className="col-span-6"></div>
+              <div className="border-l col-span-1 text-left px-10">HC</div>
+
+              <div className="border-l col-span-1"></div>
+              <div className="col-span-6"></div>
+              <div className="border-l col-span-1"></div>
+
+              <div className="border-l col-span-1"></div>
+              <div className="col-span-6"></div>
+              <div className="border-l col-span-1"></div>
+
+              <div className="border-l col-span-1 text-left px-10">287.5</div>
+              <div className="col-span-6"></div>
+              <div className="border-l col-span-1 text-left px-10">560</div>
             </div>
           </div>
 
@@ -241,7 +228,7 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{ color: launchpadData?.buttonDetailTextColor }}
+                style={{color: launchpadData?.buttonDetailTextColor}}
                 onClick={() => {
                   setShowPresaleStatus(true);
                 }}
