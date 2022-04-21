@@ -1,9 +1,9 @@
-/* eslint-disable */
-import {useEffect, useState} from "react";
-import LaunchpadModal from "../components/LaunchpadModal";
-import {useParams} from "react-router-dom";
-import {useLaunchpad} from "../utils/contractsUtils";
-import {useApiCall} from "../utils/utils";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import CustomDialog from "../components/CustomDialog";
+import PresaleModalContent from "../components/PresaleModalContent";
+import { useLaunchpad } from "../utils/contractsUtils";
+import { useApiCall } from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -11,6 +11,7 @@ interface LaunchpadsResponse {
   description: string;
   imageUrl: string;
   redirectUrl: string;
+  contractAddress: string;
 
   // Detail page
   launchpadTitle: string;
@@ -29,12 +30,8 @@ interface LaunchpadsResponse {
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
-  let [launchpads, setLaunchpads] = useState([]);
-  const {launchpadId} = useParams();
+  const { launchpadId } = useParams();
   let [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
-  //const url = window.location.href;
-  // Qui va splittato e launchpadID diventa quello dopo /launchpad
-  //const arr = url.split("/");
 
   useEffect(() => {
     apiCall(`/launchpads/list`, {}).then((res) => {
@@ -49,7 +46,7 @@ export default function LaunchpadDetailPage() {
   }, []);
 
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [showPresaleStatus, setShowPresaleStatus] = useState<boolean>(false);
+  const [showPresaleModal, setShowPresaleModal] = useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
@@ -57,9 +54,9 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({currentRaised: 0, hardCap: 0, softCap: 0});
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
 
-  /*const {
+  const {
     canClaim: checkCanClaim,
     claim,
     getPresaleStatus,
@@ -74,52 +71,50 @@ export default function LaunchpadDetailPage() {
 
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({currentRaised, hardCap, softCap}) => {
-      setPresaleStatus({currentRaised, hardCap, softCap});
+    getPresaleStatus().then(({ currentRaised, hardCap, softCap }) => {
+      setPresaleStatus({ currentRaised, hardCap, softCap });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);*/
+  }, []);
 
   return (
     <>
-      {/* <LaunchpadModal
-        setOpen={setShowModal}
-        hidden={!showModal}
-        conversionRate={40000}
-        presaleAddress={process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string}
-        initialStep={modalStep}
-        presaleStatus={presaleStatus}
-      ></LaunchpadModal>
-      <LaunchpadModal
-        setOpen={setShowPresaleStatus}
-        hidden={!showPresaleStatus}
-        initialStep={2}
-        conversionRate={40000}
-        presaleStatus={presaleStatus}
-      ></LaunchpadModal> */}
+      <CustomDialog
+        isOpen={showPresaleModal}
+        closeModal={() => setShowPresaleModal(false)}
+      >
+        <PresaleModalContent
+          conversionRate={1}
+          presaleAddress={launchpadData?.contractAddress}
+          initialStep={modalStep}
+        ></PresaleModalContent>
+      </CustomDialog>
       <main className="flex flex-col gap-0 md:gap-10">
-        <h1 className="mt-6 text-3xl font-normal text-pequod-white">
+        <span className="mt-6 text-3xl font-normal text-pequod-white">
           {launchpadData?.launchpadTitle}
-        </h1>
+        </span>
         <hr />
         <img src={launchpadData?.launchpadBg} alt="launchpad pequod" />
         <div className="p-4 text-center">
-          <h1 className="mt-6 text-3xl font-normal text-pequod-white">
+          <span className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData?.launchpadSubTitle}
-          </h1>
-          <h1
+          </span>
+          <span
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{color: launchpadData?.buttonBgColor}}
+            style={{ color: launchpadData?.buttonBgColor }}
           >
             {launchpadData?.data}
-          </h1>
-          <h2 className="mt-8 text-xl font-light text-pequod-white">
+          </span>
+          <span className="mt-8 text-xl font-light text-pequod-white">
             {launchpadData?.launchpadDesc}
-          </h2>
+          </span>
 
           {/* DA MOSTRARE QUEST INUOVI TASTI */}
           <div className="mt-5 flex justify-center">
             <button
+              onClick={() => {
+                setShowPresaleModal(true);
+              }}
               className="rounded-3xl px-3 py-3"
               style={{
                 backgroundColor: launchpadData?.buttonBgColor,
@@ -143,35 +138,44 @@ export default function LaunchpadDetailPage() {
           <div className="mt-12 flex justify-center">
             <div
               className="h-50 w-full rounded-3xl"
-              style={{backgroundColor: "#7B7663"}}
+              style={{ backgroundColor: "#7B7663" }}
             >
               <div
                 className="flex h-50 items-center justify-center rounded-3xl"
-                style={{width: "300px", backgroundColor: "#FFEBA0"}}
+                style={{
+                  width: `${
+                    (presaleStatus.currentRaised * 100) / presaleStatus.hardCap
+                  }%`,
+                  backgroundColor: "#FFEBA0",
+                }}
               >
-                100 BNB
+                {presaleStatus.currentRaised} BNB
               </div>
             </div>
 
             <div
-              className="grid grid-cols-8 grid-rows-4 absolute mb-10 text-white"
-              style={{width: "20%", marginTop: "-1%", marginLeft: "30%"}}
+              className="absolute mb-10 grid grid-cols-8 grid-rows-4 text-white"
+              style={{ width: "20%", marginTop: "-1%", marginLeft: "30%" }}
             >
-              <div className="border-l col-span-1 text-left px-10">SC</div>
+              <div className="col-span-1 border-l px-10 text-left">SC</div>
               <div className="col-span-6"></div>
-              <div className="border-l col-span-1 text-left px-10">HC</div>
+              <div className="col-span-1 border-l px-10 text-left">HC</div>
 
-              <div className="border-l col-span-1"></div>
+              <div className="col-span-1 border-l"></div>
               <div className="col-span-6"></div>
-              <div className="border-l col-span-1"></div>
+              <div className="col-span-1 border-l"></div>
 
-              <div className="border-l col-span-1"></div>
+              <div className="col-span-1 border-l"></div>
               <div className="col-span-6"></div>
-              <div className="border-l col-span-1"></div>
+              <div className="col-span-1 border-l"></div>
 
-              <div className="border-l col-span-1 text-left px-10">287.5</div>
+              <div className="col-span-1 border-l px-10 text-left">
+                {presaleStatus.softCap}
+              </div>
               <div className="col-span-6"></div>
-              <div className="border-l col-span-1 text-left px-10">560</div>
+              <div className="col-span-1 border-l px-10 text-left">
+                {presaleStatus.hardCap}
+              </div>
             </div>
           </div>
 
@@ -186,14 +190,14 @@ export default function LaunchpadDetailPage() {
                     width: 200,
                   }}
                   onClick={() => {
-                    /*setClaimInProgress(true);
+                    setClaimInProgress(true);
                     claim()
                       .then((result) => {
                         if (!result.success) return;
                         setModalStep(3);
                         setShowModal(!showModal);
                       })
-                      .finally(() => setClaimInProgress(false));*/
+                      .finally(() => setClaimInProgress(false));
                   }}
                 >
                   {claimInProgress
@@ -228,9 +232,9 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{color: launchpadData?.buttonDetailTextColor}}
+                style={{ color: launchpadData?.buttonDetailTextColor }}
                 onClick={() => {
-                  setShowPresaleStatus(true);
+                  setShowPresaleModal(true);
                 }}
               >
                 {launchpadData?.detailButtonText}

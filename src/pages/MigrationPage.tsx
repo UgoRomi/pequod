@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import LaunchpadModal from "../components/LaunchpadModal";
 import Spinner from "../components/Spinner";
 import mobyLaunchpadBg from "../images/launchpad_bg.png";
 import {
@@ -12,7 +11,7 @@ export default function MigrationPage() {
   const checkAllowance = useAllowance();
   const allow = useApprove();
 
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showPresaleModal, setShowPresaleModal] = useState<boolean>(false);
   const [allowanceInProgress, setAllowanceInProgress] =
     useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
@@ -65,12 +64,6 @@ export default function MigrationPage() {
 
   return (
     <>
-      <LaunchpadModal
-        setOpen={setShowModal}
-        hidden={!showModal}
-        initialStep={3}
-        presaleStatus={{ currentRaised: 0, hardCap: 0, softCap: 0 }}
-      ></LaunchpadModal>
       <main className="flex flex-col gap-0 md:gap-10">
         <h1 className="mt-6 text-3xl font-normal text-pequod-white">
           Launchpad MOBY
@@ -122,7 +115,7 @@ export default function MigrationPage() {
                   claim()
                     .then((result) => {
                       if (!result.success) return;
-                      setShowModal(!showModal);
+                      setShowPresaleModal(!showPresaleModal);
                     })
                     .finally(() => setClaimInProgress(false));
                 }}
