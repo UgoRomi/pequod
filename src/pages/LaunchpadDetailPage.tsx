@@ -12,6 +12,7 @@ interface LaunchpadsResponse {
   imageUrl: string;
   redirectUrl: string;
   contractAddress: string;
+  presaleContractAddress: string;
 
   // Detail page
   launchpadTitle: string;
@@ -85,7 +86,7 @@ export default function LaunchpadDetailPage() {
       >
         <PresaleModalContent
           conversionRate={1}
-          presaleAddress={launchpadData?.contractAddress}
+          presaleAddress={launchpadData?.presaleContractAddress}
           initialStep={modalStep}
         ></PresaleModalContent>
       </CustomDialog>
