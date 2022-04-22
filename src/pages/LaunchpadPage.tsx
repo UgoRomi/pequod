@@ -1,7 +1,7 @@
-import {LinkIcon} from "@heroicons/react/outline";
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {useApiCall} from "../utils/utils";
+import { LinkIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useApiCall } from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -36,7 +36,7 @@ export default function LaunchpadPage() {
       if (!res?.data) {
         return;
       }
-      const {data: response}: {data: LaunchpadsResponse[]} = res;
+      const { data: response }: { data: LaunchpadsResponse[] } = res;
       setLaunchpads(response);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,14 +45,12 @@ export default function LaunchpadPage() {
   return (
     <main className="flex flex-col gap-0 md:gap-10">
       <h1 className="ml-4 text-xl font-normal text-pequod-white">Launchpad</h1>
-      {launchpads.length === 0 ? (
+      {launchpads.length === 0 && (
         <div className="flex h-full w-full items-center justify-center overflow-hidden py-60">
           <h2 className="ml-4 text-4xl font-normal text-pequod-white">
             No launchpads available
           </h2>
         </div>
-      ) : (
-        <></>
       )}
 
       {launchpads.map((item) => {
