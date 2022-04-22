@@ -71,7 +71,7 @@ export default function LaunchpadPage() {
               )}
             </div>
             <div className="mt-4 flex flex-col px-4 text-white md:mt-0 md:px-12 ">
-              {item.redirectUrl.indexOf("http") === -1 ? (
+              {item.redirectUrl.indexOf("http") > -1 ? (
                 <a href={item.redirectUrl} rel="noreferrer">
                   <div className="text-md mb-2 flex flex-row md:text-3xl">
                     {item.title}&nbsp;
@@ -79,7 +79,7 @@ export default function LaunchpadPage() {
                   </div>
                 </a>
               ) : (
-                <Link to="/launchpad/mida" rel="noreferrer">
+                <Link to={item.redirectUrl} rel="noreferrer">
                   <div className="text-md mb-2 flex flex-row md:text-3xl">
                     {item.title}&nbsp;
                     <LinkIcon className="ml-4 w-4 md:w-8" />

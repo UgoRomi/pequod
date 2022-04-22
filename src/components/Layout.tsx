@@ -260,7 +260,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                             : item.disabled
                             ? "cursor-default text-white opacity-60"
                             : "pl-3 text-pequod-white hover:bg-pequod-white-300",
-                          "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                          "group flex items-center py-3 pl-8 pr-2 text-sm font-medium"
                         )}
                       >
                         <img
@@ -364,7 +364,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         : item.disabled
                         ? "cursor-default text-white opacity-60"
                         : "pl-3 text-pequod-white hover:bg-pequod-white-300",
-                      "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                      "group flex items-center py-3 pl-8 pr-2 text-sm font-medium"
                     )}
                   >
                     <img
