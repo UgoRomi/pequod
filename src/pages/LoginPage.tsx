@@ -25,7 +25,7 @@ export default function LoginPage() {
         <div className="flex w-full items-center flex-col justify-center py-4">
           <Logo className="flex-shrink-0" />
           <p className="text-center text-md text-pequod-white mb-2">
-            BETA V 1.2.0
+            BETA V 1.3.0
           </p>
         </div>
         <p className="text-center text-xl font-semibold text-pequod-white">

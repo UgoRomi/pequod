@@ -55,15 +55,17 @@ export default function LaunchpadDetailPage() {
     useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
+  const [, setCanContribute] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
   const [presaleStatus, setPresaleStatus] = useState<{
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({currentRaised: 0, hardCap: 0, softCap: 0});
+    status: string;}>({currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET" });
 
   const {
     canClaim: checkCanClaim,
+    canContribute: checkCanContribute,
     claim,
     getPresaleStatus,
   } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string);
@@ -75,10 +77,17 @@ export default function LaunchpadDetailPage() {
     });
   }, [checkCanClaim]);
 
+  // Check if the user can contribute to the presale
+  useEffect(() => {
+    checkCanContribute().then((canContribute) => {
+      setCanContribute(canContribute);
+    });
+  }, [checkCanContribute]);
+
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({currentRaised, hardCap, softCap}) => {
-      setPresaleStatus({currentRaised, hardCap, softCap});
+    getPresaleStatus().then(({currentRaised, hardCap, softCap, status}) => {
+      setPresaleStatus({currentRaised, hardCap, softCap, status });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -172,7 +181,8 @@ export default function LaunchpadDetailPage() {
       >
         <PresaleModalContent
           conversionRate={1}
-          presaleAddress={launchpadData?.presaleContractAddress}
+          presaleAddress={launchpadData?.presaleContractAddress as string}
+          tokenAddress={launchpadData?.contractAddress as string}
           title={launchpadData?.buyButtonText}
           symbol={launchpadData?.symbol || "MIDA"}
           initialStep={modalStep}
