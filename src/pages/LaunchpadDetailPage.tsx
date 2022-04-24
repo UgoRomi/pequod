@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import CustomDialog from "../components/CustomDialog";
 import PresaleModalContent from "../components/PresaleModalContent";
-import { useLaunchpad } from "../utils/contractsUtils";
-import { useApiCall } from "../utils/utils";
+import TokenomicsDialog from "../components/TokenomicsModal";
+import {useLaunchpad} from "../utils/contractsUtils";
+import {useApiCall} from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -13,7 +14,9 @@ interface LaunchpadsResponse {
   redirectUrl: string;
   contractAddress: string;
   presaleContractAddress: string;
-
+  symbol: string;
+  hardCap: number;
+  softCap: number;
   // Detail page
   launchpadTitle: string;
   launchpadBg: string;
@@ -31,7 +34,7 @@ interface LaunchpadsResponse {
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
-  const { launchpadId } = useParams();
+  const {launchpadId} = useParams();
   let [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
 
   useEffect(() => {
@@ -48,6 +51,8 @@ export default function LaunchpadDetailPage() {
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showPresaleModal, setShowPresaleModal] = useState<boolean>(false);
+  const [showTokenomicsModal, setShowTokenomicsModal] =
+    useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
@@ -55,7 +60,7 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-  }>({ currentRaised: 0, hardCap: 0, softCap: 0 });
+  }>({currentRaised: 0, hardCap: 0, softCap: 0});
 
   const {
     canClaim: checkCanClaim,
@@ -72,12 +77,93 @@ export default function LaunchpadDetailPage() {
 
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({ currentRaised, hardCap, softCap }) => {
-      setPresaleStatus({ currentRaised, hardCap, softCap });
+    getPresaleStatus().then(({currentRaised, hardCap, softCap}) => {
+      setPresaleStatus({currentRaised, hardCap, softCap});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const tokenomicsMida = [
+    {
+      allocation: "Seed sale",
+      supply: "8%",
+      tokens: "8.000.000",
+      price: "$ 0,055",
+      raise: "$ 440.000",
+      description:
+        "5% on TGE / 3 months cliff / Unlock of 3,9583% for 24 months after",
+    },
+    {
+      allocation: "MIDA's chosen",
+      supply: "3%",
+      tokens: "3.000.000",
+      price: "$ 0,075",
+      raise: "$ 225.000",
+      description: "20% on TGE / Unlock of 6,6666% for 12 months after",
+    },
+    {
+      allocation: "Strategic round",
+      supply: "12%",
+      tokens: "12.000.000",
+      price: "$ 0,080",
+      raise: "$ 960.000",
+      description:
+        "8,50% on TGE / 3 months cliff / Unlock of 3,8125% for 24 months after",
+    },
+    {
+      allocation: "Public sale",
+      supply: "3%",
+      tokens: "3.000.000",
+      price: "$ 0,10",
+      raise: "$ 300.000",
+      description: "15% on TGE / Unlock of 14,16666% for 6 months after",
+    },
+    {
+      allocation: "Team",
+      supply: "10%",
+      tokens: "10.000.000",
+      price: "",
+      raise: "",
+      description:
+        "0% on TGE / 12 months cliff / Unlock of 2,777% for 36 months after",
+    },
+    {
+      allocation: "Advisor",
+      supply: "6%",
+      tokens: "6.000.000",
+      price: "",
+      raise: "",
+      description:
+        "10% on TGE / 3 months cliff / Unlock of 3,75% for 24 months after",
+    },
+    {
+      allocation: "Marketing & Community",
+      supply: "20%",
+      tokens: "20.000.000",
+      price: "",
+      raise: "",
+      description:
+        "5% on TGE / 3 months cliff / Unlock of 2,6388% for 36 months after",
+    },
+    {
+      allocation: "Ecosystem & Development",
+      supply: "20%",
+      tokens: "20.000.000",
+      price: "",
+      raise: "",
+      description:
+        "3,5% on TGE / 3 months cliff / Unlock of 2,6805% for 36 months after",
+    },
+    {
+      allocation: "Liquidity",
+      supply: "18%",
+      tokens: "18.000.000",
+      price: "",
+      raise: "",
+      description:
+        "25% on TGE / 3 months cliff / Unlock of 3,125% for 24 months after",
+    },
+  ];
   return (
     <>
       <CustomDialog
@@ -87,8 +173,16 @@ export default function LaunchpadDetailPage() {
         <PresaleModalContent
           conversionRate={1}
           presaleAddress={launchpadData?.presaleContractAddress}
+          title={launchpadData?.buyButtonText}
+          symbol={launchpadData?.symbol || "MIDA"}
           initialStep={modalStep}
         ></PresaleModalContent>
+      </CustomDialog>
+      <CustomDialog
+        isOpen={showTokenomicsModal}
+        closeModal={() => setShowTokenomicsModal(false)}
+      >
+        <TokenomicsDialog tokenomics={tokenomicsMida}></TokenomicsDialog>
       </CustomDialog>
       <main className="flex flex-col gap-0 md:gap-10">
         <span className="mt-6 text-3xl font-normal text-pequod-white">
@@ -96,13 +190,13 @@ export default function LaunchpadDetailPage() {
         </span>
         <hr />
         <img src={launchpadData?.launchpadBg} alt="launchpad pequod" />
-        <div className="p-4 text-center">
+        <div className="p-4 text-center flex flex-col">
           <span className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData?.launchpadSubTitle}
           </span>
           <span
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{ color: launchpadData?.buttonBgColor }}
+            style={{color: launchpadData?.buttonBgColor}}
           >
             {launchpadData?.data}
           </span>
@@ -127,6 +221,9 @@ export default function LaunchpadDetailPage() {
             </button>
             <button
               className="ml-10 rounded-3xl px-3 py-3"
+              onClick={() => {
+                setShowTokenomicsModal(true);
+              }}
               style={{
                 backgroundColor: launchpadData?.buttonBgColor,
                 color: launchpadData?.buttonTextColor,
@@ -139,14 +236,16 @@ export default function LaunchpadDetailPage() {
           <div className="mt-12 flex justify-center">
             <div
               className="h-50 w-full rounded-3xl"
-              style={{ backgroundColor: "#7B7663" }}
+              style={{backgroundColor: "#7B7663"}}
             >
               <div
                 className="flex h-50 items-center justify-center rounded-3xl"
                 style={{
                   width: `${
-                    (presaleStatus.currentRaised * 100) / presaleStatus.hardCap
+                    (presaleStatus.currentRaised * 100) /
+                    (launchpadData?.hardCap ? launchpadData?.hardCap : 0)
                   }%`,
+                  minWidth: "7%",
                   backgroundColor: "#FFEBA0",
                 }}
               >
@@ -156,11 +255,11 @@ export default function LaunchpadDetailPage() {
 
             <div
               className="absolute mb-10 grid grid-cols-8 grid-rows-4 text-white"
-              style={{ width: "20%", marginTop: "-1%", marginLeft: "30%" }}
+              style={{width: "20%", marginTop: "-1%", marginLeft: "30%"}}
             >
-              <div className="col-span-1 border-l px-10 text-left">SC</div>
+              <div className="col-span-1 border-l px-4 text-left">SC</div>
               <div className="col-span-6"></div>
-              <div className="col-span-1 border-l px-10 text-left">HC</div>
+              <div className="col-span-1 border-l px-4 text-left">HC</div>
 
               <div className="col-span-1 border-l"></div>
               <div className="col-span-6"></div>
@@ -170,12 +269,12 @@ export default function LaunchpadDetailPage() {
               <div className="col-span-6"></div>
               <div className="col-span-1 border-l"></div>
 
-              <div className="col-span-1 border-l px-10 text-left">
-                {presaleStatus.softCap}
+              <div className="col-span-1 border-l px-4 text-left">
+                {launchpadData?.softCap}
               </div>
               <div className="col-span-6"></div>
-              <div className="col-span-1 border-l px-10 text-left">
-                {presaleStatus.hardCap}
+              <div className="col-span-1 border-l px-4 text-left">
+                {launchpadData?.hardCap}
               </div>
             </div>
           </div>
@@ -233,7 +332,7 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{ color: launchpadData?.buttonDetailTextColor }}
+                style={{color: launchpadData?.buttonDetailTextColor}}
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}

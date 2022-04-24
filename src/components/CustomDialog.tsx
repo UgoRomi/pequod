@@ -1,5 +1,5 @@
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import {Dialog, Transition} from "@headlessui/react";
+import {Fragment} from "react";
 
 export default function CustomDialog({
   isOpen,
@@ -46,7 +46,7 @@ export default function CustomDialog({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="relative inline-block transform overflow-hidden rounded-lg text-left align-bottom shadow-xl transition-all sm:w-full sm:max-w-sm sm:align-middle">
+            <div className="relative inline-block transform overflow-hidden rounded-lg  align-bottom shadow-xl transition-all min-w-25-p text-center w-fit-content sm:align-middle">
               {children}
             </div>
           </Transition.Child>

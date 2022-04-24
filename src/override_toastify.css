@@ -1,16 +1,12 @@
 /** Classes for the displayed toast **/
 .Toastify__toast {
-    background-color: #231e3e !Important;
-    border: 1px solid rgba(255,255,255,0.6);
-    border-radius: 15px;
-    color: white;
-    font-weight: bold;
-}
-
-.Toastify__progress-bar {
-    display: none
+  background-color: #231e3e !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 15px;
+  color: white;
+  font-weight: bold;
 }
 /** Classes for the close button. Better use your own closeButton **/
 .Toastify__close-button {
-    color: white;
+  color: white;
 }

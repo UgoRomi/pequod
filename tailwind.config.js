@@ -47,6 +47,7 @@ module.exports = {
         10: "10px",
       },
       width: {
+        "fit-content": "fit-content",
         55: "55px",
       },
       height: {
@@ -60,6 +61,7 @@ module.exports = {
       },
       minWidth: {
         55: "55px",
+        "25-p": "25%",
       },
     },
   },
