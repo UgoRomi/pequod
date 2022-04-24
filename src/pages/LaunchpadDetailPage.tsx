@@ -50,7 +50,7 @@ export default function LaunchpadDetailPage() {
   const [showPresaleModal, setShowPresaleModal] = useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
-  const [canContribute, setCanContribute] = useState<boolean>(false);
+  const [, setCanContribute] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
   const [presaleStatus, setPresaleStatus] = useState<{
     currentRaised: number;
