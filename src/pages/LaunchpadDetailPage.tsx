@@ -35,7 +35,7 @@ interface LaunchpadsResponse {
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
   const {launchpadId} = useParams();
-  let [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
+  const [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
 
   useEffect(() => {
     apiCall(`/launchpads/list`, {}).then((res) => {
@@ -68,7 +68,7 @@ export default function LaunchpadDetailPage() {
     canContribute: checkCanContribute,
     claim,
     getPresaleStatus,
-  } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_BNB_ADDRESS as string);
+  } = useLaunchpad(launchpadData?.presaleContractAddress || "");
 
   // Check if the user can claim the tokens
   useEffect(() => {
@@ -180,7 +180,7 @@ export default function LaunchpadDetailPage() {
         closeModal={() => setShowPresaleModal(false)}
       >
         <PresaleModalContent
-          conversionRate={1}
+          conversionRate={0.075}
           presaleAddress={launchpadData?.presaleContractAddress as string}
           tokenAddress={launchpadData?.contractAddress as string}
           title={launchpadData?.buyButtonText}

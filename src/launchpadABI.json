@@ -1,22 +1,5 @@
 [
   {
-    "inputs": [],
-    "name": "claim",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "contribute",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -34,6 +17,38 @@
     ],
     "name": "OwnershipTransferred",
     "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address[]", "name": "_addresses", "type": "address[]" }
+    ],
+    "name": "addWhiteListAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "amountOfTokenThatWillReceive",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address[]", "name": "_addresses", "type": "address[]" }
+    ],
+    "name": "removeWhiteListAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -78,18 +93,144 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_b", "type": "uint256" }],
-    "name": "setChangeRate",
+    "inputs": [
+      { "internalType": "address", "name": "newValue", "type": "address" },
+      { "internalType": "bool", "name": "value", "type": "bool" }
+    ],
+    "name": "setupBanker",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "newValue", "type": "address" },
-      { "internalType": "bool", "name": "value", "type": "bool" }
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "changeRate",
+            "type": "uint256"
+          },
+          { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
+          {
+            "internalType": "address",
+            "name": "tokenInPresale",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
+          { "internalType": "uint256", "name": "softCap", "type": "uint256" }
+        ],
+        "internalType": "struct LaunchpadInBnbWithStatuses.Info",
+        "name": "_info",
+        "type": "tuple"
+      }
     ],
-    "name": "setupBanker",
+    "name": "setupInfo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "startingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "whiteListTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "everyoneTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
+        ],
+        "internalType": "struct LaunchpadInBnbWithStatuses.Timings",
+        "name": "_timings",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "changeRate",
+            "type": "uint256"
+          },
+          { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
+          {
+            "internalType": "address",
+            "name": "tokenInPresale",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
+          { "internalType": "uint256", "name": "softCap", "type": "uint256" }
+        ],
+        "internalType": "struct LaunchpadInBnbWithStatuses.Info",
+        "name": "_info",
+        "type": "tuple"
+      }
+    ],
+    "name": "setupPresale",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "startingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "whiteListTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "everyoneTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
+        ],
+        "internalType": "struct LaunchpadInBnbWithStatuses.Timings",
+        "name": "_timings",
+        "type": "tuple"
+      }
+    ],
+    "name": "setupTimings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum LaunchpadInBnbWithStatuses.Status",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "startStatus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -112,28 +253,8 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "inputs": [{ "internalType": "bool", "name": "_b", "type": "bool" }],
-    "name": "updateClaimOpened",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "bool", "name": "_b", "type": "bool" }],
-    "name": "updateIsDivisionRate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
   { "stateMutability": "payable", "type": "receive" },
-  {
-    "inputs": [],
-    "name": "amountOfTokenThatWillReceive",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
   {
     "inputs": [],
     "name": "beneficiary",
@@ -150,37 +271,50 @@
   },
   {
     "inputs": [],
-    "name": "canClaimTime",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "changeRate",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "claimOpened",
+    "name": "canContribute",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "isDivisionRate",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "oldToken",
+    "name": "contributionInfo",
     "outputs": [
-      { "internalType": "contract IERC20", "name": "", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "totalContributed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentStatus",
+    "outputs": [
+      {
+        "internalType": "enum LaunchpadInBnbWithStatuses.Status",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "info",
+    "outputs": [
+      { "internalType": "uint256", "name": "changeRate", "type": "uint256" },
+      { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
+      {
+        "internalType": "address",
+        "name": "tokenInPresale",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
+      { "internalType": "uint256", "name": "softCap", "type": "uint256" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -194,10 +328,21 @@
   },
   {
     "inputs": [],
-    "name": "tokenInPresale",
+    "name": "timings",
     "outputs": [
-      { "internalType": "contract IERC20", "name": "", "type": "address" }
+      { "internalType": "uint256", "name": "startingTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "whiteListTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "everyoneTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "closingTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
     ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "whiteListedAddresses",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   }
