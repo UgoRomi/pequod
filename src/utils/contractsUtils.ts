@@ -327,6 +327,12 @@ export function useLaunchpad(launchpadAddress: string) {
     return await launchpadContract.methods.canClaim().call({ from: account });
   };
 
+  const canContribute = async (): Promise<boolean> => {
+    return await launchpadContract.methods
+      .canContribute()
+      .call({ from: account });
+  };
+
   const claim = async (): Promise<{ success: boolean; txHash?: string }> => {
     try {
       const result = await launchpadContract.methods
@@ -359,6 +365,13 @@ export function useLaunchpad(launchpadAddress: string) {
     hardCap: number;
     softCap: number;
     currentRaised: number;
+    status:
+      | "NOT_STARTED_YET"
+      | "WHITELIST_IN_PROGRESS"
+      | "PUBLIC_IN_PROGRESS"
+      | "HARD_CAP_REACHED"
+      | "CLOSED"
+      | "CLAIMABLE";
   }> => {
     try {
       const hardCap = library.utils.fromWei(
@@ -372,15 +385,29 @@ export function useLaunchpad(launchpadAddress: string) {
           ?.totalContributed()
           .call({ from: account })
       );
-      return { hardCap, softCap, currentRaised };
+      const status = await launchpadContract.methods
+        ?.currentStatus()
+        .call({ from: account });
+      return { hardCap, softCap, currentRaised, status };
     } catch (error) {
       toast.error(
         `There was an error checking the presale status\nPlease retry`
       );
       console.error(error);
-      return { hardCap: 0, softCap: 0, currentRaised: 0 };
+      return {
+        hardCap: 0,
+        softCap: 0,
+        currentRaised: 0,
+        status: "NOT_STARTED_YET",
+      };
     }
   };
 
-  return { canClaim, claim, amountOfTokenThatWillReceive, getPresaleStatus };
+  return {
+    canClaim,
+    canContribute,
+    claim,
+    amountOfTokenThatWillReceive,
+    getPresaleStatus,
+  };
 }

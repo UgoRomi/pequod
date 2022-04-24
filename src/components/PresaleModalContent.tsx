@@ -18,10 +18,12 @@ export default function PresaleModalContent({
   initialStep,
   conversionRate,
   presaleAddress,
+  tokenAddress,
 }: {
   initialStep: 0 | 1 | 2 | 3;
-  conversionRate?: number;
-  presaleAddress?: string;
+  conversionRate: number;
+  presaleAddress: string;
+  tokenAddress: string;
 }) {
   const [amountTo, setAmountTo] = useState<string>("0");
   const [amountFrom, setAmountFrom] = useState<string>("0");
@@ -51,7 +53,7 @@ export default function PresaleModalContent({
     setStep(initialStep);
   }, [initialStep]);
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(process.env.REACT_APP_WOT_V2_ADDRESS || "");
+    navigator.clipboard.writeText(tokenAddress);
 
     toast.success("Text copied");
   };
@@ -190,7 +192,7 @@ export default function PresaleModalContent({
           <div className="mt-4 flex w-full flex-row justify-center text-xl">
             <p style={{ color: "#00FFFF" }}>Contratto:</p>&nbsp;
             <p className="md:w-5/5 w-4/5 overflow-hidden text-ellipsis md:w-auto">
-              {process.env.REACT_APP_WOT_V2_ADDRESS}
+              {tokenAddress}
             </p>
             <DocumentDuplicateIcon
               className="ml-3 h-6 w-6 flex-shrink-0 cursor-pointer text-white"
