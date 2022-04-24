@@ -83,7 +83,7 @@ export const selectUserWotAmount = (state: RootState) =>
   state.userInfo.tokens.find(
     (token) =>
       token.address.toUpperCase() ===
-      process.env.REACT_APP_WOT_ADDRESS?.toUpperCase()
+      process.env.REACT_APP_WOT_V2_ADDRESS?.toUpperCase()
   )?.amount || 0;
 export const selectUserTokens = (state: RootState) => state.userInfo.tokens;
 export const selectUserSignedMessage = (state: RootState) =>
