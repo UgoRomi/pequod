@@ -1,8 +1,8 @@
-import { useWeb3React } from "@web3-react/core";
-import { AxiosRequestConfig } from "axios";
-import { toast } from "react-toastify";
-import { selectPequodApiInstance } from "../store/axiosInstancesSlice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {useWeb3React} from "@web3-react/core";
+import {AxiosRequestConfig} from "axios";
+import {toast} from "react-toastify";
+import {selectPequodApiInstance} from "../store/axiosInstancesSlice";
+import {useAppDispatch, useAppSelector} from "../store/hooks";
 import {
   addUserFarms,
   FarmState,
@@ -11,10 +11,10 @@ import {
   setUserTokens,
   UserToken,
 } from "../store/userInfoSlice";
-import { UserInfoResponse } from "./apiTypes";
-import { v4 as uuidV4 } from "uuid";
+import {UserInfoResponse} from "./apiTypes";
+import {v4 as uuidV4} from "uuid";
 import Web3 from "web3";
-import { setBnbUsdPrice } from "../store/pricesSlice";
+import {setBnbUsdPrice} from "../store/pricesSlice";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -78,14 +78,14 @@ export function useValidateSessionIfInvalid() {
 }
 
 export function useUserInfo() {
-  const { account, active } = useWeb3React();
+  const {account, active} = useWeb3React();
   const pequodApiInstance = useAppSelector(selectPequodApiInstance);
   const dispatch = useAppDispatch();
 
   const getUserInfo = async () => {
     // Check if the user is logged in
     if (!active) return;
-    const { data: userData }: { data: UserInfoResponse } =
+    const {data: userData}: {data: UserInfoResponse} =
       await pequodApiInstance.get(
         `/users/${account}/${process.env.REACT_APP_CHAIN_ID}/info`
       );
@@ -143,7 +143,7 @@ export function useUserInfo() {
 }
 
 export function useSignMessage() {
-  const { library, account } = useWeb3React();
+  const {library, account} = useWeb3React();
 
   const sign = async (messageToSign: string) => {
     const signedMessage = await library.eth.personal.sign(
@@ -152,7 +152,9 @@ export function useSignMessage() {
       ""
     );
     if (!signedMessage) {
-      toast.error("Please sign the message before proceeding");
+      toast.error("Please sign the message before proceeding", {
+        autoClose: 5000,
+      });
       return;
     }
     return signedMessage;
@@ -162,11 +164,11 @@ export function useSignMessage() {
 }
 
 export function useGetMessageToSign() {
-  const { account } = useWeb3React();
+  const {account} = useWeb3React();
   const pequodApi = useAppSelector(selectPequodApiInstance);
 
   const getMessageToSign = async () => {
-    const { data: messageToSign }: { data: string } = await pequodApi.get(
+    const {data: messageToSign}: {data: string} = await pequodApi.get(
       `/users/signMessage/${account}`
     );
     return messageToSign;
@@ -176,7 +178,7 @@ export function useGetMessageToSign() {
 }
 
 export function useUpdateSignedMessage() {
-  const { account } = useWeb3React();
+  const {account} = useWeb3React();
   const pequodApi = useAppSelector(selectPequodApiInstance);
   const dispatch = useAppDispatch();
 

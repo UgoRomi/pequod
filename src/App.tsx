@@ -16,6 +16,7 @@ import _ from "lodash";
 import MaintenancePage from "./pages/MaintenancePage";
 import LaunchpadPage from "./pages/LaunchpadPage";
 import MigrationPage from "./pages/MigrationPage";
+import LaunchpadDetailPage from "./pages/LaunchpadDetailPage";
 
 function App() {
   useEagerConnect();
@@ -25,10 +26,6 @@ function App() {
 
   useEffect(() => {
     getAndUpdateUserInfo();
-
-    const interval = setInterval(getAndUpdateUserInfo, 10000);
-
-    return () => clearInterval(interval);
   }, [getAndUpdateUserInfo]);
 
   useEffect(() => {
@@ -69,7 +66,7 @@ function App() {
         element={
           <RequireAuth>
             <Layout>
-              <LaunchpadPage />
+              <LaunchpadDetailPage />
             </Layout>
           </RequireAuth>
         }

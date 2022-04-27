@@ -1,4 +1,4 @@
-import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
+import {UnsupportedChainIdError, useWeb3React} from "@web3-react/core";
 import {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected,
@@ -7,17 +7,17 @@ import {
   WalletConnectConnector,
   UserRejectedRequestError as UserRejectedRequestErrorWalletConnect,
 } from "@web3-react/walletconnect-connector";
-import { useCallback } from "react";
-import { toast } from "react-toastify";
+import {useCallback} from "react";
+import {toast} from "react-toastify";
 import {
   connectorLocalStorageKey,
   ConnectorNames,
   connectorsByName,
 } from "../utils/connectors";
-import { setupNetwork } from "../utils/wallet";
+import {setupNetwork} from "../utils/wallet";
 
 const useAuth = () => {
-  const { activate, deactivate } = useWeb3React();
+  const {activate, deactivate} = useWeb3React();
 
   const login = useCallback(
     async (connectorID: ConnectorNames) => {
@@ -32,7 +32,9 @@ const useAuth = () => {
           } else {
             window.localStorage.removeItem(connectorLocalStorageKey);
             if (error instanceof NoEthereumProviderError) {
-              toast.error("Provider Error\n No provider was found");
+              toast.error("Provider Error\n No provider was found", {
+                autoClose: 5000,
+              });
             } else if (
               error instanceof UserRejectedRequestErrorInjected ||
               error instanceof UserRejectedRequestErrorWalletConnect
@@ -42,15 +44,22 @@ const useAuth = () => {
                 walletConnector.walletConnectProvider = null;
               }
               toast.error(
-                "Authorization Error\n Please authorize to access your account"
+                "Authorization Error\n Please authorize to access your account",
+                {
+                  autoClose: 5000,
+                }
               );
             } else {
-              toast.error(`${error.name}\n ${error.message}`);
+              toast.error(`${error.name}\n ${error.message}`, {
+                autoClose: 5000,
+              });
             }
           }
         });
       } else {
-        toast.error("Unable to find connector, The connector config is wrong");
+        toast.error("Unable to find connector, The connector config is wrong", {
+          autoClose: 5000,
+        });
       }
     },
     [activate]
@@ -67,7 +76,7 @@ const useAuth = () => {
     localStorage.removeItem(connectorLocalStorageKey);
   }, [deactivate]);
 
-  return { login, logout };
+  return {login, logout};
 };
 
 export default useAuth;

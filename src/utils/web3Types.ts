@@ -11,3 +11,12 @@ export interface GetTransactionResponse {
   gasPrice: string;
   input: string;
 }
+
+export enum PresaleStatuses {
+  "NOT_STARTED_YET",
+  "WHITELIST_IN_PROGRESS",
+  "PUBLIC_IN_PROGRESS",
+  "HARD_CAP_REACHED",
+  "CLOSED",
+  "CLAIMABLE",
+}

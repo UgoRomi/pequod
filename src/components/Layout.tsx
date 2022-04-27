@@ -260,7 +260,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                             : item.disabled
                             ? "cursor-default text-white opacity-60"
                             : "pl-3 text-pequod-white hover:bg-pequod-white-300",
-                          "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                          "group flex items-center py-3 pl-8 pr-2 text-sm font-medium"
                         )}
                       >
                         <img
@@ -295,7 +295,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
               <Logo className="mt-10 h-28 w-auto" />
 
               <p className="text-md mb-2 text-center text-pequod-white">
-                BETA V 1.2.0
+                BETA V 1.3.0
               </p>
             </div>
             <div className="sticky top-0 z-10 flex h-20 flex-shrink-0 flex-col items-center justify-center">
@@ -364,7 +364,7 @@ export default function Layout({ children }: { children: JSX.Element }) {
                         : item.disabled
                         ? "cursor-default text-white opacity-60"
                         : "pl-3 text-pequod-white hover:bg-pequod-white-300",
-                      "group flex items-center justify-center px-2 py-3 text-sm font-medium"
+                      "group flex items-center py-3 pl-8 pr-2 text-sm font-medium"
                     )}
                   >
                     <img

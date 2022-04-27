@@ -2,7 +2,6 @@ import { useWeb3React } from "@web3-react/core";
 import { toast } from "react-toastify";
 import BEP20_ABI from "../BEP20.json";
 import LAUNCHPAD_ABI from "../launchpadABI.json";
-import LAUNCHPAD_BNB_ABI from "../launchpadBnbABI.json";
 import PANCAKE_FACTORY_ABI from "../pancakeFactoryABI.json";
 import PANCAKE_PAIR_ABI from "../pancakePairABI.json";
 import PANCAKE_ROUTER_ABI from "../pancakeRouterABI.json";
@@ -10,6 +9,7 @@ import MOBY_STAKING_ABI from "../mobyStakingABI.json";
 import { MaxUint256 } from "@ethersproject/constants";
 import { useBuyEvent, useSellEvent, useStakeEvent } from "./events";
 import { toBigNumber, useValidateSessionIfInvalid } from "./utils";
+import { PresaleStatuses } from "./web3Types";
 
 function useGetPairAddress() {
   const { library, account } = useWeb3React();
@@ -52,7 +52,10 @@ export function useGetTokenPrice() {
     // I have to check if BNB is the token 0 because it changes for every pair
     const isBNBToken0 =
       (await pairContract.methods.token0().call()) ===
-      process.env.REACT_APP_BNB_ADDRESS;
+      (tokenAddress.toLowerCase() ===
+      process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+        ? process.env.REACT_APP_USDT_ADDRESS
+        : process.env.REACT_APP_BNB_ADDRESS);
     const { _reserve0: reserve0, _reserve1: reserve1 } =
       await pairContract.methods.getReserves().call();
     return {
@@ -169,7 +172,15 @@ export function useSwap(
       tokenDecimals,
     } = await swapData();
     try {
-      const path = [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
+      const path =
+        tokenAddress.toLowerCase() ===
+        process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+          ? [
+              process.env.REACT_APP_BNB_ADDRESS,
+              process.env.REACT_APP_USDT_ADDRESS,
+              tokenAddress,
+            ]
+          : [process.env.REACT_APP_BNB_ADDRESS, tokenAddress];
 
       const result = await routerContract.methods
         .swapExactETHForTokensSupportingFeeOnTransferTokens(
@@ -196,7 +207,9 @@ export function useSwap(
       );
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
-      toast.error(`There was an error in the transaction\nPlease retry`);
+      toast.error(`There was an error in the transaction\nPlease retry`, {
+        autoClose: 5000,
+      });
       console.error(error);
       return { success: false, txHash: "" };
     }
@@ -215,8 +228,15 @@ export function useSwap(
       tokenDecimals,
     } = await swapData();
     try {
-      const path = [tokenAddress, process.env.REACT_APP_BNB_ADDRESS];
-
+      const path =
+        tokenAddress.toLowerCase() ===
+        process.env.REACT_APP_WOT_V2_ADDRESS?.toLowerCase()
+          ? [
+              tokenAddress,
+              process.env.REACT_APP_USDT_ADDRESS,
+              process.env.REACT_APP_BNB_ADDRESS,
+            ]
+          : [tokenAddress, process.env.REACT_APP_BNB_ADDRESS];
       const result = await routerContract.methods
         .swapExactTokensForETHSupportingFeeOnTransferTokens(
           toBigNumber(parseFloat(amountFrom), tokenDecimals),
@@ -240,7 +260,9 @@ export function useSwap(
       );
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
-      toast.error(`There was an error in the transaction\nPlease retry`);
+      toast.error(`There was an error in the transaction\nPlease retry`, {
+        autoClose: 5000,
+      });
       console.error(error);
       return { success: false, txHash: "" };
     }
@@ -271,7 +293,9 @@ export function useWotStake() {
       const result = await routerContract.methods
         .deposit(amount)
         .send({ from: account, gasPrice });
-      toast.success(`${amount} ${process.env.REACT_APP_WOT_SYMBOL} Staked`);
+      toast.success(`${amount} ${process.env.REACT_APP_WOT_SYMBOL} Staked`, {
+        autoClose: 5000,
+      });
       const gasUsed = library.utils.fromWei(
         (result.gasUsed * gasPrice).toString()
       );
@@ -286,7 +310,10 @@ export function useWotStake() {
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
       toast.error(
-        `There was an error staking your ${process.env.REACT_APP_WOT_SYMBOL}\nPlease retry`
+        `There was an error staking your ${process.env.REACT_APP_WOT_SYMBOL}\nPlease retry`,
+        {
+          autoClose: 5000,
+        }
       );
       console.error(error);
       return { success: false, txHash: "" };
@@ -297,40 +324,55 @@ export function useWotStake() {
 
 export function useLaunchpad(launchpadAddress: string) {
   const { library, account } = useWeb3React();
-  const ABI =
-    launchpadAddress === process.env.REACT_APP_LAUNCHPAD_ADDRESS
-      ? LAUNCHPAD_ABI
-      : LAUNCHPAD_BNB_ABI;
 
-  const launchpadContract = new library.eth.Contract(ABI, launchpadAddress, {
-    from: account,
-  });
+  const launchpadContract = new library.eth.Contract(
+    LAUNCHPAD_ABI,
+    launchpadAddress,
+    {
+      from: account,
+    }
+  );
   const canClaim = async (): Promise<boolean> => {
+    if (!launchpadContract.options.address) return false;
     return await launchpadContract.methods.canClaim().call({ from: account });
   };
 
+  const canContribute = async (): Promise<boolean> => {
+    if (!launchpadContract.options.address) return false;
+    return await launchpadContract.methods
+      .canContribute()
+      .call({ from: account });
+  };
+
   const claim = async (): Promise<{ success: boolean; txHash?: string }> => {
+    if (!launchpadContract.options.address) return { success: false };
     try {
       const result = await launchpadContract.methods
-        .claim()
+        ?.claim()
         .send({ from: account });
       return { success: true, txHash: result.transactionHash };
     } catch (error) {
-      toast.error(`There was error an claiming your tokens\nPlease retry`);
+      toast.error(`There was error an claiming your tokens\nPlease retry`, {
+        autoClose: 5000,
+      });
       console.error(error);
       return { success: false, txHash: "" };
     }
   };
 
   const amountOfTokenThatWillReceive = async (): Promise<number> => {
+    if (!launchpadContract.options.address) return 0;
     try {
       const result = await launchpadContract.methods
-        .amountOfTokenThatWillReceive()
+        ?.amountOfTokenThatWillReceive()
         .call({ from: account });
       return result;
     } catch (error) {
       toast.error(
-        `There was an error checking how much you will receive\nPlease retry`
+        `There was an error checking how much you will receive\nPlease retry`,
+        {
+          autoClose: 5000,
+        }
       );
       console.error(error);
       return 0;
@@ -341,28 +383,57 @@ export function useLaunchpad(launchpadAddress: string) {
     hardCap: number;
     softCap: number;
     currentRaised: number;
+    status: PresaleStatuses;
   }> => {
+    if (!launchpadContract.options.address)
+      return {
+        hardCap: 0,
+        softCap: 0,
+        currentRaised: 0,
+        status: 0,
+      };
     try {
-      const hardCap = library.utils.fromWei(
-        await launchpadContract.methods.hardCap().call({ from: account })
-      );
-      const softCap = library.utils.fromWei(
-        await launchpadContract.methods.hardCap().call({ from: account })
-      );
+      // const hardCap = library.utils.fromWei(
+      //   await launchpadContract.methods?.hardCap().call({ from: account })
+      // );
+      // const softCap = library.utils.fromWei(
+      //   await launchpadContract.methods?.softCap().call({ from: account })
+      // );
+      const hardCap = 0,
+        softCap = 0;
       const currentRaised = library.utils.fromWei(
-        await launchpadContract.methods
-          .totalContributed()
-          .call({ from: account })
+        (
+          await launchpadContract.methods
+            ?.contributionInfo()
+            .call({ from: account })
+        ).totalContributed
       );
-      return { hardCap, softCap, currentRaised };
+      const status = +(await launchpadContract.methods
+        ?.currentStatus()
+        .call({ from: account }));
+      return { hardCap, softCap, currentRaised, status };
     } catch (error) {
       toast.error(
-        `There was an error checking the presale status\nPlease retry`
+        `There was an error checking the presale status\nPlease retry`,
+        {
+          autoClose: 5000,
+        }
       );
       console.error(error);
-      return { hardCap: 0, softCap: 0, currentRaised: 0 };
+      return {
+        hardCap: 0,
+        softCap: 0,
+        currentRaised: 0,
+        status: 0,
+      };
     }
   };
 
-  return { canClaim, claim, amountOfTokenThatWillReceive, getPresaleStatus };
+  return {
+    canClaim,
+    canContribute,
+    claim,
+    amountOfTokenThatWillReceive,
+    getPresaleStatus,
+  };
 }

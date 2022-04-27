@@ -1,13 +1,13 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import PercentagesGroup, { Percentages } from './PercentagesGroup';
-import { useAppSelector } from '../store/hooks';
-import { AvailableFarmState } from '../store/farmsSlice';
-import { useAllowance, useApprove, useWotStake } from '../utils/contractsUtils';
-import { RootState } from '../store/store';
-import { formatTokenAmount } from '../utils/utils';
-import Spinner from './Spinner';
+import { Fragment, useEffect, useRef, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import PercentagesGroup, { Percentages } from "./PercentagesGroup";
+import { useAppSelector } from "../store/hooks";
+import { AvailableFarmState } from "../store/farmsSlice";
+import { useAllowance, useApprove, useWotStake } from "../utils/contractsUtils";
+import { RootState } from "../store/store";
+import { formatTokenAmount } from "../utils/utils";
+import Spinner from "./Spinner";
 export default function StakingModal({
   stakeId,
   userTokenBalance,
@@ -17,7 +17,7 @@ export default function StakingModal({
 }) {
   const [open, setOpen] = useState(true);
 
-  const [stakeAmount, setStakeAmount] = useState('0');
+  const [stakeAmount, setStakeAmount] = useState("0");
   const [allowed, setAllowed] = useState(false);
   const [percentageButtonActive, setPercentageButtonActive] =
     useState<number>(0);
@@ -59,16 +59,16 @@ export default function StakingModal({
 
   const percentageButtonClicked = (percentage: Percentages) => {
     switch (percentage) {
-      case Percentages['25%']:
+      case Percentages["25%"]:
         setStakeAmount((userTokenBalance * 0.25).toFixed(4));
         break;
-      case Percentages['50%']:
+      case Percentages["50%"]:
         setStakeAmount((userTokenBalance * 0.5).toFixed(4));
         break;
-      case Percentages['75%']:
+      case Percentages["75%"]:
         setStakeAmount((userTokenBalance * 0.75).toFixed(4));
         break;
-      case Percentages['100%']:
+      case Percentages["100%"]:
         setStakeAmount(userTokenBalance.toFixed(4));
         break;
     }
@@ -162,8 +162,8 @@ export default function StakingModal({
                 />
                 {!userFarm && (
                   <p className="mt-2 text-xs text-gray-500">
-                    You need to stake at least{' '}
-                    {formatTokenAmount(farmGeneralData.minimumToStake)}{' '}
+                    You need to stake at least{" "}
+                    {formatTokenAmount(farmGeneralData.minimumToStake)}{" "}
                     {farmGeneralData.tokenSymbol}.
                   </p>
                 )}
@@ -188,7 +188,7 @@ export default function StakingModal({
                         Staking...
                       </>
                     ) : (
-                      'Stake Now'
+                      "Stake Now"
                     )}
                   </button>
                 ) : (
@@ -200,10 +200,10 @@ export default function StakingModal({
                     {approvalInProgress ? (
                       <>
                         <Spinner className="h-5 text-white" />
-                        Appriving...
+                        Approving...
                       </>
                     ) : (
-                      'Approve'
+                      "Approve"
                     )}
                   </button>
                 )}
