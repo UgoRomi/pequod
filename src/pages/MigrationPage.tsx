@@ -19,17 +19,9 @@ export default function MigrationPage() {
     useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
 
-  const {
-    canClaim: checkCanClaim,
-    claim,
-    amountOfTokenThatWillReceive,
-  } = useLaunchpad(process.env.REACT_APP_LAUNCHPAD_ADDRESS as string);
-
-  useEffect(() => {
-    amountOfTokenThatWillReceive().then((amountToReceive) => {
-      console.log("amountToReceive", amountToReceive);
-    });
-  });
+  const { canClaim: checkCanClaim, claim } = useLaunchpad(
+    process.env.REACT_APP_LAUNCHPAD_ADDRESS as string
+  );
 
   // Check if the user has already allowed the spending of the tokens
   // to the presale contract
@@ -45,7 +37,6 @@ export default function MigrationPage() {
   // Check if the user can claim the tokens
   useEffect(() => {
     checkCanClaim().then((canClaim) => {
-      console.log("canClaim", canClaim);
       setCanClaim(canClaim);
     });
   }, [checkCanClaim, presaleContractAllowance]);
