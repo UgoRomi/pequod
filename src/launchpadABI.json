@@ -1,5 +1,69 @@
 [
   {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "startingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "whiteListTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "everyoneTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
+        ],
+        "internalType": "struct Launchpad.Timings",
+        "name": "_timings",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "changeRate",
+            "type": "uint256"
+          },
+          { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
+          {
+            "internalType": "address",
+            "name": "tokenInPresale",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
+          { "internalType": "uint256", "name": "softCap", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "minContribution",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxContribution",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Launchpad.Info",
+        "name": "_info",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -31,7 +95,28 @@
     "inputs": [],
     "name": "amountOfTokenThatWillReceive",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "beneficiary",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "canClaim",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "canContribute",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -39,6 +124,111 @@
     "name": "claim",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "contributionByAddress",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contributionInfo",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "contributorsLength",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalContributed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "contributors",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentStatus",
+    "outputs": [
+      { "internalType": "enum Launchpad.Status", "name": "", "type": "uint8" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "goToNextStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "info",
+    "outputs": [
+      { "internalType": "uint256", "name": "changeRate", "type": "uint256" },
+      { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
+      {
+        "internalType": "address",
+        "name": "tokenInPresale",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
+      { "internalType": "uint256", "name": "softCap", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "minContribution",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxContribution",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "overrideClaimWithNoSoftCap",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "overrideStatus",
+    "outputs": [
+      { "internalType": "enum Launchpad.Status", "name": "", "type": "uint8" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "overrideStatusActivated",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -93,6 +283,20 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "bool", "name": "_v", "type": "bool" }],
+    "name": "setOverrideClaimWithNoSoftCap",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bool", "name": "_v", "type": "bool" }],
+    "name": "setUpdateStatusActivate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "address", "name": "newValue", "type": "address" },
       { "internalType": "bool", "name": "value", "type": "bool" }
@@ -118,9 +322,19 @@
             "type": "address"
           },
           { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
-          { "internalType": "uint256", "name": "softCap", "type": "uint256" }
+          { "internalType": "uint256", "name": "softCap", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "minContribution",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxContribution",
+            "type": "uint256"
+          }
         ],
-        "internalType": "struct LaunchpadInBnbWithStatuses.Info",
+        "internalType": "struct Launchpad.Info",
         "name": "_info",
         "type": "tuple"
       }
@@ -156,7 +370,7 @@
           },
           { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
         ],
-        "internalType": "struct LaunchpadInBnbWithStatuses.Timings",
+        "internalType": "struct Launchpad.Timings",
         "name": "_timings",
         "type": "tuple"
       },
@@ -174,9 +388,19 @@
             "type": "address"
           },
           { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
-          { "internalType": "uint256", "name": "softCap", "type": "uint256" }
+          { "internalType": "uint256", "name": "softCap", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "minContribution",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxContribution",
+            "type": "uint256"
+          }
         ],
-        "internalType": "struct LaunchpadInBnbWithStatuses.Info",
+        "internalType": "struct Launchpad.Info",
         "name": "_info",
         "type": "tuple"
       }
@@ -212,7 +436,7 @@
           },
           { "internalType": "uint256", "name": "claimTime", "type": "uint256" }
         ],
-        "internalType": "struct LaunchpadInBnbWithStatuses.Timings",
+        "internalType": "struct Launchpad.Timings",
         "name": "_timings",
         "type": "tuple"
       }
@@ -225,7 +449,7 @@
   {
     "inputs": [
       {
-        "internalType": "enum LaunchpadInBnbWithStatuses.Status",
+        "internalType": "enum Launchpad.Status",
         "name": "status",
         "type": "uint8"
       }
@@ -245,88 +469,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  { "stateMutability": "payable", "type": "receive" },
-  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
-  {
-    "inputs": [],
-    "name": "beneficiary",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "canClaim",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "canContribute",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "contributionInfo",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalContributed",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "currentStatus",
-    "outputs": [
-      {
-        "internalType": "enum LaunchpadInBnbWithStatuses.Status",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "info",
-    "outputs": [
-      { "internalType": "uint256", "name": "changeRate", "type": "uint256" },
-      { "internalType": "bool", "name": "isDivisionRate", "type": "bool" },
-      {
-        "internalType": "address",
-        "name": "tokenInPresale",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "hardCap", "type": "uint256" },
-      { "internalType": "uint256", "name": "softCap", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "timings",
     "outputs": [
@@ -340,10 +482,27 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "tokenInPresaleDecimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "whiteListedAddresses",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
-  }
+  },
+  { "stateMutability": "payable", "type": "receive" }
 ]

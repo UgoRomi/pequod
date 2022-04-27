@@ -91,7 +91,6 @@ export default function LaunchpadDetailPage() {
   // check the presale status
   useEffect(() => {
     getPresaleStatus().then(({currentRaised, hardCap, softCap, status}) => {
-      console.log(status);
       setPresaleStatus({currentRaised, hardCap, softCap, status});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

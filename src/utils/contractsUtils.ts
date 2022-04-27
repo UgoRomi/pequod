@@ -402,9 +402,11 @@ export function useLaunchpad(launchpadAddress: string) {
       const hardCap = 0,
         softCap = 0;
       const currentRaised = library.utils.fromWei(
-        await launchpadContract.methods
-          ?.contributionInfo()
-          .call({ from: account })
+        (
+          await launchpadContract.methods
+            ?.contributionInfo()
+            .call({ from: account })
+        ).totalContributed
       );
       const status = +(await launchpadContract.methods
         ?.currentStatus()
