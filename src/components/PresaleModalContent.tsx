@@ -7,13 +7,12 @@ import {
   ArrowCircleRightIcon,
   DocumentDuplicateIcon,
 } from "@heroicons/react/outline";
-import {useEffect, useState} from "react";
-import {formatAmount} from "../utils/utils";
-import {useWeb3React} from "@web3-react/core";
+import { useEffect, useState } from "react";
+import { formatAmount } from "../utils/utils";
+import { useWeb3React } from "@web3-react/core";
 import Web3 from "web3";
 
-import {toast} from "react-toastify";
-import {update} from "lodash";
+import { toast } from "react-toastify";
 
 export default function PresaleModalContent({
   initialStep,
@@ -38,7 +37,7 @@ export default function PresaleModalContent({
   const [amountFrom, setAmountFrom] = useState<string>("0");
   const [sendingBnb, setSendingBnb] = useState<boolean>(false);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(initialStep);
-  const {account, library} = useWeb3React();
+  const { account, library } = useWeb3React();
 
   const updateFrom = (value: string, updateTo = true) => {
     // replace comma with dot
@@ -149,7 +148,7 @@ export default function PresaleModalContent({
 
           <div className="relative mt-10 w-4/5 rounded-md shadow-sm">
             <button
-              style={{borderColor: "#00FFFF", color: "#00FFFF"}}
+              style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
               className="focus:outline-none block h-50 w-full rounded-10 border border-pequod-white bg-transparent px-2 py-1.5 text-pequod-white focus:ring focus:ring-pequod-purple disabled:cursor-not-allowed disabled:opacity-80 sm:text-sm"
               onClick={sendBnbToPresaleAddress}
             >
@@ -180,7 +179,7 @@ export default function PresaleModalContent({
         </div>
         <button
           disabled={true}
-          style={{backgroundColor: "#B3B6BF", color: "#2d2d2d"}}
+          style={{ backgroundColor: "#B3B6BF", color: "#2d2d2d" }}
           className="block h-50 w-3/5 rounded-10 border border-pequod-white disabled:cursor-not-allowed sm:text-sm"
         >
           Token acquistati correttamente
@@ -200,22 +199,22 @@ export default function PresaleModalContent({
         <div className="mt-20 mb-20 flex w-4/5 flex-col items-center justify-center">
           <img src={claimIcon} className="mb-4 w-20" alt="" />
           <div className="mt-4 flex w-full flex-row justify-center text-xl">
-            <p style={{color: "#00FFFF"}}>Contratto:</p>&nbsp;
+            <p style={{ color: "#00FFFF" }}>Contratto:</p>&nbsp;
             <p className="md:w-5/5 w-4/5 overflow-hidden text-ellipsis md:w-auto">
               {tokenAddress}
             </p>
             <DocumentDuplicateIcon
               className="ml-3 h-6 w-6 flex-shrink-0 cursor-pointer text-white"
-              style={{color: "#00FFFF"}}
+              style={{ color: "#00FFFF" }}
               aria-hidden="true"
               onClick={(e) => copyToClipboard()}
             />
           </div>
           <div className="mt-4 flex flex-row text-xl">
-            <p style={{color: "#00FFFF"}}>Simbolo:</p>&nbsp; {symbol}
+            <p style={{ color: "#00FFFF" }}>Simbolo:</p>&nbsp; {symbol}
           </div>
           <div className="mt-4 flex flex-row text-xl">
-            <p style={{color: "#00FFFF"}}>Decimali:</p>&nbsp; 18
+            <p style={{ color: "#00FFFF" }}>Decimali:</p>&nbsp; 18
           </div>
         </div>
       </div>
