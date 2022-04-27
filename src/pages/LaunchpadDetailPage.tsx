@@ -1,10 +1,10 @@
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import CustomDialog from "../components/CustomDialog";
 import PresaleModalContent from "../components/PresaleModalContent";
 import TokenomicsDialog from "../components/TokenomicsModal";
-import {useLaunchpad} from "../utils/contractsUtils";
-import {useApiCall} from "../utils/utils";
+import { useLaunchpad } from "../utils/contractsUtils";
+import { useApiCall } from "../utils/utils";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -34,7 +34,7 @@ interface LaunchpadsResponse {
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
-  const {launchpadId} = useParams();
+  const { launchpadId } = useParams();
   const [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function LaunchpadDetailPage() {
     hardCap: number;
     softCap: number;
     status: string;
-  }>({currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET"});
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET" });
 
   const {
     canClaim: checkCanClaim,
@@ -87,8 +87,8 @@ export default function LaunchpadDetailPage() {
 
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({currentRaised, hardCap, softCap, status}) => {
-      setPresaleStatus({currentRaised, hardCap, softCap, status});
+    getPresaleStatus().then(({ currentRaised, hardCap, softCap, status }) => {
+      setPresaleStatus({ currentRaised, hardCap, softCap, status });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -201,13 +201,13 @@ export default function LaunchpadDetailPage() {
         </span>
         <hr />
         <img src={launchpadData?.launchpadBg} alt="launchpad pequod" />
-        <div className="p-4 text-center flex flex-col">
+        <div className="flex flex-col p-4 text-center">
           <span className="mt-6 text-3xl font-normal text-pequod-white">
             {launchpadData?.launchpadSubTitle}
           </span>
           <span
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{color: launchpadData?.buttonBgColor}}
+            style={{ color: launchpadData?.buttonBgColor }}
           >
             {launchpadData?.data}
           </span>
@@ -219,7 +219,7 @@ export default function LaunchpadDetailPage() {
           <div className="mt-5 flex justify-center">
             {presaleStatus.status === "NOT_STARTED_YET" ? (
               <button
-                className="rounded-3xl px-3 py-3 disabled"
+                className="disabled rounded-3xl px-3 py-3"
                 style={{
                   backgroundColor: "#2d2d2d",
                   color: "white",
@@ -234,7 +234,7 @@ export default function LaunchpadDetailPage() {
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}
-                className="rounded-3xl px-3 py-3 disabled"
+                className="disabled rounded-3xl px-3 py-3"
                 style={{
                   backgroundColor: launchpadData?.buttonBgColor,
                   color: launchpadData?.buttonTextColor,
@@ -250,7 +250,7 @@ export default function LaunchpadDetailPage() {
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}
-                className="rounded-3xl px-3 py-3 disabled"
+                className="disabled rounded-3xl px-3 py-3"
                 style={{
                   backgroundColor: launchpadData?.buttonBgColor,
                   color: launchpadData?.buttonTextColor,
@@ -261,7 +261,7 @@ export default function LaunchpadDetailPage() {
               </button>
             ) : presaleStatus.status === "HARD_CAP_REACHED" ? (
               <button
-                className="rounded-3xl px-3 py-3 disabled"
+                className="disabled rounded-3xl px-3 py-3"
                 style={{
                   backgroundColor: launchpadData?.buttonBgColor,
                   color: launchpadData?.buttonTextColor,
@@ -272,7 +272,7 @@ export default function LaunchpadDetailPage() {
               </button>
             ) : presaleStatus.status === "CLOSED" ? (
               <button
-                className="rounded-3xl px-3 py-3 disabled"
+                className="disabled rounded-3xl px-3 py-3"
                 style={{
                   backgroundColor: "#2d2d2d",
                   color: "white",
@@ -324,7 +324,7 @@ export default function LaunchpadDetailPage() {
           <div className="mt-12 flex justify-center">
             <div
               className="h-50 w-full rounded-3xl"
-              style={{backgroundColor: "#7B7663"}}
+              style={{ backgroundColor: "#7B7663" }}
             >
               <div
                 className="flex h-50 items-center justify-center rounded-3xl"
@@ -343,7 +343,7 @@ export default function LaunchpadDetailPage() {
 
             <div
               className="absolute mb-10 grid grid-cols-8 grid-rows-4 text-white"
-              style={{width: "20%", marginTop: "-1%", marginLeft: "30%"}}
+              style={{ width: "20%", marginTop: "-1%", marginLeft: "30%" }}
             >
               <div className="col-span-1 border-l px-4 text-left">SC</div>
               <div className="col-span-6"></div>
@@ -420,7 +420,7 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{color: launchpadData?.buttonDetailTextColor}}
+                style={{ color: launchpadData?.buttonDetailTextColor }}
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}
