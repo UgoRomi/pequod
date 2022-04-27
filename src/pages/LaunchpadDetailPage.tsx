@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import CustomDialog from "../components/CustomDialog";
 import PresaleModalContent from "../components/PresaleModalContent";
 import TokenomicsDialog from "../components/TokenomicsModal";
-import { useLaunchpad } from "../utils/contractsUtils";
-import { useApiCall } from "../utils/utils";
-import { PresaleStatuses } from "../utils/web3Types";
+import {useLaunchpad} from "../utils/contractsUtils";
+import {useApiCall} from "../utils/utils";
+import {PresaleStatuses} from "../utils/web3Types";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -37,7 +37,7 @@ interface LaunchpadsResponse {
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
-  const { launchpadId } = useParams();
+  const {launchpadId} = useParams();
   const [launchpadData, setLaunchpadData] = useState<LaunchpadsResponse>();
 
   useEffect(() => {
@@ -58,14 +58,14 @@ export default function LaunchpadDetailPage() {
     useState<boolean>(false);
   const [claimInProgress, setClaimInProgress] = useState<boolean>(false);
   const [canClaim, setCanClaim] = useState<boolean>(false);
-  const [, setCanContribute] = useState<boolean>(false);
+  const [canContribute, setCanContribute] = useState<boolean>(false);
   const [modalStep, setModalStep] = useState<0 | 1 | 2 | 3>(0);
   const [presaleStatus, setPresaleStatus] = useState<{
     currentRaised: number;
     hardCap: number;
     softCap: number;
     status: PresaleStatuses;
-  }>({ currentRaised: 0, hardCap: 0, softCap: 0, status: 0 });
+  }>({currentRaised: 0, hardCap: 0, softCap: 0, status: 0});
 
   const {
     canClaim: checkCanClaim,
@@ -90,9 +90,9 @@ export default function LaunchpadDetailPage() {
 
   // check the presale status
   useEffect(() => {
-    getPresaleStatus().then(({ currentRaised, hardCap, softCap, status }) => {
+    getPresaleStatus().then(({currentRaised, hardCap, softCap, status}) => {
       console.log(status);
-      setPresaleStatus({ currentRaised, hardCap, softCap, status });
+      setPresaleStatus({currentRaised, hardCap, softCap, status});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [launchpadData?.presaleContractAddress]);
@@ -185,7 +185,7 @@ export default function LaunchpadDetailPage() {
         closeModal={() => setShowPresaleModal(false)}
       >
         <PresaleModalContent
-          conversionRate={0.075}
+          conversionRate={1000}
           presaleAddress={launchpadData?.presaleContractAddress as string}
           tokenAddress={launchpadData?.contractAddress as string}
           title={launchpadData?.buyButtonText}
@@ -213,7 +213,7 @@ export default function LaunchpadDetailPage() {
           </span>
           <span
             className="mt-3 text-xl font-normal text-pequod-pink"
-            style={{ color: launchpadData?.buttonBgColor }}
+            style={{color: launchpadData?.buttonBgColor}}
           >
             {launchpadData?.data}
           </span>
@@ -240,7 +240,8 @@ export default function LaunchpadDetailPage() {
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}
-                className="disabled rounded-3xl px-3 py-3"
+                className="rounded-3xl px-3 py-3 disabled:opacity-50 disabled:cursor-default"
+                disabled={!canContribute}
                 style={{
                   backgroundColor: launchpadData?.buttonBgColor,
                   color: launchpadData?.buttonTextColor,
@@ -330,7 +331,7 @@ export default function LaunchpadDetailPage() {
           <div className="mt-12 flex justify-center">
             <div
               className="h-50 w-full rounded-3xl"
-              style={{ backgroundColor: "#7B7663" }}
+              style={{backgroundColor: "#7B7663"}}
             >
               <div
                 className="flex h-50 items-center justify-center rounded-3xl"
@@ -349,7 +350,7 @@ export default function LaunchpadDetailPage() {
 
             <div
               className="absolute mb-10 grid grid-cols-8 grid-rows-4 text-white"
-              style={{ width: "20%", marginTop: "-1%", marginLeft: "30%" }}
+              style={{width: "20%", marginTop: "-1%", marginLeft: "30%"}}
             >
               <div className="col-span-1 border-l px-4 text-left">SC</div>
               <div className="col-span-6"></div>
@@ -426,7 +427,7 @@ export default function LaunchpadDetailPage() {
               )}
               <button
                 className="mt-10 text-xl font-normal underline"
-                style={{ color: launchpadData?.buttonDetailTextColor }}
+                style={{color: launchpadData?.buttonDetailTextColor}}
                 onClick={() => {
                   setShowPresaleModal(true);
                 }}
