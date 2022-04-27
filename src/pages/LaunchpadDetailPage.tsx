@@ -61,7 +61,8 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-    status: string;}>({currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET" });
+    status: string;
+  }>({currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET"});
 
   const {
     canClaim: checkCanClaim,
@@ -87,7 +88,7 @@ export default function LaunchpadDetailPage() {
   // check the presale status
   useEffect(() => {
     getPresaleStatus().then(({currentRaised, hardCap, softCap, status}) => {
-      setPresaleStatus({currentRaised, hardCap, softCap, status });
+      setPresaleStatus({currentRaised, hardCap, softCap, status});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -216,19 +217,96 @@ export default function LaunchpadDetailPage() {
 
           {/* DA MOSTRARE QUEST INUOVI TASTI */}
           <div className="mt-5 flex justify-center">
-            <button
-              onClick={() => {
-                setShowPresaleModal(true);
-              }}
-              className="rounded-3xl px-3 py-3"
-              style={{
-                backgroundColor: launchpadData?.buttonBgColor,
-                color: launchpadData?.buttonTextColor,
-                width: 200,
-              }}
-            >
-              {launchpadData?.buyButtonText}
-            </button>
+            {presaleStatus.status === "NOT_STARTED_YET" ? (
+              <button
+                className="rounded-3xl px-3 py-3 disabled"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "white",
+                  cursor: "default",
+                  width: 200,
+                }}
+              >
+                {launchpadData?.buyButtonText}
+              </button>
+            ) : presaleStatus.status === "WHITELIST_IN_PROGRESS" ? (
+              <button
+                onClick={() => {
+                  setShowPresaleModal(true);
+                }}
+                className="rounded-3xl px-3 py-3 disabled"
+                style={{
+                  backgroundColor: launchpadData?.buttonBgColor,
+                  color: launchpadData?.buttonTextColor,
+                  width: 200,
+                }}
+              >
+                {launchpadData?.buyButtonText}
+                <br />
+                Whitelist
+              </button>
+            ) : presaleStatus.status === "PUBLIC_IN_PROGRESS" ? (
+              <button
+                onClick={() => {
+                  setShowPresaleModal(true);
+                }}
+                className="rounded-3xl px-3 py-3 disabled"
+                style={{
+                  backgroundColor: launchpadData?.buttonBgColor,
+                  color: launchpadData?.buttonTextColor,
+                  width: 200,
+                }}
+              >
+                {launchpadData?.buyButtonText}
+              </button>
+            ) : presaleStatus.status === "HARD_CAP_REACHED" ? (
+              <button
+                className="rounded-3xl px-3 py-3 disabled"
+                style={{
+                  backgroundColor: launchpadData?.buttonBgColor,
+                  color: launchpadData?.buttonTextColor,
+                  width: 200,
+                }}
+              >
+                HC Reached
+              </button>
+            ) : presaleStatus.status === "CLOSED" ? (
+              <button
+                className="rounded-3xl px-3 py-3 disabled"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "white",
+                  width: 200,
+                }}
+              >
+                Presale Closed
+              </button>
+            ) : presaleStatus.status === "CLAIMABLE" ? (
+              <button
+                className="rounded-3xl px-3 py-3"
+                style={{
+                  backgroundColor: launchpadData?.buttonBgColor,
+                  color: launchpadData?.buttonTextColor,
+                  width: 200,
+                }}
+                onClick={() => {
+                  setClaimInProgress(true);
+                  claim()
+                    .then((result) => {
+                      if (!result.success) return;
+                      setModalStep(3);
+                      setShowModal(!showModal);
+                    })
+                    .finally(() => setClaimInProgress(false));
+                }}
+              >
+                {claimInProgress
+                  ? "Claiming..."
+                  : launchpadData?.claimButtonText}
+              </button>
+            ) : (
+              <></>
+            )}
             <button
               className="ml-10 rounded-3xl px-3 py-3"
               onClick={() => {
