@@ -1,3 +1,4 @@
+import {GlobeIcon} from "@heroicons/react/outline";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import CustomDialog from "../components/CustomDialog";
@@ -219,7 +220,34 @@ export default function LaunchpadDetailPage() {
           <span className="mt-8 text-xl font-light text-pequod-white">
             {launchpadData?.launchpadDesc}
           </span>
-
+          <br />
+          {launchpadData?.id === "mida" ? (
+            <>
+              <a
+                style={{
+                  color: launchpadData?.buttonBgColor,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+                href="https://midanft.com/it/dai-musei-al-metaverso/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <p
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                  }}
+                >
+                  <GlobeIcon width="20px" style={{marginRight: "10px"}} />{" "}
+                  Website
+                </p>
+              </a>
+            </>
+          ) : (
+            <></>
+          )}
           {/* DA MOSTRARE QUEST INUOVI TASTI */}
           <div className="mt-5 flex justify-center">
             {presaleStatus.status === 0 ? (
@@ -267,7 +295,8 @@ export default function LaunchpadDetailPage() {
               </button>
             ) : presaleStatus.status === 3 ? (
               <button
-                className="disabled rounded-3xl px-3 py-3"
+                className="disabled:cursor-default rounded-3xl px-3 py-3"
+                disabled={true}
                 style={{
                   backgroundColor: "#2d2d2d",
                   color: "white",
@@ -278,7 +307,8 @@ export default function LaunchpadDetailPage() {
               </button>
             ) : presaleStatus.status === 4 ? (
               <button
-                className="disabled rounded-3xl px-3 py-3"
+                className="disabled:cursor-default rounded-3xl px-3 py-3"
+                disabled={true}
                 style={{
                   backgroundColor: "#2d2d2d",
                   color: "white",
