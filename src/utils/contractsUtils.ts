@@ -406,9 +406,9 @@ export function useLaunchpad(launchpadAddress: string) {
           ?.contributionInfo()
           .call({ from: account })
       );
-      const status = await launchpadContract.methods
+      const status = +(await launchpadContract.methods
         ?.currentStatus()
-        .call({ from: account });
+        .call({ from: account }));
       return { hardCap, softCap, currentRaised, status };
     } catch (error) {
       toast.error(
