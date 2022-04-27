@@ -9,6 +9,7 @@ import MOBY_STAKING_ABI from "../mobyStakingABI.json";
 import { MaxUint256 } from "@ethersproject/constants";
 import { useBuyEvent, useSellEvent, useStakeEvent } from "./events";
 import { toBigNumber, useValidateSessionIfInvalid } from "./utils";
+import { PresaleStatuses } from "./web3Types";
 
 function useGetPairAddress() {
   const { library, account } = useWeb3React();
@@ -382,31 +383,27 @@ export function useLaunchpad(launchpadAddress: string) {
     hardCap: number;
     softCap: number;
     currentRaised: number;
-    status:
-      | "NOT_STARTED_YET"
-      | "WHITELIST_IN_PROGRESS"
-      | "PUBLIC_IN_PROGRESS"
-      | "HARD_CAP_REACHED"
-      | "CLOSED"
-      | "CLAIMABLE";
+    status: PresaleStatuses;
   }> => {
     if (!launchpadContract.options.address)
       return {
         hardCap: 0,
         softCap: 0,
         currentRaised: 0,
-        status: "NOT_STARTED_YET",
+        status: 0,
       };
     try {
-      const hardCap = library.utils.fromWei(
-        await launchpadContract.methods?.hardCap().call({ from: account })
-      );
-      const softCap = library.utils.fromWei(
-        await launchpadContract.methods?.softCap().call({ from: account })
-      );
+      // const hardCap = library.utils.fromWei(
+      //   await launchpadContract.methods?.hardCap().call({ from: account })
+      // );
+      // const softCap = library.utils.fromWei(
+      //   await launchpadContract.methods?.softCap().call({ from: account })
+      // );
+      const hardCap = 0,
+        softCap = 0;
       const currentRaised = library.utils.fromWei(
         await launchpadContract.methods
-          ?.totalContributed()
+          ?.contributionInfo()
           .call({ from: account })
       );
       const status = await launchpadContract.methods
@@ -425,7 +422,7 @@ export function useLaunchpad(launchpadAddress: string) {
         hardCap: 0,
         softCap: 0,
         currentRaised: 0,
-        status: "NOT_STARTED_YET",
+        status: 0,
       };
     }
   };

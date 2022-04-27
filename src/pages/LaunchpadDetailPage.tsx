@@ -5,6 +5,7 @@ import PresaleModalContent from "../components/PresaleModalContent";
 import TokenomicsDialog from "../components/TokenomicsModal";
 import { useLaunchpad } from "../utils/contractsUtils";
 import { useApiCall } from "../utils/utils";
+import { PresaleStatuses } from "../utils/web3Types";
 interface LaunchpadsResponse {
   id: string;
   title: string;
@@ -63,8 +64,8 @@ export default function LaunchpadDetailPage() {
     currentRaised: number;
     hardCap: number;
     softCap: number;
-    status: string;
-  }>({ currentRaised: 0, hardCap: 0, softCap: 0, status: "NOT_STARTED_YET" });
+    status: PresaleStatuses;
+  }>({ currentRaised: 0, hardCap: 0, softCap: 0, status: 0 });
 
   const {
     canClaim: checkCanClaim,
@@ -90,10 +91,11 @@ export default function LaunchpadDetailPage() {
   // check the presale status
   useEffect(() => {
     getPresaleStatus().then(({ currentRaised, hardCap, softCap, status }) => {
+      console.log(status);
       setPresaleStatus({ currentRaised, hardCap, softCap, status });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [launchpadData?.presaleContractAddress]);
 
   const tokenomicsMida = [
     {
@@ -221,7 +223,7 @@ export default function LaunchpadDetailPage() {
 
           {/* DA MOSTRARE QUEST INUOVI TASTI */}
           <div className="mt-5 flex justify-center">
-            {presaleStatus.status === "NOT_STARTED_YET" ? (
+            {presaleStatus.status === 0 ? (
               <button
                 className="disabled rounded-3xl px-3 py-3"
                 style={{
@@ -233,7 +235,7 @@ export default function LaunchpadDetailPage() {
               >
                 {launchpadData?.buyButtonText}
               </button>
-            ) : presaleStatus.status === "WHITELIST_IN_PROGRESS" ? (
+            ) : presaleStatus.status === 1 ? (
               <button
                 onClick={() => {
                   setShowPresaleModal(true);
@@ -249,7 +251,7 @@ export default function LaunchpadDetailPage() {
                 <br />
                 Whitelist
               </button>
-            ) : presaleStatus.status === "PUBLIC_IN_PROGRESS" ? (
+            ) : presaleStatus.status === 2 ? (
               <button
                 onClick={() => {
                   setShowPresaleModal(true);
@@ -263,7 +265,7 @@ export default function LaunchpadDetailPage() {
               >
                 {launchpadData?.buyButtonText}
               </button>
-            ) : presaleStatus.status === "HARD_CAP_REACHED" ? (
+            ) : presaleStatus.status === 3 ? (
               <button
                 className="disabled rounded-3xl px-3 py-3"
                 style={{
@@ -274,7 +276,7 @@ export default function LaunchpadDetailPage() {
               >
                 HC Reached
               </button>
-            ) : presaleStatus.status === "CLOSED" ? (
+            ) : presaleStatus.status === 4 ? (
               <button
                 className="disabled rounded-3xl px-3 py-3"
                 style={{
@@ -285,7 +287,7 @@ export default function LaunchpadDetailPage() {
               >
                 Presale Closed
               </button>
-            ) : presaleStatus.status === "CLAIMABLE" ? (
+            ) : presaleStatus.status === 5 ? (
               <button
                 className="rounded-3xl px-3 py-3"
                 style={{
