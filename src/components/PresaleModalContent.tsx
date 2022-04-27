@@ -13,6 +13,7 @@ import {useWeb3React} from "@web3-react/core";
 import Web3 from "web3";
 
 import {toast} from "react-toastify";
+import {update} from "lodash";
 
 export default function PresaleModalContent({
   initialStep,
@@ -21,6 +22,8 @@ export default function PresaleModalContent({
   title,
   symbol,
   tokenAddress,
+  minBuy,
+  maxBuy,
 }: {
   initialStep: 0 | 1 | 2 | 3;
   conversionRate?: number;
@@ -28,6 +31,8 @@ export default function PresaleModalContent({
   title?: string;
   symbol?: string;
   tokenAddress: string;
+  minBuy: number;
+  maxBuy: number;
 }) {
   const [amountTo, setAmountTo] = useState<string>("0");
   const [amountFrom, setAmountFrom] = useState<string>("0");
@@ -94,6 +99,8 @@ export default function PresaleModalContent({
               name="amountFrom"
               id="amountFrom"
               inputMode="decimal"
+              min={minBuy}
+              max={maxBuy}
               autoComplete="off"
               autoCorrect="off"
               pattern="^[0-9]*[.,]?[0-9]*$"

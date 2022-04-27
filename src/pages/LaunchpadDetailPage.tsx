@@ -31,6 +31,8 @@ interface LaunchpadsResponse {
   buttonDetailTextColor: string;
   hideButtons: boolean;
   isClosed: boolean;
+  minBuy: string;
+  maxBuy: string;
 }
 export default function LaunchpadDetailPage() {
   const apiCall = useApiCall();
@@ -187,6 +189,8 @@ export default function LaunchpadDetailPage() {
           title={launchpadData?.buyButtonText}
           symbol={launchpadData?.symbol || "MIDA"}
           initialStep={modalStep}
+          minBuy={parseFloat(launchpadData?.minBuy || "0")}
+          maxBuy={parseFloat(launchpadData?.maxBuy || "0")}
         ></PresaleModalContent>
       </CustomDialog>
       <CustomDialog
@@ -263,8 +267,8 @@ export default function LaunchpadDetailPage() {
               <button
                 className="rounded-3xl px-3 py-3 disabled"
                 style={{
-                  backgroundColor: launchpadData?.buttonBgColor,
-                  color: launchpadData?.buttonTextColor,
+                  backgroundColor: "#2d2d2d",
+                  color: "white",
                   width: 200,
                 }}
               >
