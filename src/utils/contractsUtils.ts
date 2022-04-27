@@ -2,7 +2,6 @@ import {useWeb3React} from "@web3-react/core";
 import {toast} from "react-toastify";
 import BEP20_ABI from "../BEP20.json";
 import LAUNCHPAD_ABI from "../launchpadABI.json";
-import LAUNCHPAD_BNB_ABI from "../launchpadBnbABI.json";
 import PANCAKE_FACTORY_ABI from "../pancakeFactoryABI.json";
 import PANCAKE_PAIR_ABI from "../pancakePairABI.json";
 import PANCAKE_ROUTER_ABI from "../pancakeRouterABI.json";
@@ -324,12 +323,8 @@ export function useWotStake() {
 
 export function useLaunchpad(launchpadAddress: string) {
   const {library, account} = useWeb3React();
-  const ABI =
-    launchpadAddress === process.env.REACT_APP_LAUNCHPAD_ADDRESS
-      ? LAUNCHPAD_ABI
-      : LAUNCHPAD_BNB_ABI;
 
-  const launchpadContract = new library.eth.Contract(ABI, launchpadAddress, {
+  const launchpadContract = new library.eth.Contract(LAUNCHPAD_ABI, launchpadAddress, {
     from: account,
   });
   const canClaim = async (): Promise<boolean> => {
