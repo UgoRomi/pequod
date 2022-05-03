@@ -393,6 +393,8 @@ export function useLaunchpad(launchpadAddress: string) {
         status: 0,
       };
     try {
+      const mobyPresaleAddress =
+        process.env.REACT_APP_MOBY_PRESALE_ADDRESS?.toLowerCase();
       // const hardCap = library.utils.fromWei(
       //   await launchpadContract.methods?.hardCap().call({ from: account })
       // );
@@ -401,16 +403,24 @@ export function useLaunchpad(launchpadAddress: string) {
       // );
       const hardCap = 0,
         softCap = 0;
-      const currentRaised = library.utils.fromWei(
-        (
-          await launchpadContract.methods
-            ?.contributionInfo()
-            .call({ from: account })
-        ).totalContributed
-      );
-      const status = +(await launchpadContract.methods
-        ?.currentStatus()
-        .call({ from: account }));
+      const currentRaised =
+        launchpadContract.options.address.toLowerCase() === mobyPresaleAddress
+          ? 0
+          : library.utils.fromWei(
+              (
+                await launchpadContract.methods
+                  ?.contributionInfo()
+                  .call({ from: account })
+              ).totalContributed
+            );
+
+      // Set status to "CLAIMABLE for moby, since the contract is different"
+      const status =
+        launchpadContract.options.address.toLowerCase() === mobyPresaleAddress
+          ? PresaleStatuses.CLAIMABLE
+          : +(await launchpadContract.methods
+              ?.currentStatus()
+              .call({ from: account }));
       return { hardCap, softCap, currentRaised, status };
     } catch (error) {
       toast.error(
