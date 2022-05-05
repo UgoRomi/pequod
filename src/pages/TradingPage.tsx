@@ -1,17 +1,17 @@
-import React, {useCallback, useEffect, useState} from "react";
-import {toast} from "react-toastify";
-import {MinusIcon, PlusIcon} from "@heroicons/react/outline";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { MinusIcon, PlusIcon } from "@heroicons/react/outline";
 import {
   classNames,
   formatAmount,
   formatMoney,
   useApiCall,
 } from "../utils/utils";
-import {useAppSelector} from "../store/hooks";
+import { useAppSelector } from "../store/hooks";
 import TradeSettingsDialog from "../components/TradeSettingsDialog";
 import Web3 from "web3";
 import Carousel from "react-multi-carousel";
-import {PairDataTimeWindowEnum} from "../utils/chart";
+import { PairDataTimeWindowEnum } from "../utils/chart";
 import {
   useGetTokenPrice,
   useAllowance,
@@ -26,19 +26,19 @@ import {
   selectUserTokens,
   UserToken,
 } from "../store/userInfoSlice";
-import PercentagesGroup, {Percentages} from "../components/PercentagesGroup";
-import {RootState} from "../store/store";
+import PercentagesGroup, { Percentages } from "../components/PercentagesGroup";
+import { RootState } from "../store/store";
 import TradingPageChart from "../components/TradingPageChart";
-import {MIN_ETH} from "../utils/consts";
+import { MIN_ETH } from "../utils/consts";
 import Spinner from "../components/Spinner";
 import _ from "lodash";
-import {selectTokensList} from "../store/miscSlice";
-import {TokensListResponse} from "../utils/apiTypes";
-import {useTakeProfitStopLossEvent} from "../utils/events";
-import {Switch} from "@headlessui/react";
-import {selectBnbUsdPrice} from "../store/pricesSlice";
+import { selectTokensList } from "../store/miscSlice";
+import { TokensListResponse } from "../utils/apiTypes";
+import { useTakeProfitStopLossEvent } from "../utils/events";
+import { Switch } from "@headlessui/react";
+import { selectBnbUsdPrice } from "../store/pricesSlice";
 import NotificationTable from "../components/NotificationTable";
-import {useWeb3React} from "@web3-react/core";
+import { useWeb3React } from "@web3-react/core";
 
 import searchIcon from "../images/search.png";
 import swapArrows from "../images/swaparrow.png";
@@ -83,17 +83,17 @@ export interface GraphData {
 
 const responsive = {
   desktop: {
-    breakpoint: {max: 3000, min: 1024},
+    breakpoint: { max: 3000, min: 1024 },
     items: 3,
     partialVisibilityGutter: 30,
   },
   tablet: {
-    breakpoint: {max: 1024, min: 464},
+    breakpoint: { max: 1024, min: 464 },
     items: 2,
     partialVisibilityGutter: 30,
   },
   mobile: {
-    breakpoint: {max: 464, min: 0},
+    breakpoint: { max: 464, min: 0 },
     items: 1,
     partialVisibilityGutter: 30,
   },
@@ -144,7 +144,7 @@ export default function TradingPage() {
     PairDataTimeWindowEnum.WEEK
   );
   const pequodApiCall = useApiCall();
-  const {account} = useWeb3React();
+  const { account } = useWeb3React();
   const getTokenPrice = useGetTokenPrice();
   const approve = useApprove();
   const checkSwapAllowance = useAllowance();
@@ -185,7 +185,7 @@ export default function TradingPage() {
     );
   }, [userTokens]);
 
-  const {buyCallback, sellCallback} = useSwap(
+  const { buyCallback, sellCallback } = useSwap(
     selectedTokenInfo.address,
     amountFrom.toString(),
     amountTo.toString(),
@@ -297,7 +297,7 @@ export default function TradingPage() {
     (tokenAddress: string) => {
       pequodApiCall(
         `tokens/info/${tokenAddress}/${process.env.REACT_APP_CHAIN_ID}`,
-        {method: "GET"}
+        { method: "GET" }
       )
         .then((res) => {
           if (!res?.data) {
@@ -306,8 +306,8 @@ export default function TradingPage() {
             });
             return;
           }
-          const {data: response}: {data: TokenInfoResponse} = res;
-          const {name, symbol, decimals, logoUrl} = response;
+          const { data: response }: { data: TokenInfoResponse } = res;
+          const { name, symbol, decimals, logoUrl } = response;
           setSelectedTokenInfo(
             (selectedTokenInfo) =>
               ({
@@ -335,7 +335,7 @@ export default function TradingPage() {
     if (!selectedTokenInfo.address) return;
     pequodApiCall(
       `/tokens/price/history/${timeWindow}/${selectedTokenInfo.address}/${process.env.REACT_APP_CHAIN_ID}/bnb`,
-      {method: "GET"}
+      { method: "GET" }
     )
       .then((res) => {
         if (!res?.data) {
@@ -344,7 +344,7 @@ export default function TradingPage() {
           });
           return;
         }
-        const {data: response}: {data: PairPriceHistoryApiResponse[]} = res;
+        const { data: response }: { data: PairPriceHistoryApiResponse[] } = res;
         const priceHistory: GraphData[] = response.map((item) => ({
           time: new Date(item.date),
           value: item.close,
@@ -407,7 +407,7 @@ export default function TradingPage() {
       // If the searched term is an address just search it
       if (Web3.utils.isAddress(tokenSearch)) {
         getTokenInfo(tokenSearch);
-        const {BNBReserve, tokenReserve} = await getTokenPrice(tokenSearch);
+        const { BNBReserve, tokenReserve } = await getTokenPrice(tokenSearch);
         setSelectedTokenInfo((selectedTokenInfo) => ({
           ...selectedTokenInfo,
           BNBReserve,
@@ -741,7 +741,7 @@ export default function TradingPage() {
                   Balance:{" "}
                   {currentlySelectedTab === "buy"
                     ? userBnbBalance.toFixed(3)
-                    : userSelectedTokenBalance.toFixed(6)}
+                    : userSelectedTokenBalance.toFixed(5)}
                 </div>
               </div>
               <div className="relative mt-1 rounded-md shadow-sm">
@@ -812,7 +812,7 @@ export default function TradingPage() {
                   Balance:{" "}
                   {currentlySelectedTab === "sell"
                     ? userBnbBalance.toFixed(3)
-                    : userSelectedTokenBalance.toFixed(6)}
+                    : userSelectedTokenBalance.toFixed(5)}
                 </div>
               </div>
               <div className="relative mt-1 rounded-md shadow-sm">
